@@ -1,14 +1,28 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; 
-import { Container, TextField, Button, Typography, Box, Alert } from '@mui/material';
+import React, { useState, useContext } from 'react';
+import {
+  Container,
+  Typography,
+  Box,
+  TextField,
+  Button,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Alert
+} from '@mui/material';
+import { AuthContext } from '../context/AuthContext';
+import api from '../services/api';
 
 const Register = () => {
-  const navigate = useNavigate();
-
-  const [form, setForm] = useState({ username: '', email: '', password: '', role: '' });
+  const { auth } = useContext(AuthContext);
+  const [form, setForm] = useState({ username: '', email: '', password: '', role: 'user' });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  if (!auth.isAuthenticated || (auth.user.role !== 'admin' && auth.user.role !== 'owner')) {
+    return <Typography variant="h6" align="center" mt={5}>Access Denied</Typography>;
+  }
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -19,9 +33,9 @@ const Register = () => {
     setError('');
     setSuccess('');
     try {
-      await axios.post('/api/auth/register', form); // Hapus 'response ='
-      setSuccess('Registration successful! You can now login.');
-      navigate('/login');
+      const response = await api.post('/auth/register', form);
+      setSuccess(response.data.message);
+      setForm({ username: '', email: '', password: '', role: 'user' });
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed');
     }
@@ -31,10 +45,10 @@ const Register = () => {
     <Container maxWidth="sm">
       <Box mt={5}>
         <Typography variant="h4" gutterBottom>
-          Register
+          Register New User
         </Typography>
-        {error && <Alert severity="error">{error}</Alert>}
-        {success && <Alert severity="success">{success}</Alert>}
+        {error && <Alert severity="error" onClose={() => setError('')}>{error}</Alert>}
+        {success && <Alert severity="success" onClose={() => setSuccess('')}>{success}</Alert>}
         <form onSubmit={handleSubmit}>
           <TextField
             label="Username"
@@ -65,19 +79,23 @@ const Register = () => {
             margin="normal"
             required
           />
-          <TextField
-            label="Role"
-            name="role"
-            value={form.role}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-            required
-            placeholder="e.g., user, admin"
-          />
+          <FormControl fullWidth margin="normal">
+            <InputLabel id="role-label">Role</InputLabel>
+            <Select
+              labelId="role-label"
+              name="role"
+              value={form.role}
+              label="Role"
+              onChange={handleChange}
+            >
+              <MenuItem value="user">User</MenuItem>
+              <MenuItem value="admin">Admin</MenuItem>
+              <MenuItem value="owner">Owner</MenuItem>
+            </Select>
+          </FormControl>
           <Box mt={2}>
             <Button type="submit" variant="contained" color="primary" fullWidth>
-              Register
+              Register User
             </Button>
           </Box>
         </form>

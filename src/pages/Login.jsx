@@ -30,12 +30,14 @@ const Login = () => {
     console.log('Login form submitted'); // Logging untuk debugging
     setError('');
     try {
-      await login(form.username, form.password);
+      await login(form); // Pass the form object
       console.log('Login successful'); // Logging jika berhasil
       navigate('/dashboard');
     } catch (err) {
       console.error('Login failed:', err); // Logging error
-      setError('Invalid username or password');
+      // Periksa apakah error memiliki respon dari backend
+      const message = err.response?.data?.message || 'Invalid username or password';
+      setError(message);
     }
   };
 
@@ -49,7 +51,7 @@ const Login = () => {
         <Typography variant="h4" gutterBottom>
           Login
         </Typography>
-        {error && <Alert severity="error">{error}</Alert>}
+        {error && <Alert severity="error" onClose={() => setError('')}>{error}</Alert>}
         <form onSubmit={handleSubmit}>
           <TextField
             label="Username"

@@ -1,48 +1,43 @@
 import React, { useContext } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { AppBar, Toolbar, Typography, Button, IconButton } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { AppBar, Toolbar, Typography, Button } from '@mui/material';
+import { ThemeContext } from '../context/ThemeContext';
+import Brightness4Icon from '@mui/icons-material/Brightness4'; 
+import Brightness7Icon from '@mui/icons-material/Brightness7'; 
 
 const Navbar = () => {
   const { auth, logout } = useContext(AuthContext);
-  const navigate = useNavigate();
+  const { mode, toggleTheme } = useContext(ThemeContext);
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
+  const handleLogout = async () => {
+    await logout();
   };
 
   return (
     <AppBar position="static">
       <Toolbar>
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          Hamlet Information System
+          HIS
         </Typography>
         {auth.isAuthenticated ? (
           <>
-            <Button color="inherit" component={Link} to="/dashboard">
-              Dashboard
-            </Button>
-            <Button color="inherit" component={Link} to="/reports">
-              Reports
-            </Button>
-            <Button color="inherit" component={Link} to="/profile">
-              Profile
-            </Button>
-            <Button color="inherit" onClick={handleLogout}>
-              Logout
-            </Button>
+            <Button color="inherit" component={RouterLink} to="/dashboard">Dashboard</Button>
+            <Button color="inherit" component={RouterLink} to="/reports">Reports</Button>
+            <Button color="inherit" component={RouterLink} to="/profile">Profile</Button>
+            {(auth.user.role === 'owner' || auth.user.role === 'admin') && (
+              <Button color="inherit" component={RouterLink} to="/user-management">User Management</Button>
+            )}
+            <Button color="inherit" onClick={handleLogout}>Logout</Button>
           </>
         ) : (
           <>
-            <Button color="inherit" component={Link} to="/login">
-              Login
-            </Button>
-            <Button color="inherit" component={Link} to="/register">
-              Register
-            </Button>
+            <Button color="inherit" component={RouterLink} to="/login">Login</Button>
           </>
         )}
+        <IconButton sx={{ ml: 1 }} color="inherit" onClick={toggleTheme}>
+          {mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
+        </IconButton>
       </Toolbar>
     </AppBar>
   );

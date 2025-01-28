@@ -1,70 +1,88 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'; 
-import Navbar from './components/Navbar';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Dashboard from './pages/Dashboard';
-import Reports from './pages/Reports';
-import ReportDetail from './pages/ReportDetail';
-import CreateReport from './pages/CreateReport';
-import Profile from './pages/Profile';
-import NotFound from './pages/NotFound';
-import PrivateRoute from './components/PrivateRoute';
+import React from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+} from "react-router-dom";
+import Navbar from "./components/Navbar";
+import Login from "./pages/Login";
+import LandingPage from "./pages/LandingPage"; 
+import Dashboard from "./pages/Dashboard";
+import Reports from "./pages/Reports";
+import ReportDetail from "./pages/ReportDetail";
+import CreateReport from "./pages/CreateReport";
+import Profile from "./pages/Profile";
+import UserManagement from "./pages/UserManagement";
+import Unauthorized from "./pages/Unauthorized";
+import NotFound from "./pages/NotFound";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Register from "./pages/Register";
 
 function App() {
   return (
     <Router>
       <Navbar />
       <Routes>
-        <Route path="/" element={<Navigate to="/dashboard" />} /> {/* Pastikan Navigate diimpor */}
+        <Route path="/" element={<LandingPage />} />{" "}
+        {/* Atur '/' ke LandingPage */}
         <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-
+        <Route path="/unauthorized" element={<Unauthorized />} />
         <Route
           path="/dashboard"
           element={
-            <PrivateRoute>
+            <ProtectedRoute>
               <Dashboard />
-            </PrivateRoute>
+            </ProtectedRoute>
           }
         />
-
         <Route
           path="/reports"
           element={
-            <PrivateRoute>
+            <ProtectedRoute>
               <Reports />
-            </PrivateRoute>
+            </ProtectedRoute>
           }
         />
-
         <Route
           path="/reports/:id"
           element={
-            <PrivateRoute>
+            <ProtectedRoute>
               <ReportDetail />
-            </PrivateRoute>
+            </ProtectedRoute>
           }
         />
-
         <Route
           path="/create-report"
           element={
-            <PrivateRoute>
+            <ProtectedRoute>
               <CreateReport />
-            </PrivateRoute>
+            </ProtectedRoute>
           }
         />
-
         <Route
           path="/profile"
           element={
-            <PrivateRoute>
+            <ProtectedRoute>
               <Profile />
-            </PrivateRoute>
+            </ProtectedRoute>
           }
         />
-
+        <Route
+          path="/user-management"
+          element={
+            <ProtectedRoute roles={["owner", "admin"]}>
+              <UserManagement />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <ProtectedRoute roles={["owner", "admin"]}>
+              <Register />
+            </ProtectedRoute>
+          }
+        />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
