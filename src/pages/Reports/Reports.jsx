@@ -1,7 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import useAxios from '../services/api';
+
+import {
+  Container,
+  Typography,
+  Box,
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  CircularProgress,
+  Alert,
+} from '@mui/material';
 import { Link } from 'react-router-dom';
-import { Container, Typography, Box, Button, Table, TableBody, TableCell, TableHead, TableRow, CircularProgress, Alert } from '@mui/material';
+
+import useAxios from '../../services/api';
 
 const Reports = () => {
   const axios = useAxios();
@@ -44,9 +58,19 @@ const Reports = () => {
 
   return (
     <Container>
-      <Box mt={5} display="flex" justifyContent="space-between" alignItems="center">
+      <Box
+        mt={5}
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+      >
         <Typography variant="h4">Reports</Typography>
-        <Button variant="contained" color="primary" component={Link} to="/create-report">
+        <Button
+          variant="contained"
+          color="primary"
+          component={Link}
+          to="/create-report"
+        >
           Create Report
         </Button>
       </Box>
@@ -67,7 +91,12 @@ const Reports = () => {
                 <TableCell>{report.title}</TableCell>
                 <TableCell>{report.status}</TableCell>
                 <TableCell>
-                  <Button component={Link} to={`/reports/${report.id}`} variant="outlined" size="small">
+                  <Button
+                    component={Link}
+                    to={`/reports/${report.id}`}
+                    variant="outlined"
+                    size="small"
+                  >
                     View
                   </Button>
                 </TableCell>

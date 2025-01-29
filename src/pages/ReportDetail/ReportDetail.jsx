@@ -1,7 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom'; 
-import useAxios from '../services/api';
-import { Container, Typography, Box, CircularProgress, Alert, Button } from '@mui/material';
+
+import {
+  Container,
+  Typography,
+  Box,
+  CircularProgress,
+  Alert,
+  Button,
+} from '@mui/material';
+import { useParams, useNavigate } from 'react-router-dom';
+
+import useAxios from '../../services/api';
 
 const ReportDetail = () => {
   const { id } = useParams();

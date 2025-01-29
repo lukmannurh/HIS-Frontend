@@ -1,4 +1,5 @@
 import React, { useState, useContext } from 'react';
+
 import {
   Container,
   Typography,
@@ -9,19 +10,32 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
-  Alert
+  Alert,
 } from '@mui/material';
-import { AuthContext } from '../context/AuthContext';
-import api from '../services/api';
+
+import { AuthContext } from '../../context/AuthContext';
+import api from '../../services/api';
 
 const Register = () => {
   const { auth } = useContext(AuthContext);
-  const [form, setForm] = useState({ username: '', email: '', password: '', role: 'user' });
+  const [form, setForm] = useState({
+    username: '',
+    email: '',
+    password: '',
+    role: 'user',
+  });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  if (!auth.isAuthenticated || (auth.user.role !== 'admin' && auth.user.role !== 'owner')) {
-    return <Typography variant="h6" align="center" mt={5}>Access Denied</Typography>;
+  if (
+    !auth.isAuthenticated ||
+    (auth.user.role !== 'admin' && auth.user.role !== 'owner')
+  ) {
+    return (
+      <Typography variant="h6" align="center" mt={5}>
+        Access Denied
+      </Typography>
+    );
   }
 
   const handleChange = (e) => {
@@ -47,8 +61,16 @@ const Register = () => {
         <Typography variant="h4" gutterBottom>
           Register New User
         </Typography>
-        {error && <Alert severity="error" onClose={() => setError('')}>{error}</Alert>}
-        {success && <Alert severity="success" onClose={() => setSuccess('')}>{success}</Alert>}
+        {error && (
+          <Alert severity="error" onClose={() => setError('')}>
+            {error}
+          </Alert>
+        )}
+        {success && (
+          <Alert severity="success" onClose={() => setSuccess('')}>
+            {success}
+          </Alert>
+        )}
         <form onSubmit={handleSubmit}>
           <TextField
             label="Username"

@@ -1,6 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
+
 import {
   Container,
   TextField,
@@ -9,9 +8,13 @@ import {
   Box,
   Alert,
   InputAdornment,
-  IconButton
+  IconButton,
+  CircularProgress,
 } from '@mui/material';
 import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Import ikon mata
+import { useNavigate } from 'react-router-dom';
+
+import { AuthContext } from '../../context/AuthContext';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -20,6 +23,7 @@ const Login = () => {
   const [form, setForm] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false); // State untuk visibilitas password
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -29,6 +33,7 @@ const Login = () => {
     e.preventDefault();
     console.log('Login form submitted'); // Logging untuk debugging
     setError('');
+    setLoading(true);
     try {
       await login(form); // Pass the form object
       console.log('Login successful'); // Logging jika berhasil
@@ -36,8 +41,11 @@ const Login = () => {
     } catch (err) {
       console.error('Login failed:', err); // Logging error
       // Periksa apakah error memiliki respon dari backend
-      const message = err.response?.data?.message || 'Invalid username or password';
+      const message =
+        err.response?.data?.message || 'Invalid username or password';
       setError(message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -51,7 +59,11 @@ const Login = () => {
         <Typography variant="h4" gutterBottom>
           Login
         </Typography>
-        {error && <Alert severity="error" onClose={() => setError('')}>{error}</Alert>}
+        {error && (
+          <Alert severity="error" onClose={() => setError('')}>
+            {error}
+          </Alert>
+        )}
         <form onSubmit={handleSubmit}>
           <TextField
             label="Username"
@@ -79,16 +91,35 @@ const Login = () => {
                     onClick={togglePasswordVisibility}
                     edge="end"
                   >
-                    {showPassword ? <FaEyeSlash /> : <FaEye />} {/* Tampilkan ikon sesuai state */}
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}{' '}
+                    {/* Tampilkan ikon sesuai state */}
                   </IconButton>
                 </InputAdornment>
-              )
+              ),
             }}
           />
-          <Box mt={2}>
-            <Button type="submit" variant="contained" color="primary" fullWidth>
+          <Box mt={2} position="relative">
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              fullWidth
+              disabled={loading}
+            >
               Login
             </Button>
+            {loading && (
+              <CircularProgress
+                size={24}
+                sx={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  marginTop: '-12px',
+                  marginLeft: '-12px',
+                }}
+              />
+            )}
           </Box>
         </form>
       </Box>

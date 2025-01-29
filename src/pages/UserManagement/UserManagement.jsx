@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+
 import {
   Container,
   Typography,
@@ -22,7 +23,8 @@ import {
   TextField,
   Alert,
 } from '@mui/material';
-import api from '../services/api';
+
+import api from '../../services/api';
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -106,10 +108,22 @@ const UserManagement = () => {
         <Typography variant="h4" gutterBottom>
           Manajemen Pengguna
         </Typography>
-        {error && <Alert severity="error" onClose={() => setError('')}>{error}</Alert>}
-        {success && <Alert severity="success" onClose={() => setSuccess('')}>{success}</Alert>}
+        {error && (
+          <Alert severity="error" onClose={() => setError('')}>
+            {error}
+          </Alert>
+        )}
+        {success && (
+          <Alert severity="success" onClose={() => setSuccess('')}>
+            {success}
+          </Alert>
+        )}
         <Box mb={2}>
-          <Button variant="contained" color="primary" onClick={handleOpenDialog}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleOpenDialog}
+          >
             Tambah Pengguna
           </Button>
         </Box>
@@ -161,10 +175,19 @@ const UserManagement = () => {
       <Dialog open={openDialog} onClose={handleCloseDialog}>
         <DialogTitle>Tambah Pengguna Baru</DialogTitle>
         <DialogContent>
-          {error && <Alert severity="error" onClose={() => setError('')}>{error}</Alert>}
-          {success && <Alert severity="success" onClose={() => setSuccess('')}>{success}</Alert>}
+          {error && (
+            <Alert severity="error" onClose={() => setError('')}>
+              {error}
+            </Alert>
+          )}
+          {success && (
+            <Alert severity="success" onClose={() => setSuccess('')}>
+              {success}
+            </Alert>
+          )}
           <TextField
-            autoFocus
+            // Hapus autoFocus jika ada
+            // autoFocus
             margin="dense"
             label="Username"
             name="username"
@@ -210,7 +233,9 @@ const UserManagement = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog}>Batal</Button>
-          <Button onClick={handleRegister} variant="contained" color="primary">Daftar</Button>
+          <Button onClick={handleRegister} variant="contained" color="primary">
+            Daftar
+          </Button>
         </DialogActions>
       </Dialog>
     </Container>

@@ -1,6 +1,16 @@
-import React, { createContext, useState, useEffect } from 'react';
-import { login as loginService, logout as logoutService } from '../services/authService';
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+} from 'react';
+
 import api from '../services/api';
+import {
+  login as loginService,
+  logout as logoutService,
+} from '../services/authService';
 
 export const AuthContext = createContext();
 
@@ -10,13 +20,21 @@ export const AuthProvider = ({ children }) => {
     user: null,
   });
 
+  const logout = useCallback(async () => {
+    await logoutService();
+    setAuth({
+      isAuthenticated: false,
+      user: null,
+    });
+  }, []);
+
   useEffect(() => {
     const initializeAuth = async () => {
       const accessToken = localStorage.getItem('accessToken');
       if (accessToken) {
         try {
           // Coba mendapatkan data pengguna dari token
-          const response = await api.get('/users/me'); // Endpoint ini harus Anda tambahkan di backend
+          const response = await api.get('/users/me'); // Pastikan endpoint ini tersedia di backend
           setAuth({
             isAuthenticated: true,
             user: response.data,
@@ -28,27 +46,17 @@ export const AuthProvider = ({ children }) => {
       }
     };
     initializeAuth();
-  }, []);
+  }, [logout]); // Tambahkan 'logout' di sini
 
-  const login = async (credentials) => {
+  const login = useCallback(async (credentials) => {
     const user = await loginService(credentials);
     setAuth({
       isAuthenticated: true,
       user,
     });
-  };
+  }, []);
 
-  const logout = async () => {
-    await logoutService();
-    setAuth({
-      isAuthenticated: false,
-      user: null,
-    });
-  };
+  const value = useMemo(() => ({ auth, login, logout }), [auth, login, logout]);
 
-  return (
-    <AuthContext.Provider value={{ auth, login, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

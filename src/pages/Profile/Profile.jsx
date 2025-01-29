@@ -1,7 +1,17 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { AuthContext } from '../context/AuthContext';
-import useAxios from '../services/api';
-import { Container, Typography, Box, TextField, Button, Alert, CircularProgress } from '@mui/material';
+
+import {
+  Container,
+  Typography,
+  Box,
+  TextField,
+  Button,
+  Alert,
+  CircularProgress,
+} from '@mui/material';
+
+import { AuthContext } from '../../context/AuthContext';
+import useAxios from '../../services/api';
 
 const Profile = () => {
   const { auth, setAuth } = useContext(AuthContext);
@@ -40,7 +50,10 @@ const Profile = () => {
       setSuccess('Profile updated successfully!');
       // Update auth context if needed
       setAuth({ ...auth, user: response.data.user });
-      localStorage.setItem('auth', JSON.stringify({ ...auth, user: response.data.user }));
+      localStorage.setItem(
+        'auth',
+        JSON.stringify({ ...auth, user: response.data.user })
+      );
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to update profile');
     }

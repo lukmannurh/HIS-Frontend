@@ -1,22 +1,20 @@
 import React from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-} from "react-router-dom";
-import Navbar from "./components/Navbar";
-import Login from "./pages/Login";
-import LandingPage from "./pages/LandingPage"; 
-import Dashboard from "./pages/Dashboard";
-import Reports from "./pages/Reports";
-import ReportDetail from "./pages/ReportDetail";
-import CreateReport from "./pages/CreateReport";
-import Profile from "./pages/Profile";
-import UserManagement from "./pages/UserManagement";
-import Unauthorized from "./pages/Unauthorized";
-import NotFound from "./pages/NotFound";
-import ProtectedRoute from "./components/ProtectedRoute";
-import Register from "./pages/Register";
+
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+import Navbar from "./components/Navbar/Navbar.jsx";
+import ProtectedRoute from "./components/Routes/ProtectedRoute.jsx";
+import CreateReport from "./pages/CreateReport/CreateReport.jsx";
+import Dashboard from "./pages/Dashboard/Dashboard.jsx";
+import LandingPage from "./pages/LandingPage/LandingPage.jsx";
+import Login from "./pages/Login/Login.jsx";
+import NotFound from "./pages/NotFound/NotFound.jsx";
+import Profile from "./pages/Profile/Profile.jsx";
+import Register from "./pages/Register/Register.jsx";
+import ReportDetail from "./pages/ReportDetail/ReportDetail.jsx";
+import Reports from "./pages/Reports/Reports.jsx";
+import Unauthorized from "./pages/Unauthorized/Unauthorized.jsx";
+import UserManagement from "./pages/UserManagement/UserManagement.jsx";
 
 function App() {
   return (
