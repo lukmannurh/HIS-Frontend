@@ -1,0 +1,23 @@
+.appBar {
+    z-index: 1201; /* Lebih tinggi dari Drawer */
+  }
+  
+  .drawer {
+    width: 250px;
+  }
+  
+  /* Menambahkan styling tambahan untuk ListItem */
+  .drawer .MuiListItem-root {
+    padding: 12px 24px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .drawer .MuiListItem-root:hover {
+    background-color: #f0f0f0; /* Warna hover */
+  }
+  
+  .drawer .MuiListItemText-primary {
+    font-size: 1rem;
+    font-weight: 500;
+  }
+  

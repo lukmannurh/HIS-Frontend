@@ -33,27 +33,37 @@ export const AuthProvider = ({ children }) => {
       const accessToken = localStorage.getItem('accessToken');
       if (accessToken) {
         try {
-          // Coba mendapatkan data pengguna dari token
-          const response = await api.get('/users/me'); // Pastikan endpoint ini tersedia di backend
+          // Sertakan header Authorization dengan token
+          const response = await api.get('/users/me', {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          });
           setAuth({
             isAuthenticated: true,
             user: response.data,
           });
         } catch (error) {
-          // Jika token tidak valid, logout
+          // Jika token tidak valid atau permintaan gagal, lakukan logout
+          console.error('Invalid token or failed to fetch user data:', error);
           logout();
         }
       }
     };
     initializeAuth();
-  }, [logout]); // Tambahkan 'logout' di sini
+  }, [logout]);
 
   const login = useCallback(async (credentials) => {
-    const user = await loginService(credentials);
-    setAuth({
-      isAuthenticated: true,
-      user,
-    });
+    try {
+      const user = await loginService(credentials);
+      setAuth({
+        isAuthenticated: true,
+        user,
+      });
+    } catch (error) {
+      console.error('Login failed:', error);
+      throw error; // Agar komponen login dapat menangani error
+    }
   }, []);
 
   const value = useMemo(() => ({ auth, login, logout }), [auth, login, logout]);
