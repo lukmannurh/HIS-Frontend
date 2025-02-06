@@ -17,13 +17,14 @@ import {
 } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 
-import styles from './SidebarNavbar.module.css'; // CSS Module untuk styling tambahan
+import styles from './SidebarNavbar.module.css';
 import { AuthContext } from '../../context/AuthContext';
-import 'bootstrap/dist/css/bootstrap.min.css'; // Pastikan Bootstrap diimpor
+import { ThemeContext } from '../../context/ThemeContext';
 
 const SidebarNavbar = () => {
   const [open, setOpen] = useState(false);
-  const { auth, logout, toggleTheme } = useContext(AuthContext);
+  const { auth, logout } = useContext(AuthContext);
+  const { toggleTheme, mode } = useContext(ThemeContext);
 
   const toggleDrawer = () => {
     setOpen(!open);
@@ -41,8 +42,7 @@ const SidebarNavbar = () => {
 
   return (
     <>
-      {/* AppBar di atas sidebar */}
-      <AppBar position="fixed" className={`bg-primary ${styles.appBar}`}>
+      <AppBar position="fixed" className={styles.appBar}>
         <Toolbar>
           <IconButton
             edge="start"
@@ -57,19 +57,16 @@ const SidebarNavbar = () => {
             HIS
           </Typography>
           <IconButton sx={{ ml: 1 }} color="inherit" onClick={toggleTheme}>
-            {auth.mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
+            {mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
           </IconButton>
         </Toolbar>
       </AppBar>
 
-      {/* Sidebar Drawer dengan Bootstrap */}
       <Drawer
         variant="temporary"
         open={open}
         onClose={toggleDrawer}
-        ModalProps={{
-          keepMounted: true, // Membantu performa pada perangkat mobile
-        }}
+        ModalProps={{ keepMounted: true }}
         className={styles.drawer}
       >
         <Box
@@ -77,7 +74,7 @@ const SidebarNavbar = () => {
           role="presentation"
           onClick={toggleDrawer}
           onKeyDown={toggleDrawer}
-          className="bg-light"
+          className={styles.drawerBox}
         >
           <List className="mt-3">
             {menuItems.map((item, index) => (
@@ -87,7 +84,7 @@ const SidebarNavbar = () => {
                 component={item.path ? RouterLink : 'button'}
                 to={item.path}
                 onClick={item.action ? item.action : null}
-                className="text-dark"
+                className={styles.listItem}
               >
                 <ListItemText primary={item.text} />
               </ListItem>

@@ -1,6 +1,6 @@
 import React, { createContext, useState, useMemo } from 'react';
 
-import CssBaseline from '@mui/material/CssBaseline';
+import { CssBaseline } from '@mui/material';
 import {
   createTheme,
   ThemeProvider as MuiThemeProvider,
@@ -9,10 +9,14 @@ import {
 export const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
-  const [mode, setMode] = useState('light');
+  const [mode, setMode] = useState(
+    () => localStorage.getItem('themeMode') || 'light'
+  );
 
   const toggleTheme = () => {
-    setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
+    const newMode = mode === 'light' ? 'dark' : 'light';
+    setMode(newMode);
+    localStorage.setItem('themeMode', newMode);
   };
 
   const theme = useMemo(
@@ -20,11 +24,10 @@ export const ThemeProvider = ({ children }) => {
       createTheme({
         palette: {
           mode,
-          primary: {
-            main: '#66bb6a', // Hijau muda
-          },
-          secondary: {
-            main: '#ff9800', // Oranye untuk aksen
+          primary: { main: '#88c273' },
+          background: {
+            default: mode === 'light' ? '#ffffff' : '#121212',
+            paper: mode === 'light' ? '#f7f7f7' : '#333333',
           },
         },
       }),

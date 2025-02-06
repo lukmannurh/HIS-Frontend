@@ -1,23 +1,35 @@
 .appBar {
-    z-index: 1201; /* Lebih tinggi dari Drawer */
-  }
-  
-  .drawer {
-    width: 250px;
-  }
-  
-  /* Menambahkan styling tambahan untuk ListItem */
-  .drawer .MuiListItem-root {
-    padding: 12px 24px;
-    transition: background-color 0.3s ease;
-  }
-  
-  .drawer .MuiListItem-root:hover {
-    background-color: #f0f0f0; /* Warna hover */
-  }
-  
-  .drawer .MuiListItemText-primary {
-    font-size: 1rem;
-    font-weight: 500;
-  }
-  
+  z-index: 1201; /* Lebih tinggi dari Drawer */
+  background-color: #88c273; /* Gunakan warna #88c273 */
+}
+
+.drawer {
+  width: 250px;
+}
+
+/* Styling untuk konten drawer */
+.drawerBox {
+  background-color: #88c273; /* Sidebar background dengan warna yang sama */
+  color: #ffffff; /* Pastikan teks terlihat dengan warna putih */
+  height: 100%;
+}
+
+/* Styling untuk ListItem */
+.listItem {
+  color: #ffffff; /* Teks putih */
+}
+
+/* Styling tambahan untuk ListItem menggunakan MUI */
+.drawer .MuiListItem-root {
+  padding: 12px 24px;
+  transition: background-color 0.3s ease;
+}
+
+.drawer .MuiListItem-root:hover {
+  background-color: #76a15c; /* Sedikit lebih gelap sebagai efek hover */
+}
+
+.drawer .MuiListItemText-primary {
+  font-size: 1rem;
+  font-weight: 500;
+}

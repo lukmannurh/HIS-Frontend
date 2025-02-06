@@ -1,113 +1,58 @@
-/* Styling untuk kontainer utama */
 .container {
-    padding-top: 80px; /* Memberikan ruang untuk top navbar */
-    padding-bottom: 40px; /* Memberikan ruang di bagian bawah */
-  }
-  
-  .table-responsive {
-    margin-top: 20px;
-    overflow-x: auto;
-  }
-  
-  /* Styling untuk tabel */
-  .table {
-    font-size: 14px;
-  }
-  
-  .table th {
-    background-color: #f8f9fa;
-    font-weight: bold;
-  }
-  
-  .table td, .table th {
-    text-align: center;
-  }
-  
-  /* Styling untuk tombol */
-  .btn-outline-primary {
-    border-color: #007bff;
-    color: #007bff;
-  }
-  
-  .btn-outline-primary:hover {
-    background-color: #007bff;
-    color: white;
-  }
-  
-  .btn-outline-warning {
-    border-color: #ffc107;
-    color: #ffc107;
-  }
-  
-  .btn-outline-warning:hover {
-    background-color: #ffc107;
-    color: white;
-  }
-  
-  .btn-outline-danger {
-    border-color: #dc3545;
-    color: #dc3545;
-  }
-  
-  .btn-outline-danger:hover {
-    background-color: #dc3545;
-    color: white;
-  }
-  
-  /* Responsif layout */
-  @media (max-width: 768px) {
-    .table th, .table td {
-      font-size: 12px;
-    }
-    .btn-sm {
-      font-size: 10px;
-    }
-  }
-  
-  @media (max-width: 576px) {
-    .container {
-      padding-left: 10px;
-      padding-right: 10px;
-    }
-  }
-  
-  /* Styling pagination */
-  .pagination {
-    justify-content: center;
-  }
-  
-  .pagination .page-item.active .page-link {
-    background-color: #007bff;
-    border-color: #007bff;
-    color: white;
-  }
-/* Styling untuk ikon sorting */
-th button,
-th IconButton {
-  background: none;
-  border: none;
-  color: #007bff;
-  cursor: pointer;
+  padding-top: 80px; /* Ruang untuk top navbar */
+  padding-bottom: 40px;
 }
 
-th button:hover,
-th .MuiIconButton-root:hover {
-  color: #0056b3;
+.table-responsive {
+  margin-top: 20px;
+  overflow-x: auto;
 }
 
-th button.active,
-th .MuiIconButton-root.active {
+.table {
+  font-size: 14px;
+}
+
+.table th {
+  background-color: #f8f9fa;
   font-weight: bold;
 }
 
-  
-  /* Styling pagination */
-  .pagination {
-    justify-content: center;
-  }
-  
-  .pagination .page-item.active .page-link {
-    background-color: #007bff;
-    border-color: #007bff;
-    color: white;
-  }
+.table td,
+.table th {
+  text-align: center;
+}
+
+/* Styling untuk tombol Edit */
+.btn-outline-warning {
+  border-color: #ffc107;
+  color: #ffc107;
+}
+
+.btn-outline-warning:hover {
+  background-color: #ffc107;
+  color: white;
+}
+
+/* Styling untuk tombol Delete */
+.btn-danger,
+.btn-outline-danger {
+  border-color: #dc3545;
+  color: #dc3545;
+}
+
+.btn-danger:hover,
+.btn-outline-danger:hover {
+  background-color: #dc3545;
+  color: white;
+}
+
+/* Pagination styling */
+.pagination {
+  justify-content: center;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #007bff;
+  border-color: #007bff;
+  color: white;
+}

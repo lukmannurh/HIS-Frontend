@@ -11,7 +11,7 @@ import {
   IconButton,
   CircularProgress,
 } from '@mui/material';
-import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Import ikon mata
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
 import { AuthContext } from '../../context/AuthContext';
@@ -19,38 +19,28 @@ import { AuthContext } from '../../context/AuthContext';
 const Login = () => {
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
-
   const [form, setForm] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
-  const [showPassword, setShowPassword] = useState(false); // State untuk visibilitas password
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const handleChange = (e) =>
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Login form submitted'); // Logging untuk debugging
     setError('');
     setLoading(true);
     try {
-      await login(form); // Pass the form object
-      console.log('Login successful'); // Logging jika berhasil
+      await login(form);
       navigate('/dashboard');
     } catch (err) {
-      console.error('Login failed:', err); // Logging error
-      // Periksa apakah error memiliki respon dari backend
       const message =
         err.response?.data?.message || 'Invalid username or password';
       setError(message);
     } finally {
       setLoading(false);
     }
-  };
-
-  const togglePasswordVisibility = () => {
-    setShowPassword((prev) => !prev);
   };
 
   return (
@@ -77,7 +67,7 @@ const Login = () => {
           <TextField
             label="Password"
             name="password"
-            type={showPassword ? 'text' : 'password'} // Ubah tipe input berdasarkan state
+            type={showPassword ? 'text' : 'password'}
             value={form.password}
             onChange={handleChange}
             fullWidth
@@ -88,11 +78,10 @@ const Login = () => {
                 <InputAdornment position="end">
                   <IconButton
                     aria-label="toggle password visibility"
-                    onClick={togglePasswordVisibility}
+                    onClick={() => setShowPassword((prev) => !prev)}
                     edge="end"
                   >
-                    {showPassword ? <FaEyeSlash /> : <FaEye />}{' '}
-                    {/* Tampilkan ikon sesuai state */}
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
                   </IconButton>
                 </InputAdornment>
               ),

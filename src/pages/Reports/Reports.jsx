@@ -1,12 +1,30 @@
 import React, { useEffect, useState } from 'react';
 
-import { ArrowDownward, ArrowUpward } from '@mui/icons-material'; // Import sorting icons
-import { IconButton } from '@mui/material'; // Import IconButton for icon clicks
+import { ArrowDownward, ArrowUpward } from '@mui/icons-material';
+import {
+  IconButton,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Box,
+  TextField,
+  Typography,
+  TableContainer,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Paper,
+  CircularProgress,
+  Alert,
+} from '@mui/material';
 import ReactPaginate from 'react-paginate';
-import { Link } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 
-import api from '../../services/api'; // Pastikan API diimpor dengan benar
-import './Reports.module.css'; // Import custom CSS untuk styling tambahan
+import api from '../../services/api';
 
 const Reports = () => {
   const [reports, setReports] = useState([]);
@@ -16,19 +34,19 @@ const Reports = () => {
   const [userId, setUserId] = useState('');
   const [currentPage, setCurrentPage] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortOrder, setSortOrder] = useState('asc'); // Sorting order for title
-  const [sortColumn, setSortColumn] = useState('no'); // Sorting column ('no' or 'title')
+  const [sortOrder, setSortOrder] = useState('asc');
+  const [sortColumn, setSortColumn] = useState('no');
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedReportId, setSelectedReportId] = useState(null);
 
   useEffect(() => {
     const fetchReports = async () => {
       try {
-        // Ambil data user dari localStorage
-        const userData = JSON.parse(localStorage.getItem('user')); // Pastikan 'user' ada di localStorage
+        const userData = JSON.parse(localStorage.getItem('user'));
         if (userData) {
           setUserRole(userData.role);
           setUserId(userData.id);
         }
-
         const response = await api.get('/reports');
         setReports(response.data);
       } catch (err) {
@@ -37,191 +55,213 @@ const Reports = () => {
         setLoading(false);
       }
     };
-
     fetchReports();
   }, []);
 
-  // Handle sorting
   const handleSort = (column) => {
+    const newSortOrder =
+      sortColumn === column && sortOrder === 'asc' ? 'desc' : 'asc';
     const sortedReports = [...reports].sort((a, b) => {
       if (column === 'title') {
-        return sortOrder === 'asc'
+        return newSortOrder === 'asc'
           ? a.title.localeCompare(b.title)
           : b.title.localeCompare(a.title);
       } else if (column === 'no') {
-        return sortOrder === 'asc' ? a.id - b.id : b.id - a.id;
+        return newSortOrder === 'asc' ? a.id - b.id : b.id - a.id;
       }
       return 0;
     });
     setReports(sortedReports);
-    setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    setSortOrder(newSortOrder);
     setSortColumn(column);
   };
 
-  // Handle search
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
+    setCurrentPage(0);
   };
 
-  // Filtered reports based on search query
-  const filteredReports = reports.filter(
-    (report) =>
-      report.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      report.status.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredReports = reports.filter((report) =>
+    report.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Pagination logic
   const itemsPerPage = 5;
   const displayedReports = filteredReports.slice(
     currentPage * itemsPerPage,
     (currentPage + 1) * itemsPerPage
   );
-
   const pageCount = Math.ceil(filteredReports.length / itemsPerPage);
+
+  const handleOpenDeleteDialog = (reportId) => {
+    setSelectedReportId(reportId);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setDeleteDialogOpen(false);
+    setSelectedReportId(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await api.delete(`/reports/${selectedReportId}`);
+      setReports((prev) => prev.filter((r) => r.id !== selectedReportId));
+      handleCloseDeleteDialog();
+    } catch (err) {
+      setError('Failed to delete report');
+      handleCloseDeleteDialog();
+    }
+  };
 
   if (loading) {
     return (
-      <div className="d-flex justify-content-center mt-5">
-        <div className="spinner-border" role="status">
-          <span className="sr-only">Loading...</span>
-        </div>
-      </div>
+      <Box display="flex" justifyContent="center" mt={5}>
+        <CircularProgress />
+      </Box>
     );
   }
 
   if (error) {
     return (
-      <div className="container">
-        <div className="mt-5">
-          <div className="alert alert-danger">{error}</div>
-        </div>
-      </div>
+      <Box m={5}>
+        <Alert severity="error">{error}</Alert>
+      </Box>
     );
   }
 
   return (
-    <div className="container my-5">
-      {/* Main content area */}
-      <div className="row justify-content-center">
-        <div className="col-12 col-md-10 col-lg-8">
-          <div className="d-flex justify-content-between align-items-center mb-4 my-5">
-            <h4>Reports</h4>
-            <Link to="/create-report" className="btn btn-primary">
-              Create Report
-            </Link>
-          </div>
-
-          {/* Search Bar */}
-          <div className="mb-3">
-            <input
-              type="text"
-              className="form-control"
-              placeholder="Search by Title or Status"
-              value={searchQuery}
-              onChange={handleSearch}
-            />
-          </div>
-
-          {/* Report Table */}
-          <div className="table-responsive">
-            <table className="table table-striped table-bordered">
-              <thead>
-                <tr>
-                  <th>
-                    <IconButton onClick={() => handleSort('no')}>
-                      {sortColumn === 'no' && sortOrder === 'asc' ? (
-                        <ArrowDownward />
-                      ) : (
-                        <ArrowUpward />
-                      )}
-                    </IconButton>
-                    No
-                  </th>
-                  <th>
-                    <IconButton onClick={() => handleSort('title')}>
-                      {sortColumn === 'title' && sortOrder === 'asc' ? (
-                        <ArrowDownward />
-                      ) : (
-                        <ArrowUpward />
-                      )}
-                    </IconButton>
-                    Title
-                  </th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {displayedReports.map((report, index) => (
-                  <tr key={report.id}>
-                    <td>{currentPage * itemsPerPage + index + 1}</td>
-                    <td>{report.title}</td>
-                    <td>{report.status}</td>
-                    <td>
-                      <Link
-                        to={`/reports/${report.id}`}
-                        className="btn btn-outline-primary btn-sm mr-2"
+    <Box m={3}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={4}
+      >
+        <Typography variant="h4">Reports</Typography>
+        <Button variant="contained" component={RouterLink} to="/create-report">
+          Create Report
+        </Button>
+      </Box>
+      <TextField
+        fullWidth
+        placeholder="Search by Title"
+        value={searchQuery}
+        onChange={handleSearch}
+        margin="normal"
+      />
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>
+                <IconButton onClick={() => handleSort('no')}>
+                  {sortColumn === 'no' && sortOrder === 'asc' ? (
+                    <ArrowDownward />
+                  ) : (
+                    <ArrowUpward />
+                  )}
+                </IconButton>
+                No
+              </TableCell>
+              <TableCell>
+                <IconButton onClick={() => handleSort('title')}>
+                  {sortColumn === 'title' && sortOrder === 'asc' ? (
+                    <ArrowDownward />
+                  ) : (
+                    <ArrowUpward />
+                  )}
+                </IconButton>
+                Title
+              </TableCell>
+              <TableCell>Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {displayedReports.map((report, index) => (
+              <TableRow key={report.id}>
+                <TableCell>{currentPage * itemsPerPage + index + 1}</TableCell>
+                <TableCell>{report.title}</TableCell>
+                <TableCell>
+                  <Button
+                    variant="outlined"
+                    component={RouterLink}
+                    to={`${report.id}`} // Link relatif: di dalam route /reports, "report.id" akan membentuk URL /reports/123
+                    size="small"
+                  >
+                    View
+                  </Button>
+                  {(userRole === 'owner' ||
+                    userRole === 'admin' ||
+                    report.userId === userId) && (
+                    <>
+                      <Button
+                        variant="outlined"
+                        color="warning"
+                        component={RouterLink}
+                        to={`/reports/edit/${report.id}`}
+                        size="small"
+                        sx={{ ml: 1 }}
                       >
-                        View
-                      </Link>
-                      {(userRole === 'owner' ||
-                        userRole === 'admin' ||
-                        report.userId === userId) && (
-                        <Link
-                          to={`/reports/edit/${report.id}`}
-                          className="btn btn-outline-warning btn-sm mr-2"
-                        >
-                          Edit
-                        </Link>
-                      )}
-                      {(userRole === 'owner' ||
-                        userRole === 'admin' ||
-                        report.userId === userId) && (
-                        <button
-                          onClick={async () => {
-                            try {
-                              await api.delete(`/reports/${report.id}`);
-                              // After delete, remove report from state
-                              setReports(
-                                reports.filter((r) => r.id !== report.id)
-                              );
-                            } catch (err) {
-                              setError('Failed to delete report');
-                            }
-                          }}
-                          className="btn btn-outline-danger btn-sm"
-                        >
-                          Delete
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Pagination */}
-          <div className="d-flex justify-content-center mt-4">
-            <ReactPaginate
-              previousLabel={'Previous'}
-              nextLabel={'Next'}
-              breakLabel={'...'}
-              pageCount={pageCount}
-              onPageChange={({ selected }) => setCurrentPage(selected)}
-              containerClassName={'pagination'}
-              activeClassName={'active'}
-              pageClassName={'page-item'}
-              pageLinkClassName={'page-link'}
-              previousClassName={'page-item'}
-              previousLinkClassName={'page-link'}
-              nextClassName={'page-item'}
-              nextLinkClassName={'page-link'}
-            />
-          </div>
-        </div>
-      </div>
-    </div>
+                        Edit
+                      </Button>
+                      <Button
+                        variant="contained"
+                        color="error"
+                        size="small"
+                        onClick={() => handleOpenDeleteDialog(report.id)}
+                        sx={{ ml: 1 }}
+                      >
+                        Delete
+                      </Button>
+                    </>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
+            {filteredReports.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={3} align="center">
+                  No reports found.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <Box display="flex" justifyContent="center" mt={3}>
+        <ReactPaginate
+          previousLabel={'Previous'}
+          nextLabel={'Next'}
+          breakLabel={'...'}
+          pageCount={pageCount}
+          onPageChange={({ selected }) => setCurrentPage(selected)}
+          containerClassName={'pagination'}
+          activeClassName={'active'}
+          pageClassName={'page-item'}
+          pageLinkClassName={'page-link'}
+          previousClassName={'page-item'}
+          previousLinkClassName={'page-link'}
+          nextClassName={'page-item'}
+          nextLinkClassName={'page-link'}
+        />
+      </Box>
+      <Dialog open={deleteDialogOpen} onClose={handleCloseDeleteDialog}>
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          Are you sure you want to delete this report?
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeleteDialog}>No</Button>
+          <Button
+            onClick={handleConfirmDelete}
+            variant="contained"
+            color="error"
+          >
+            Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
   );
 };
 

@@ -13,7 +13,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import useAxios from '../../services/api';
 
 const ReportDetail = () => {
-  const { id } = useParams();
+  // Ambil parameter dengan nama reportId (sesuai dengan route di App.jsx)
+  const { reportId } = useParams();
+  console.log('ReportDetail - reportId:', reportId); // Debug: pastikan nilainya tidak undefined
   const axios = useAxios();
   const navigate = useNavigate();
 
@@ -21,21 +23,27 @@ const ReportDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const fetchReport = async () => {
-    try {
-      const response = await axios.get(`/reports/${id}`);
-      setReport(response.data);
-    } catch (err) {
-      setError('Failed to fetch report details');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    if (!reportId) {
+      setError('ID laporan tidak ditemukan.');
+      setLoading(false);
+      return;
+    }
+    const fetchReport = async () => {
+      try {
+        // Base URL sudah diatur di api.js; URL akhir: http://localhost:3000/api/reports/123
+        const response = await axios.get(`/reports/${reportId}`);
+        setReport(response.data);
+      } catch (err) {
+        setError(
+          err.response?.data?.message || 'Failed to fetch report details'
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchReport();
-    // eslint-disable-next-line
-  }, [id]);
+  }, [reportId, axios]);
 
   const handleBack = () => {
     navigate('/reports');
@@ -69,12 +77,11 @@ const ReportDetail = () => {
       <Box mt={5}>
         <Typography variant="h4">{report.title}</Typography>
         <Typography variant="subtitle1" color="textSecondary">
-          Status: {report.status}
+          Status: {report.validationStatus}
         </Typography>
         <Box mt={2}>
-          <Typography variant="body1">{report.description}</Typography>
+          <Typography variant="body1">{report.content}</Typography>
         </Box>
-        {/* Tambahkan detail lainnya sesuai kebutuhan */}
         <Box mt={2}>
           <Button variant="contained" onClick={handleBack}>
             Back to Reports

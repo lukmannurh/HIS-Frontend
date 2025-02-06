@@ -6,7 +6,7 @@ const api = axios.create({
   baseURL: API_URL,
 });
 
-// Interceptor untuk menambahkan Authorization header jika ada access token
+// Interceptor untuk menambahkan Authorization header jika ada token
 api.interceptors.request.use(
   (config) => {
     const accessToken = localStorage.getItem('accessToken');
@@ -15,9 +15,7 @@ api.interceptors.request.use(
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 // Interceptor untuk menangani error dan refresh token jika diperlukan
@@ -33,13 +31,13 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       try {
         const refreshToken = localStorage.getItem('refreshToken');
+        if (!refreshToken) throw new Error('No refresh token available');
         const response = await api.post('/auth/refresh', { refreshToken });
         const { accessToken } = response.data;
         localStorage.setItem('accessToken', accessToken);
-        api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+        originalRequest.headers['Authorization'] = `Bearer ${accessToken}`;
         return api(originalRequest);
       } catch (err) {
-        // Jika refresh token juga gagal, logout pengguna
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         window.location.href = '/login';

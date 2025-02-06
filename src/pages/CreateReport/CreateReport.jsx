@@ -16,20 +16,20 @@ const CreateReport = () => {
   const axios = useAxios();
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({ title: '', description: '' });
+  // Jika backend menggunakan field "title" dan "content", gunakan nama tersebut.
+  const [form, setForm] = useState({ title: '', content: '' });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const handleChange = (e) =>
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
     try {
-      await axios.post('/reports', form); // Hapus 'response ='
+      await axios.post('/reports', form);
       setSuccess('Report created successfully!');
       navigate('/reports');
     } catch (err) {
@@ -56,9 +56,9 @@ const CreateReport = () => {
             required
           />
           <TextField
-            label="Description"
-            name="description"
-            value={form.description}
+            label="Content"
+            name="content"
+            value={form.content}
             onChange={handleChange}
             fullWidth
             margin="normal"

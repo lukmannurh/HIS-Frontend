@@ -2,19 +2,19 @@ import React from 'react';
 
 import ReactDOM from 'react-dom/client';
 
-import App from './App';
+import AppWithTheme from './AppWithTheme';
 import { AuthProvider } from './context/AuthContext';
-import { ThemeProvider } from './context/ThemeContext';
+import { ThemeProvider as CustomThemeProvider } from './context/ThemeContext';
 import './index.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <ThemeProvider>
+    <CustomThemeProvider>
       <AuthProvider>
-        <App />
+        <AppWithTheme />
       </AuthProvider>
-    </ThemeProvider>
+    </CustomThemeProvider>
   </React.StrictMode>
 );

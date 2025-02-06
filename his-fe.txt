@@ -1,0 +1,2155 @@
+// File: ./.env
+REACT_APP_API_URL=http://localhost:3000/api
+PORT=3001
+
+
+
+// File: ./.eslintrc.json
+{
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:jsx-a11y/recommended",
+    "plugin:import/errors",
+    "plugin:import/warnings",
+    "plugin:import/react",
+    "plugin:prettier/recommended"
+  ],
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": 12,
+    "sourceType": "module"
+  },
+  "plugins": ["react", "react-hooks", "jsx-a11y", "import", "prettier"],
+  "rules": {
+    "import/no-unresolved": [
+      "error",
+      {
+        "ignore": ["\\.module\\.css$"]
+      }
+    ],
+    "prettier/prettier": "error",
+    "react/react-in-jsx-scope": "off",
+    "react/prop-types": "off",
+    "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+    "import/order": [
+      "warn",
+      {
+        "groups": [["builtin", "external", "internal"]],
+        "pathGroups": [
+          {
+            "pattern": "react",
+            "group": "builtin",
+            "position": "before"
+          }
+        ],
+        "pathGroupsExcludedImportTypes": ["react"],
+        "alphabetize": { "order": "asc", "caseInsensitive": true },
+        "newlines-between": "always"
+      }
+    ],
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
+    "jsx-a11y/no-autofocus": "error"
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    },
+    "import/resolver": {
+      "node": {
+        "extensions": [".js", ".jsx", ".json"]
+      }
+    }
+  }
+}
+
+
+
+// File: ./.gitignore
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# production
+/build
+
+# misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+
+
+// File: ./.prettierrc
+{
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "es5",
+    "printWidth": 80,
+    "tabWidth": 2,
+    "useTabs": false,
+    "bracketSpacing": true,
+    "jsxBracketSameLine": false,
+    "arrowParens": "always",
+    "endOfLine": "lf"
+  }
+  
+
+
+// File: ./package.json
+{
+  "name": "his-fe",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^6.4.1",
+    "@mui/material": "^6.4.1",
+    "axios": "^1.7.9",
+    "bootstrap": "^5.3.3",
+    "cra-template": "1.2.0",
+    "dotenv": "^16.4.7",
+    "jwt-decode": "^3.1.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-icons": "^5.4.0",
+    "react-paginate": "^8.3.0",
+    "react-router-dom": "^7.1.3",
+    "react-scripts": "5.0.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "lint": "eslint . --ext .js,.jsx",
+    "lint:fix": "eslint . --ext .js,.jsx --fix",
+    "format": "prettier --write \"src/**/*.{js,jsx,css}\""
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-prettier": "^5.2.3",
+    "eslint-plugin-react": "^7.37.4",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "prettier": "^3.4.2"
+  }
+}
+
+
+
+// File: ./src/App.jsx
+import React from 'react';
+
+import { Box, Toolbar } from '@mui/material';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Outlet,
+} from 'react-router-dom';
+
+import Navbar from './components/Navbar/Navbar.jsx';
+import ProtectedRoute from './components/Routes/ProtectedRoute.jsx';
+import CreateReport from './pages/CreateReport/CreateReport.jsx';
+import Dashboard from './pages/Dashboard/Dashboard.jsx';
+import LandingPage from './pages/LandingPage/LandingPage.jsx';
+import Login from './pages/Login/Login.jsx';
+import NotFound from './pages/NotFound/NotFound.jsx';
+import Profile from './pages/Profile/Profile.jsx';
+import Register from './pages/Register/Register.jsx';
+import ReportDetail from './pages/ReportDetail/ReportDetail.jsx';
+import Reports from './pages/Reports/Reports.jsx';
+import Unauthorized from './pages/Unauthorized/Unauthorized.jsx';
+import UserManagement from './pages/UserManagement/UserManagement.jsx';
+
+const DefaultLayout = () => {
+  return (
+    <Box sx={{ display: 'flex' }}>
+      <Box component="main" sx={{ flexGrow: 1, p: 1 }}>
+        {/* Toolbar sebagai spacer untuk mengkompensasi tinggi AppBar */}
+        <Toolbar />
+        <Outlet />
+      </Box>
+    </Box>
+  );
+};
+
+function App() {
+  return (
+    <Router>
+      <Navbar />
+      <Routes>
+        {/* Landing page full screen tanpa layout spacer */}
+        <Route path="/" element={<LandingPage />} />
+
+        {/* Route lainnya dibungkus oleh DefaultLayout */}
+        <Route element={<DefaultLayout />}>
+          <Route path="/login" element={<Login />} />
+          <Route path="/unauthorized" element={<Unauthorized />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/reports"
+            element={
+              <ProtectedRoute>
+                <Reports />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/reports/:id"
+            element={
+              <ProtectedRoute>
+                <ReportDetail />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/create-report"
+            element={
+              <ProtectedRoute>
+                <CreateReport />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/user-management"
+            element={
+              <ProtectedRoute roles={['owner', 'admin']}>
+                <UserManagement />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <ProtectedRoute roles={['owner', 'admin']}>
+                <Register />
+              </ProtectedRoute>
+            }
+          />
+        </Route>
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Router>
+  );
+}
+
+export default App;
+
+
+
+// File: ./src/AppWithTheme.jsx
+import React, { useContext } from 'react';
+
+import CssBaseline from '@mui/material/CssBaseline';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+
+import App from './App';
+import { ThemeContext } from './context/ThemeContext';
+
+const AppWithTheme = () => {
+  const { mode } = useContext(ThemeContext);
+  const theme = createTheme({
+    palette: {
+      mode,
+      primary: {
+        main: '#88c273',
+      },
+    },
+  });
+
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <App />
+    </ThemeProvider>
+  );
+};
+
+export default AppWithTheme;
+
+
+
+// File: ./src/components/Navbar/Navbar.jsx
+import React, { useContext } from 'react';
+
+import SidebarNavbar from './SidebarNavbar';
+import TopNavbar from './TopNavbar';
+import { AuthContext } from '../../context/AuthContext';
+import { ThemeContext } from '../../context/ThemeContext';
+
+const Navbar = () => {
+  const { auth } = useContext(AuthContext);
+  const { toggleTheme, mode } = useContext(ThemeContext); // Dapatkan mode dari ThemeContext
+
+  return (
+    <>
+      {auth.isAuthenticated ? (
+        <SidebarNavbar toggleTheme={toggleTheme} mode={mode} />
+      ) : (
+        <TopNavbar toggleTheme={toggleTheme} mode={mode} />
+      )}
+    </>
+  );
+};
+
+export default Navbar;
+
+
+
+// File: ./src/components/Navbar/Navbar.module.css
+.navbar {
+  background-color: #88c273;
+}
+
+
+
+// File: ./src/components/Navbar/SidebarNavbar.jsx
+import React, { useState, useContext } from 'react';
+
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
+import MenuIcon from '@mui/icons-material/Menu';
+import {
+  Drawer,
+  List,
+  ListItem,
+  ListItemText,
+  IconButton,
+  AppBar,
+  Toolbar,
+  Typography,
+  Divider,
+  Box,
+} from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
+
+import styles from './SidebarNavbar.module.css';
+import { AuthContext } from '../../context/AuthContext';
+import { ThemeContext } from '../../context/ThemeContext';
+
+const SidebarNavbar = () => {
+  const [open, setOpen] = useState(false);
+  const { auth, logout } = useContext(AuthContext);
+  const { toggleTheme, mode } = useContext(ThemeContext);
+
+  const toggleDrawer = () => {
+    setOpen(!open);
+  };
+
+  const menuItems = [
+    { text: 'Dashboard', path: '/dashboard' },
+    { text: 'Reports', path: '/reports' },
+    { text: 'Profile', path: '/profile' },
+    ...(auth.user.role === 'owner' || auth.user.role === 'admin'
+      ? [{ text: 'User Management', path: '/user-management' }]
+      : []),
+    { text: 'Logout', action: logout },
+  ];
+
+  return (
+    <>
+      <AppBar position="fixed" className={styles.appBar}>
+        <Toolbar>
+          <IconButton
+            edge="start"
+            color="inherit"
+            aria-label="menu"
+            onClick={toggleDrawer}
+            sx={{ mr: 2 }}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+            HIS
+          </Typography>
+          <IconButton sx={{ ml: 1 }} color="inherit" onClick={toggleTheme}>
+            {mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
+          </IconButton>
+        </Toolbar>
+      </AppBar>
+
+      <Drawer
+        variant="temporary"
+        open={open}
+        onClose={toggleDrawer}
+        ModalProps={{ keepMounted: true }}
+        className={styles.drawer}
+      >
+        <Box
+          sx={{ width: 250 }}
+          role="presentation"
+          onClick={toggleDrawer}
+          onKeyDown={toggleDrawer}
+          className={styles.drawerBox}
+        >
+          <List className="mt-3">
+            {menuItems.map((item, index) => (
+              <ListItem
+                button
+                key={index}
+                component={item.path ? RouterLink : 'button'}
+                to={item.path}
+                onClick={item.action ? item.action : null}
+                className={styles.listItem}
+              >
+                <ListItemText primary={item.text} />
+              </ListItem>
+            ))}
+          </List>
+          <Divider />
+        </Box>
+      </Drawer>
+    </>
+  );
+};
+
+export default SidebarNavbar;
+
+
+
+// File: ./src/components/Navbar/SidebarNavbar.module.css
+.appBar {
+  z-index: 1201; /* Lebih tinggi dari Drawer */
+  background-color: #88c273; /* Gunakan warna #88c273 */
+}
+
+.drawer {
+  width: 250px;
+}
+
+/* Styling untuk konten drawer */
+.drawerBox {
+  background-color: #88c273; /* Sidebar background dengan warna yang sama */
+  color: #ffffff; /* Pastikan teks terlihat dengan warna putih */
+  height: 100%;
+}
+
+/* Styling untuk ListItem */
+.listItem {
+  color: #ffffff; /* Teks putih */
+}
+
+/* Styling tambahan untuk ListItem menggunakan MUI */
+.drawer .MuiListItem-root {
+  padding: 12px 24px;
+  transition: background-color 0.3s ease;
+}
+
+.drawer .MuiListItem-root:hover {
+  background-color: #76a15c; /* Sedikit lebih gelap sebagai efek hover */
+}
+
+.drawer .MuiListItemText-primary {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+
+
+// File: ./src/components/Navbar/TopNavbar.jsx
+import React, { useContext } from 'react';
+
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
+import { AppBar, Toolbar, Typography, Button, IconButton } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
+
+import { ThemeContext } from '../../context/ThemeContext';
+
+const TopNavbar = () => {
+  const { toggleTheme, mode } = useContext(ThemeContext);
+
+  return (
+    <AppBar position="static" sx={{ backgroundColor: '#88c273' }}>
+      <Toolbar>
+        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          HIS
+        </Typography>
+        <Button color="inherit" component={RouterLink} to="/login">
+          Login
+        </Button>
+        <IconButton sx={{ ml: 1 }} color="inherit" onClick={toggleTheme}>
+          {mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
+        </IconButton>
+      </Toolbar>
+    </AppBar>
+  );
+};
+
+export default TopNavbar;
+
+
+
+// File: ./src/components/Navbar/TopNavbar.module.css
+.appBar {
+  z-index: 1200;
+  background-color: #88c273;
+}
+
+
+
+// File: ./src/components/Routes/PrivateRoute.jsx
+import React, { useContext } from 'react';
+
+import { Navigate } from 'react-router-dom';
+
+import { AuthContext } from '../../context/AuthContext';
+
+const PrivateRoute = ({ children }) => {
+  const { auth } = useContext(AuthContext);
+
+  return auth.isAuthenticated ? children : <Navigate to="/login" />;
+};
+
+export default PrivateRoute;
+
+
+
+// File: ./src/components/Routes/ProtectedRoute.jsx
+import React, { useContext } from 'react';
+
+import PropTypes from 'prop-types';
+import { Navigate } from 'react-router-dom';
+
+import { AuthContext } from '../../context/AuthContext';
+
+const ProtectedRoute = ({ children, roles }) => {
+  const { auth } = useContext(AuthContext);
+
+  if (!auth.isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (roles && !roles.includes(auth.user.role)) {
+    return <Navigate to="/unauthorized" replace />;
+  }
+
+  return children;
+};
+
+ProtectedRoute.propTypes = {
+  children: PropTypes.node.isRequired,
+  roles: PropTypes.arrayOf(PropTypes.string),
+};
+
+ProtectedRoute.defaultProps = {
+  roles: null,
+};
+
+export default ProtectedRoute;
+
+
+
+// File: ./src/context/AuthContext.jsx
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+} from 'react';
+
+import api from '../services/api';
+import {
+  login as loginService,
+  logout as logoutService,
+} from '../services/authService';
+
+export const AuthContext = createContext();
+
+export const AuthProvider = ({ children }) => {
+  const [auth, setAuth] = useState({
+    isAuthenticated: false,
+    user: null,
+  });
+
+  const logout = useCallback(async () => {
+    await logoutService();
+    setAuth({
+      isAuthenticated: false,
+      user: null,
+    });
+  }, []);
+
+  useEffect(() => {
+    const initializeAuth = async () => {
+      const accessToken = localStorage.getItem('accessToken');
+      if (accessToken) {
+        try {
+          // Sertakan header Authorization dengan token
+          const response = await api.get('/users/me', {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          });
+          setAuth({
+            isAuthenticated: true,
+            user: response.data,
+          });
+        } catch (error) {
+          // Jika token tidak valid atau permintaan gagal, lakukan logout
+          console.error('Invalid token or failed to fetch user data:', error);
+          logout();
+        }
+      }
+    };
+    initializeAuth();
+  }, [logout]);
+
+  const login = useCallback(async (credentials) => {
+    try {
+      const user = await loginService(credentials);
+      setAuth({
+        isAuthenticated: true,
+        user,
+      });
+    } catch (error) {
+      console.error('Login failed:', error);
+      throw error; // Agar komponen login dapat menangani error
+    }
+  }, []);
+
+  const value = useMemo(() => ({ auth, login, logout }), [auth, login, logout]);
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
+
+
+
+// File: ./src/context/ThemeContext.jsx
+import React, { createContext, useState, useMemo } from 'react';
+
+import { CssBaseline } from '@mui/material';
+import {
+  createTheme,
+  ThemeProvider as MuiThemeProvider,
+} from '@mui/material/styles';
+
+export const ThemeContext = createContext();
+
+export const ThemeProvider = ({ children }) => {
+  // Cek localStorage untuk tema yang tersimpan
+  const [mode, setMode] = useState(() => {
+    const savedMode = localStorage.getItem('themeMode');
+    return savedMode ? savedMode : 'light';
+  });
+
+  const toggleTheme = () => {
+    const newMode = mode === 'light' ? 'dark' : 'light';
+    setMode(newMode);
+    localStorage.setItem('themeMode', newMode);
+  };
+
+  const theme = useMemo(
+    () =>
+      createTheme({
+        palette: {
+          mode,
+          primary: {
+            main: '#88c273',
+          },
+          background: {
+            default: mode === 'light' ? '#ffffff' : '#121212',
+            paper: mode === 'light' ? '#f7f7f7' : '#333333',
+          },
+        },
+      }),
+    [mode]
+  );
+
+  return (
+    <ThemeContext.Provider value={{ mode, toggleTheme }}>
+      <MuiThemeProvider theme={theme}>
+        <CssBaseline />
+        {children}
+      </MuiThemeProvider>
+    </ThemeContext.Provider>
+  );
+};
+
+
+
+// File: ./src/index.css
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
+    'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
+    'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f5f5f5;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+
+
+// File: ./src/index.js
+import React from 'react';
+
+import ReactDOM from 'react-dom/client';
+
+import AppWithTheme from './AppWithTheme';
+import { AuthProvider } from './context/AuthContext';
+import { ThemeProvider as CustomThemeProvider } from './context/ThemeContext';
+import './index.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <React.StrictMode>
+    <CustomThemeProvider>
+      <AuthProvider>
+        <AppWithTheme />
+      </AuthProvider>
+    </CustomThemeProvider>
+  </React.StrictMode>
+);
+
+
+
+// File: ./src/pages/CreateReport/CreateReport.jsx
+// File: ./CreateReport/CreateReport.jsx
+import React, { useState } from 'react';
+
+import {
+  Container,
+  TextField,
+  Button,
+  Typography,
+  Box,
+  Alert,
+  useTheme,
+} from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+
+import useAxios from '../../services/api';
+
+const CreateReport = () => {
+  const theme = useTheme(); // Menggunakan theme dari context
+  const axios = useAxios();
+  const navigate = useNavigate();
+
+  const [form, setForm] = useState({ title: '', description: '' });
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+    try {
+      await axios.post('/reports', form); // Hapus 'response ='
+      setSuccess('Report created successfully!');
+      navigate('/reports');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to create report');
+    }
+  };
+
+  return (
+    <Container maxWidth="sm">
+      <Box mt={5}>
+        <Typography variant="h4" gutterBottom>
+          Create New Report
+        </Typography>
+        {error && <Alert severity="error">{error}</Alert>}
+        {success && <Alert severity="success">{success}</Alert>}
+        <form onSubmit={handleSubmit}>
+          <TextField
+            label="Title"
+            name="title"
+            value={form.title}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+            required
+            sx={{ backgroundColor: theme.palette.background.paper }} // Sesuaikan dengan tema
+          />
+          <TextField
+            label="Description"
+            name="description"
+            value={form.description}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+            multiline
+            rows={4}
+            required
+            sx={{ backgroundColor: theme.palette.background.paper }} // Sesuaikan dengan tema
+          />
+          <Box mt={2}>
+            <Button type="submit" variant="contained" color="primary" fullWidth>
+              Create Report
+            </Button>
+          </Box>
+        </form>
+      </Box>
+    </Container>
+  );
+};
+
+export default CreateReport;
+
+
+
+// File: ./src/pages/Dashboard/Dashboard.jsx
+import React from 'react';
+
+import { Box, Typography, useMediaQuery, useTheme } from '@mui/material';
+
+const Dashboard = () => {
+  const theme = useTheme(); // Menggunakan tema dari context
+  const isDesktop = useMediaQuery(theme.breakpoints.up('sm')); // sm = 600px
+
+  return (
+    <Box
+      sx={{
+        padding: 3,
+        mt: '64px', // Menyesuaikan dengan tinggi AppBar
+        ml: isDesktop ? '250px' : 0, // Menyesuaikan dengan lebar sidebar
+        backgroundColor: theme.palette.background.default, // Sesuaikan background dengan tema
+        color: theme.palette.text.primary, // Sesuaikan warna teks dengan tema
+        overflowY: 'auto', // Menambahkan scroll vertikal jika diperlukan
+      }}
+    >
+      <Typography variant="h4" gutterBottom>
+        Dashboard
+      </Typography>
+      {/* Contoh konten */}
+      <Typography variant="body1">
+        {Array.from({ length: 100 }, (_, i) => (
+          <p key={i}>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
+            eiusmod tempor incididunt ut labore et dolore magna aliqua.
+          </p>
+        ))}
+      </Typography>
+    </Box>
+  );
+};
+
+export default Dashboard;
+
+
+
+// File: ./src/pages/LandingPage/LandingPage.jsx
+import React from 'react';
+
+import { Box, Typography, Button, Container } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
+
+import styles from './LandingPage.module.css'; // Import CSS Module
+
+const LandingPage = () => {
+  return (
+    <Box className={styles.landingContainer}>
+      <Box className={styles.parallax}>
+        <Container maxWidth="md" className={styles.landingContent}>
+          <Typography variant="h2" gutterBottom align="center" color="white">
+            Hamlet Information System
+          </Typography>
+          <Typography variant="h5" gutterBottom align="center" color="white">
+            Hamlet Information System (HIS) adalah aplikasi web yang dirancang
+            untuk memfasilitasi komunikasi dan manajemen informasi di tingkat
+            desa dengan fitur utama yaitu hoaks checker.
+          </Typography>
+          <Box mt={4} display="flex" justifyContent="center">
+            <Button
+              variant="contained"
+              color="primary"
+              size="large"
+              component={RouterLink}
+              to="/login"
+            >
+              Mulai Sekarang
+            </Button>
+          </Box>
+        </Container>
+      </Box>
+    </Box>
+  );
+};
+
+export default LandingPage;
+
+
+
+// File: ./src/pages/LandingPage/LandingPage.module.css
+.landingContainer {
+  height: 100vh;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.parallax {
+  background-image: url('../../assets/images/landingPage.jpg');
+  height: 100vh;
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.landingContent {
+  background-color: rgba(0, 128, 0, 0.6); /* Hijau tua dengan transparansi */
+  padding: 40px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+
+
+// File: ./src/pages/Login/Login.jsx
+import React, { useState, useContext } from 'react';
+
+import {
+  Container,
+  TextField,
+  Button,
+  Typography,
+  Box,
+  Alert,
+  InputAdornment,
+  IconButton,
+  CircularProgress,
+} from '@mui/material';
+import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Import ikon mata
+import { useNavigate } from 'react-router-dom';
+
+import { AuthContext } from '../../context/AuthContext';
+
+const Login = () => {
+  const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
+
+  const [form, setForm] = useState({ username: '', password: '' });
+  const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // State untuk visibilitas password
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log('Login form submitted'); // Logging untuk debugging
+    setError('');
+    setLoading(true);
+    try {
+      await login(form); // Pass the form object
+      console.log('Login successful'); // Logging jika berhasil
+      navigate('/dashboard');
+    } catch (err) {
+      console.error('Login failed:', err); // Logging error
+      // Periksa apakah error memiliki respon dari backend
+      const message =
+        err.response?.data?.message || 'Invalid username or password';
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
+
+  return (
+    <Container maxWidth="sm">
+      <Box mt={5}>
+        <Typography variant="h4" gutterBottom>
+          Login
+        </Typography>
+        {error && (
+          <Alert severity="error" onClose={() => setError('')}>
+            {error}
+          </Alert>
+        )}
+        <form onSubmit={handleSubmit}>
+          <TextField
+            label="Username"
+            name="username"
+            value={form.username}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+            required
+          />
+          <TextField
+            label="Password"
+            name="password"
+            type={showPassword ? 'text' : 'password'} // Ubah tipe input berdasarkan state
+            value={form.password}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+            required
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={togglePasswordVisibility}
+                    edge="end"
+                  >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}{' '}
+                    {/* Tampilkan ikon sesuai state */}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+          <Box mt={2} position="relative">
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              fullWidth
+              disabled={loading}
+            >
+              Login
+            </Button>
+            {loading && (
+              <CircularProgress
+                size={24}
+                sx={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  marginTop: '-12px',
+                  marginLeft: '-12px',
+                }}
+              />
+            )}
+          </Box>
+        </form>
+      </Box>
+    </Container>
+  );
+};
+
+export default Login;
+
+
+
+// File: ./src/pages/NotFound/NotFound.jsx
+import React from 'react';
+
+import { Container, Typography, Box, Button } from '@mui/material';
+import { Link } from 'react-router-dom';
+
+const NotFound = () => {
+  return (
+    <Container>
+      <Box mt={10} textAlign="center">
+        <Typography variant="h3" gutterBottom>
+          404 - Page Not Found
+        </Typography>
+        <Typography variant="body1" gutterBottom>
+          Oops! The page you are looking for does not exist.
+        </Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          component={Link}
+          to="/dashboard"
+        >
+          Go to Dashboard
+        </Button>
+      </Box>
+    </Container>
+  );
+};
+
+export default NotFound;
+
+
+
+// File: ./src/pages/Profile/Profile.jsx
+import React, { useContext, useState, useEffect } from 'react';
+
+import {
+  Container,
+  Typography,
+  Box,
+  TextField,
+  Button,
+  Alert,
+  CircularProgress,
+} from '@mui/material';
+
+import { AuthContext } from '../../context/AuthContext';
+import useAxios from '../../services/api';
+
+const Profile = () => {
+  const { auth, setAuth } = useContext(AuthContext);
+  const axios = useAxios();
+  const [form, setForm] = useState({ username: '', email: '' });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  const fetchProfile = async () => {
+    try {
+      const response = await axios.get('/users/profile');
+      setForm({ username: response.data.username, email: response.data.email });
+    } catch (err) {
+      setError('Failed to fetch profile');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProfile();
+    // eslint-disable-next-line
+  }, []);
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+    try {
+      const response = await axios.put('/users/profile', form);
+      setSuccess('Profile updated successfully!');
+      // Update auth context if needed
+      setAuth({ ...auth, user: response.data.user });
+      localStorage.setItem(
+        'auth',
+        JSON.stringify({ ...auth, user: response.data.user })
+      );
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to update profile');
+    }
+  };
+
+  if (loading) {
+    return (
+      <Box mt={5} display="flex" justifyContent="center">
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  return (
+    <Container maxWidth="sm">
+      <Box mt={5}>
+        <Typography variant="h4" gutterBottom>
+          Profile
+        </Typography>
+        {error && <Alert severity="error">{error}</Alert>}
+        {success && <Alert severity="success">{success}</Alert>}
+        <form onSubmit={handleSubmit}>
+          <TextField
+            label="Username"
+            name="username"
+            value={form.username}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+            required
+          />
+          <TextField
+            label="Email"
+            name="email"
+            type="email"
+            value={form.email}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+            required
+          />
+          {/* Tambahkan field lain jika diperlukan */}
+          <Box mt={2}>
+            <Button type="submit" variant="contained" color="primary" fullWidth>
+              Update Profile
+            </Button>
+          </Box>
+        </form>
+      </Box>
+    </Container>
+  );
+};
+
+export default Profile;
+
+
+
+// File: ./src/pages/Register/Register.jsx
+import React, { useState, useContext } from 'react';
+
+import {
+  Container,
+  Typography,
+  Box,
+  TextField,
+  Button,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Alert,
+} from '@mui/material';
+
+import { AuthContext } from '../../context/AuthContext';
+import api from '../../services/api';
+
+const Register = () => {
+  const { auth } = useContext(AuthContext);
+  const [form, setForm] = useState({
+    username: '',
+    email: '',
+    password: '',
+    role: 'user',
+  });
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  if (
+    !auth.isAuthenticated ||
+    (auth.user.role !== 'admin' && auth.user.role !== 'owner')
+  ) {
+    return (
+      <Typography variant="h6" align="center" mt={5}>
+        Access Denied
+      </Typography>
+    );
+  }
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+    try {
+      const response = await api.post('/auth/register', form);
+      setSuccess(response.data.message);
+      setForm({ username: '', email: '', password: '', role: 'user' });
+    } catch (err) {
+      setError(err.response?.data?.message || 'Registration failed');
+    }
+  };
+
+  return (
+    <Container maxWidth="sm">
+      <Box mt={5}>
+        <Typography variant="h4" gutterBottom>
+          Register New User
+        </Typography>
+        {error && (
+          <Alert severity="error" onClose={() => setError('')}>
+            {error}
+          </Alert>
+        )}
+        {success && (
+          <Alert severity="success" onClose={() => setSuccess('')}>
+            {success}
+          </Alert>
+        )}
+        <form onSubmit={handleSubmit}>
+          <TextField
+            label="Username"
+            name="username"
+            value={form.username}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+            required
+          />
+          <TextField
+            label="Email"
+            name="email"
+            type="email"
+            value={form.email}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+            required
+          />
+          <TextField
+            label="Password"
+            name="password"
+            type="password"
+            value={form.password}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+            required
+          />
+          <FormControl fullWidth margin="normal">
+            <InputLabel id="role-label">Role</InputLabel>
+            <Select
+              labelId="role-label"
+              name="role"
+              value={form.role}
+              label="Role"
+              onChange={handleChange}
+            >
+              <MenuItem value="user">User</MenuItem>
+              <MenuItem value="admin">Admin</MenuItem>
+              <MenuItem value="owner">Owner</MenuItem>
+            </Select>
+          </FormControl>
+          <Box mt={2}>
+            <Button type="submit" variant="contained" color="primary" fullWidth>
+              Register User
+            </Button>
+          </Box>
+        </form>
+      </Box>
+    </Container>
+  );
+};
+
+export default Register;
+
+
+
+// File: ./src/pages/ReportDetail/ReportDetail.jsx
+import React, { useEffect, useState } from 'react';
+
+import {
+  Container,
+  Typography,
+  Box,
+  CircularProgress,
+  Alert,
+  Button,
+} from '@mui/material';
+import { useParams, useNavigate } from 'react-router-dom';
+
+import useAxios from '../../services/api';
+
+const ReportDetail = () => {
+  const { id } = useParams();
+  const axios = useAxios();
+  const navigate = useNavigate();
+
+  const [report, setReport] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  const fetchReport = async () => {
+    try {
+      const response = await axios.get(`/reports/${id}`);
+      setReport(response.data);
+    } catch (err) {
+      setError('Failed to fetch report details');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchReport();
+    // eslint-disable-next-line
+  }, [id]);
+
+  const handleBack = () => {
+    navigate('/reports');
+  };
+
+  if (loading) {
+    return (
+      <Box mt={5} display="flex" justifyContent="center">
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container>
+        <Box mt={5}>
+          <Alert severity="error">{error}</Alert>
+          <Box mt={2}>
+            <Button variant="contained" onClick={handleBack}>
+              Back to Reports
+            </Button>
+          </Box>
+        </Box>
+      </Container>
+    );
+  }
+
+  return (
+    <Container>
+      <Box mt={5}>
+        <Typography variant="h4">{report.title}</Typography>
+        <Typography variant="subtitle1" color="textSecondary">
+          Status: {report.status}
+        </Typography>
+        <Box mt={2}>
+          <Typography variant="body1">{report.description}</Typography>
+        </Box>
+        {/* Tambahkan detail lainnya sesuai kebutuhan */}
+        <Box mt={2}>
+          <Button variant="contained" onClick={handleBack}>
+            Back to Reports
+          </Button>
+        </Box>
+      </Box>
+    </Container>
+  );
+};
+
+export default ReportDetail;
+
+
+
+// File: ./src/pages/Reports/Reports.jsx
+import React, { useEffect, useState } from 'react';
+
+import { ArrowDownward, ArrowUpward } from '@mui/icons-material';
+import {
+  IconButton,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from '@mui/material';
+import ReactPaginate from 'react-paginate';
+import { Link } from 'react-router-dom';
+
+import api from '../../services/api';
+import './Reports.module.css';
+
+const Reports = () => {
+  const [reports, setReports] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [userRole, setUserRole] = useState('');
+  const [userId, setUserId] = useState('');
+  const [currentPage, setCurrentPage] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortOrder, setSortOrder] = useState('asc');
+  const [sortColumn, setSortColumn] = useState('no');
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedReportId, setSelectedReportId] = useState(null);
+
+  useEffect(() => {
+    const fetchReports = async () => {
+      try {
+        // Ambil data user dari localStorage
+        const userData = JSON.parse(localStorage.getItem('user'));
+        console.log('userData from localStorage:', userData);
+        if (userData) {
+          setUserRole(userData.role);
+          setUserId(userData.id);
+        }
+        const response = await api.get('/reports');
+        setReports(response.data);
+      } catch (err) {
+        setError('Failed to fetch reports');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReports();
+  }, []);
+
+  const handleSort = (column) => {
+    const sortedReports = [...reports].sort((a, b) => {
+      if (column === 'title') {
+        return sortOrder === 'asc'
+          ? a.title.localeCompare(b.title)
+          : b.title.localeCompare(a.title);
+      } else if (column === 'no') {
+        return sortOrder === 'asc' ? a.id - b.id : b.id - a.id;
+      }
+      return 0;
+    });
+    setReports(sortedReports);
+    setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    setSortColumn(column);
+  };
+
+  const handleSearch = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const filteredReports = reports.filter((report) =>
+    report.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const itemsPerPage = 5;
+  const displayedReports = filteredReports.slice(
+    currentPage * itemsPerPage,
+    (currentPage + 1) * itemsPerPage
+  );
+  const pageCount = Math.ceil(filteredReports.length / itemsPerPage);
+
+  const handleOpenDeleteDialog = (reportId) => {
+    setSelectedReportId(reportId);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setDeleteDialogOpen(false);
+    setSelectedReportId(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await api.delete(`/reports/${selectedReportId}`);
+      setReports(reports.filter((r) => r.id !== selectedReportId));
+      handleCloseDeleteDialog();
+    } catch (err) {
+      setError('Failed to delete report');
+      handleCloseDeleteDialog();
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center mt-5">
+        <div className="spinner-border" role="status">
+          <span className="sr-only">Loading...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mt-5">
+        <div className="alert alert-danger">{error}</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container my-3">
+      <div className="row justify-content-center">
+        <div className="col-12 col-md-10 col-lg-8">
+          <div className="d-flex justify-content-between align-items-center mb-4 my-5">
+            <h4>Reports</h4>
+            <Link to="/create-report" className="btn btn-primary">
+              Create Report
+            </Link>
+          </div>
+
+          <div className="mb-3">
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Search by Title"
+              value={searchQuery}
+              onChange={handleSearch}
+            />
+          </div>
+
+          <div className="table-responsive">
+            <table className="table table-striped table-bordered">
+              <thead>
+                <tr>
+                  <th>
+                    <IconButton onClick={() => handleSort('no')}>
+                      {sortColumn === 'no' && sortOrder === 'asc' ? (
+                        <ArrowDownward />
+                      ) : (
+                        <ArrowUpward />
+                      )}
+                    </IconButton>
+                    No
+                  </th>
+                  <th>
+                    <IconButton onClick={() => handleSort('title')}>
+                      {sortColumn === 'title' && sortOrder === 'asc' ? (
+                        <ArrowDownward />
+                      ) : (
+                        <ArrowUpward />
+                      )}
+                    </IconButton>
+                    Title
+                  </th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {displayedReports.map((report, index) => {
+                  // Debug log per report
+                  console.log(
+                    'Report:',
+                    report.title,
+                    'report.userId:',
+                    report.userId,
+                    'userId:',
+                    userId,
+                    'userRole:',
+                    userRole
+                  );
+                  return (
+                    <tr key={report.id}>
+                      <td>{currentPage * itemsPerPage + index + 1}</td>
+                      <td>{report.title}</td>
+                      <td>
+                        <Link
+                          to={`/reports/${report.id}`}
+                          className="btn btn-outline-primary btn-sm mr-2"
+                        >
+                          View
+                        </Link>
+                        {(userRole === 'owner' ||
+                          userRole === 'admin' ||
+                          report.userId === userId) && (
+                          <>
+                            <Link
+                              to={`/reports/edit/${report.id}`}
+                              className="btn btn-outline-warning btn-sm mr-2"
+                            >
+                              Edit
+                            </Link>
+                            <Button
+                              variant="contained"
+                              color="error"
+                              size="small"
+                              onClick={() => handleOpenDeleteDialog(report.id)}
+                            >
+                              Delete
+                            </Button>
+                          </>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="d-flex justify-content-center mt-4">
+            <ReactPaginate
+              previousLabel={'Previous'}
+              nextLabel={'Next'}
+              breakLabel={'...'}
+              pageCount={pageCount}
+              onPageChange={({ selected }) => setCurrentPage(selected)}
+              containerClassName={'pagination'}
+              activeClassName={'active'}
+              pageClassName={'page-item'}
+              pageLinkClassName={'page-link'}
+              previousClassName={'page-item'}
+              previousLinkClassName={'page-link'}
+              nextClassName={'page-item'}
+              nextLinkClassName={'page-link'}
+            />
+          </div>
+        </div>
+      </div>
+
+      <Dialog open={deleteDialogOpen} onClose={handleCloseDeleteDialog}>
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          Are you sure you want to delete this report?
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeleteDialog} color="primary">
+            No
+          </Button>
+          <Button
+            onClick={handleConfirmDelete}
+            color="error"
+            variant="contained"
+          >
+            Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </div>
+  );
+};
+
+export default Reports;
+
+
+
+// File: ./src/pages/Reports/Reports.module.css
+.container {
+  padding-top: 80px; /* Ruang untuk top navbar */
+  padding-bottom: 40px;
+}
+
+.table-responsive {
+  margin-top: 20px;
+  overflow-x: auto;
+}
+
+.table {
+  font-size: 14px;
+}
+
+.table th {
+  background-color: #f8f9fa;
+  font-weight: bold;
+}
+
+.table td,
+.table th {
+  text-align: center;
+}
+
+/* Styling untuk tombol Edit */
+.btn-outline-warning {
+  border-color: #ffc107;
+  color: #ffc107;
+}
+
+.btn-outline-warning:hover {
+  background-color: #ffc107;
+  color: white;
+}
+
+/* Styling untuk tombol Delete */
+.btn-danger,
+.btn-outline-danger {
+  border-color: #dc3545;
+  color: #dc3545;
+}
+
+.btn-danger:hover,
+.btn-outline-danger:hover {
+  background-color: #dc3545;
+  color: white;
+}
+
+/* Pagination styling */
+.pagination {
+  justify-content: center;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #007bff;
+  border-color: #007bff;
+  color: white;
+}
+
+
+
+// File: ./src/pages/Unauthorized/Unauthorized.jsx
+import React from 'react';
+
+import { Container, Typography } from '@mui/material';
+
+const Unauthorized = () => {
+  return (
+    <Container>
+      <Typography variant="h4" gutterBottom>
+        403 - Unauthorized
+      </Typography>
+      <Typography variant="body1">
+        Anda tidak memiliki izin untuk mengakses halaman ini.
+      </Typography>
+    </Container>
+  );
+};
+
+export default Unauthorized;
+
+
+
+// File: ./src/pages/UserManagement/UserManagement.jsx
+import React, { useState, useEffect } from 'react';
+
+import {
+  Container,
+  Typography,
+  Box,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Alert,
+} from '@mui/material';
+
+import api from '../../services/api';
+
+const UserManagement = () => {
+  const [users, setUsers] = useState([]);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [openDialog, setOpenDialog] = useState(false);
+  const [newUser, setNewUser] = useState({
+    username: '',
+    email: '',
+    password: '',
+    role: 'user',
+  });
+
+  const fetchUsers = async () => {
+    try {
+      const response = await api.get('/users');
+      setUsers(response.data);
+    } catch (err) {
+      setError('Gagal mengambil data pengguna.');
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const handleDelete = async (userId) => {
+    if (window.confirm('Apakah Anda yakin ingin menghapus pengguna ini?')) {
+      try {
+        await api.delete(`/users/${userId}`);
+        setSuccess('Pengguna berhasil dihapus.');
+        fetchUsers();
+      } catch (err) {
+        setError('Gagal menghapus pengguna.');
+      }
+    }
+  };
+
+  const handleOpenDialog = () => {
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setNewUser({
+      username: '',
+      email: '',
+      password: '',
+      role: 'user',
+    });
+    setOpenDialog(false);
+    setError('');
+    setSuccess('');
+  };
+
+  const handleChange = (e) => {
+    setNewUser({
+      ...newUser,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleRegister = async () => {
+    const { username, email, password, role } = newUser;
+    if (!username || !email || !password || !role) {
+      setError('Semua field wajib diisi.');
+      return;
+    }
+    try {
+      await api.post('/auth/register', { username, email, password, role });
+      setSuccess('Pengguna baru berhasil didaftarkan.');
+      fetchUsers();
+      handleCloseDialog();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Gagal mendaftarkan pengguna.');
+    }
+  };
+
+  return (
+    <Container>
+      <Box mt={5}>
+        <Typography variant="h4" gutterBottom>
+          Manajemen Pengguna
+        </Typography>
+        {error && (
+          <Alert severity="error" onClose={() => setError('')}>
+            {error}
+          </Alert>
+        )}
+        {success && (
+          <Alert severity="success" onClose={() => setSuccess('')}>
+            {success}
+          </Alert>
+        )}
+        <Box mb={2}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleOpenDialog}
+          >
+            Tambah Pengguna
+          </Button>
+        </Box>
+        <TableContainer component={Paper}>
+          <Table aria-label="user table">
+            <TableHead>
+              <TableRow>
+                <TableCell>ID</TableCell>
+                <TableCell>Username</TableCell>
+                <TableCell>Email</TableCell>
+                <TableCell>Role</TableCell>
+                <TableCell>Nama Lengkap</TableCell>
+                <TableCell>Aksi</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {users.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell>{user.id}</TableCell>
+                  <TableCell>{user.username}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>{user.role}</TableCell>
+                  <TableCell>{user.fullName || '-'}</TableCell>
+                  <TableCell>
+                    {/* Tambahkan aksi lain seperti edit jika diperlukan */}
+                    <Button
+                      variant="outlined"
+                      color="secondary"
+                      onClick={() => handleDelete(user.id)}
+                    >
+                      Hapus
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {users.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={6} align="center">
+                    Tidak ada pengguna ditemukan.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
+
+      {/* Dialog untuk Menambah Pengguna */}
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
+        <DialogTitle>Tambah Pengguna Baru</DialogTitle>
+        <DialogContent>
+          {error && (
+            <Alert severity="error" onClose={() => setError('')}>
+              {error}
+            </Alert>
+          )}
+          {success && (
+            <Alert severity="success" onClose={() => setSuccess('')}>
+              {success}
+            </Alert>
+          )}
+          <TextField
+            // Hapus autoFocus jika ada
+            // autoFocus
+            margin="dense"
+            label="Username"
+            name="username"
+            type="text"
+            fullWidth
+            variant="standard"
+            value={newUser.username}
+            onChange={handleChange}
+          />
+          <TextField
+            margin="dense"
+            label="Email"
+            name="email"
+            type="email"
+            fullWidth
+            variant="standard"
+            value={newUser.email}
+            onChange={handleChange}
+          />
+          <TextField
+            margin="dense"
+            label="Password"
+            name="password"
+            type="password"
+            fullWidth
+            variant="standard"
+            value={newUser.password}
+            onChange={handleChange}
+          />
+          <FormControl fullWidth margin="dense" variant="standard">
+            <InputLabel id="role-label">Role</InputLabel>
+            <Select
+              labelId="role-label"
+              name="role"
+              value={newUser.role}
+              onChange={handleChange}
+            >
+              <MenuItem value="user">User</MenuItem>
+              <MenuItem value="admin">Admin</MenuItem>
+              <MenuItem value="owner">Owner</MenuItem>
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog}>Batal</Button>
+          <Button onClick={handleRegister} variant="contained" color="primary">
+            Daftar
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Container>
+  );
+};
+
+export default UserManagement;
+
+
+
+// File: ./src/services/api.js
+import axios from 'axios';
+
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000/api';
+
+const api = axios.create({
+  baseURL: API_URL,
+});
+
+// Interceptor untuk menambahkan Authorization header jika ada access token
+api.interceptors.request.use(
+  (config) => {
+    const accessToken = localStorage.getItem('accessToken');
+    if (accessToken) {
+      config.headers['Authorization'] = `Bearer ${accessToken}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Interceptor untuk menangani error dan refresh token jika diperlukan
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    if (
+      error.response &&
+      error.response.status === 401 &&
+      !originalRequest._retry
+    ) {
+      originalRequest._retry = true;
+      try {
+        const refreshToken = localStorage.getItem('refreshToken');
+        const response = await api.post('/auth/refresh', { refreshToken });
+        const { accessToken } = response.data;
+        localStorage.setItem('accessToken', accessToken);
+        api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+        return api(originalRequest);
+      } catch (err) {
+        // Jika refresh token juga gagal, logout pengguna
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        window.location.href = '/login';
+        return Promise.reject(err);
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
+export default api;
+
+
+
+// File: ./src/services/authService.js
+import api from './api';
+
+export const register = async (userData) => {
+  const response = await api.post('/auth/register', userData);
+  return response.data;
+};
+
+export const login = async (credentials) => {
+  const response = await api.post('/auth/login', credentials);
+  const { accessToken, refreshToken, user } = response.data;
+  localStorage.setItem('accessToken', accessToken);
+  localStorage.setItem('refreshToken', refreshToken);
+  return user;
+};
+
+export const logout = async () => {
+  const refreshToken = localStorage.getItem('refreshToken');
+  await api.post('/auth/logout', { refreshToken });
+  localStorage.removeItem('accessToken');
+  localStorage.removeItem('refreshToken');
+};
+
+
+
