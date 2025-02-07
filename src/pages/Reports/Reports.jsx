@@ -27,6 +27,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import api from '../../services/api';
 
 const Reports = () => {
+  // (State dan useEffect tidak berubah)
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -185,7 +186,7 @@ const Reports = () => {
                   <Button
                     variant="outlined"
                     component={RouterLink}
-                    to={`${report.id}`} // Link relatif: di dalam route /reports, "report.id" akan membentuk URL /reports/123
+                    to={`/reports/${report.id}`} // URL absolut menuju detail laporan
                     size="small"
                   >
                     View

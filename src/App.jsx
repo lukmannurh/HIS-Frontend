@@ -52,7 +52,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-          {/* Nesting route detail laporan di dalam route /reports */}
+          {/* Sibling routes untuk Reports */}
           <Route
             path="/reports"
             element={
@@ -60,19 +60,15 @@ function App() {
                 <Reports />
               </ProtectedRoute>
             }
-          >
-            {/* Route index: daftar laporan akan tetap dirender oleh Reports */}
-            <Route index element={<Reports />} />
-            {/* Route child: detail laporan */}
-            <Route
-              path=":reportId"
-              element={
-                <ProtectedRoute>
-                  <ReportDetail />
-                </ProtectedRoute>
-              }
-            />
-          </Route>
+          />
+          <Route
+            path="/reports/:reportId"
+            element={
+              <ProtectedRoute>
+                <ReportDetail />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/create-report"
             element={
