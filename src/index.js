@@ -6,6 +6,7 @@ import AppWithTheme from './AppWithTheme';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider as CustomThemeProvider } from './context/ThemeContext';
 import './index.css';
+import '@fontsource/roboto';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

@@ -1,0 +1,193 @@
+.container {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    padding: 2rem;
+    background-color: #f5f7fa;
+  }
+  
+  .card {
+    position: relative;
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 2rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  }
+  
+  .downloadContainer {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+  }
+  
+  .downloadButton {
+    background-color: #43a047;
+    color: #fff;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.9rem;
+  }
+  
+  .downloadButton:hover {
+    background-color: #388e3c;
+  }
+  
+  .pdfIcon {
+    margin-right: 0.3rem;
+    vertical-align: middle;
+    color: #fff;
+  }
+  
+  .pdfContent {
+    margin-top: 3rem;
+  }
+  
+  .timestampBox {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .updatedBox {
+    display: flex;
+    align-items: center;
+    margin-left: 1rem;
+  }
+  
+  .icon {
+    margin-right: 0.3rem;
+    color: #6c757d;
+  }
+  
+  .timestamp {
+    font-size: 0.85rem;
+    color: #6c757d;
+    font-style: italic;
+  }
+  
+  .title {
+    text-align: center;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    font-family: 'Roboto', sans-serif;
+    letter-spacing: 0.5px;
+  }
+  
+  .sectionHeader {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.3rem;
+    border-bottom: 2px solid #e0e0e0;
+    color: #34495e;
+    font-family: 'Roboto', sans-serif;
+    text-align: left;
+  }
+  
+  .paperContent {
+    padding: 1.5rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1rem;
+  }
+  
+  .contentText {
+    font-family: 'Roboto', sans-serif;
+    letter-spacing: 0.25px;
+    color: #424242;
+    line-height: 1.6;
+    text-align: justify;
+  }
+  
+  .statusBadge {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 700;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.75rem;
+    display: inline-flex;
+    align-items: center;
+    /* Warna default akan di override oleh kelas .hoax atau .valid */
+  }
+  
+  .hoax {
+    background-color: #ffcdd2; /* Light red */
+    color: #d32f2f; /* Dark red */
+  }
+  
+  .valid {
+    background-color: #c8e6c9; /* Light green */
+    color: #388e3c; /* Dark green */
+  }
+  
+  .iconStatus {
+    margin-right: 0.3rem;
+    font-size: 1.5rem;
+  }
+  
+  .iconInfo {
+    margin-right: 0.5rem;
+    color: #1e88e5;
+  }
+  
+  .userInfo {
+    font-size: 1rem;
+    color: #616161;
+    margin-top: 1rem;
+    font-family: 'Roboto', sans-serif;
+    text-align: left;
+  }
+  
+  .relatedNewsItem {
+    padding: 1rem;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .relatedNewsItem:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .relatedNewsLink a {
+    text-decoration: none;
+    color: #1e88e5;
+    font-weight: 500;
+    font-family: 'Roboto', sans-serif;
+    text-align: left;
+  }
+  
+  .relatedNewsLink a:hover {
+    text-decoration: underline;
+  }
+  
+  .buttonContainer {
+    margin-top: 2rem;
+    text-align: center;
+  }
+  
+  .backButton {
+    background-color: #1e88e5;
+    color: #fff;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+    padding: 0.75rem 2rem;
+    font-family: 'Roboto', sans-serif;
+  }
+  
+  .backButton:hover {
+    background-color: #1565c0;
+  }
+  
