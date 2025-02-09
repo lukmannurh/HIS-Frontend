@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
-import { ArrowDownward, ArrowUpward } from '@mui/icons-material';
+import SortIcon from '@mui/icons-material/Sort';
 import {
-  IconButton,
   Button,
   Dialog,
   DialogTitle,
@@ -11,23 +10,21 @@ import {
   Box,
   TextField,
   Typography,
-  TableContainer,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  Paper,
   CircularProgress,
   Alert,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
 } from '@mui/material';
 import ReactPaginate from 'react-paginate';
 import { Link as RouterLink } from 'react-router-dom';
 
+import styles from './Reports.module.css';
+import ReportsTable from './ReportsTable';
 import api from '../../services/api';
 
 const Reports = () => {
-  // (State dan useEffect tidak berubah)
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -35,10 +32,22 @@ const Reports = () => {
   const [userId, setUserId] = useState('');
   const [currentPage, setCurrentPage] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortOrder, setSortOrder] = useState('asc');
-  const [sortColumn, setSortColumn] = useState('no');
+
+  // Sorting state
+  const [sortDialogOpen, setSortDialogOpen] = useState(false);
+  const [selectedSortOption, setSelectedSortOption] = useState('title-asc');
+
+  // Delete dialog state
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedReportId, setSelectedReportId] = useState(null);
+
+  // Daftar opsi sorting
+  const sortOptions = [
+    { value: 'title-asc', label: 'Title (A-Z)' },
+    { value: 'title-desc', label: 'Title (Z-A)' },
+    { value: 'time-new', label: 'Waktu (Terbaru)' },
+    { value: 'time-old', label: 'Waktu (Terlama)' },
+  ];
 
   useEffect(() => {
     const fetchReports = async () => {
@@ -59,22 +68,57 @@ const Reports = () => {
     fetchReports();
   }, []);
 
-  const handleSort = (column) => {
-    const newSortOrder =
-      sortColumn === column && sortOrder === 'asc' ? 'desc' : 'asc';
+  // Helper: gunakan updatedAt jika ada dan berbeda, jika tidak gunakan createdAt.
+  const getReportTimestamp = (report) => {
+    return report.updatedAt && report.updatedAt !== report.createdAt
+      ? report.updatedAt
+      : report.createdAt;
+  };
+
+  // Format tanggal sesuai locale 'id-ID' dan tambahkan "WIB"
+  const formatDateWIB = (dateStr) => {
+    const options = {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    };
+    return new Date(dateStr).toLocaleString('id-ID', options) + ' WIB';
+  };
+
+  // Fungsi sorting: mengurutkan laporan sesuai opsi yang dipilih
+  const handleSortOption = (option) => {
+    let newSortColumn, newSortOrder;
+    if (option === 'title-asc') {
+      newSortColumn = 'title';
+      newSortOrder = 'asc';
+    } else if (option === 'title-desc') {
+      newSortColumn = 'title';
+      newSortOrder = 'desc';
+    } else if (option === 'time-new') {
+      newSortColumn = 'timestamp';
+      newSortOrder = 'desc';
+    } else if (option === 'time-old') {
+      newSortColumn = 'timestamp';
+      newSortOrder = 'asc';
+    }
     const sortedReports = [...reports].sort((a, b) => {
-      if (column === 'title') {
+      if (newSortColumn === 'title') {
         return newSortOrder === 'asc'
           ? a.title.localeCompare(b.title)
           : b.title.localeCompare(a.title);
-      } else if (column === 'no') {
-        return newSortOrder === 'asc' ? a.id - b.id : b.id - a.id;
+      } else if (newSortColumn === 'timestamp') {
+        const timeA = new Date(getReportTimestamp(a));
+        const timeB = new Date(getReportTimestamp(b));
+        return newSortOrder === 'asc' ? timeA - timeB : timeB - timeA;
       }
       return 0;
     });
     setReports(sortedReports);
-    setSortOrder(newSortOrder);
-    setSortColumn(column);
+    setSortDialogOpen(false);
   };
 
   const handleSearch = (e) => {
@@ -116,28 +160,26 @@ const Reports = () => {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" mt={5}>
+      <Box
+        className={styles.container}
+        display="flex"
+        justifyContent="center"
+        mt={5}
+      >
         <CircularProgress />
       </Box>
     );
   }
-
   if (error) {
     return (
-      <Box m={5}>
+      <Box className={styles.container} m={5}>
         <Alert severity="error">{error}</Alert>
       </Box>
     );
   }
-
   return (
-    <Box m={3}>
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        mb={4}
-      >
+    <Box className={styles.container}>
+      <Box className={styles.header}>
         <Typography variant="h4">Reports</Typography>
         <Button variant="contained" component={RouterLink} to="/create-report">
           Create Report
@@ -149,101 +191,86 @@ const Reports = () => {
         value={searchQuery}
         onChange={handleSearch}
         margin="normal"
+        className="mb-3"
       />
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>
-                <IconButton onClick={() => handleSort('no')}>
-                  {sortColumn === 'no' && sortOrder === 'asc' ? (
-                    <ArrowDownward />
-                  ) : (
-                    <ArrowUpward />
+
+      {/* Sorting Control */}
+      <Box className={styles.sortContainer}>
+        <Button
+          variant="outlined"
+          onClick={() => setSortDialogOpen(true)}
+          className={styles.sortButton}
+        >
+          <SortIcon fontSize="small" style={{ marginRight: '0.3rem' }} />
+          Sort By
+        </Button>
+      </Box>
+
+      {/* Sorting Dialog */}
+      <Dialog open={sortDialogOpen} onClose={() => setSortDialogOpen(false)}>
+        <DialogTitle>Sort By</DialogTitle>
+        <DialogContent>
+          <List>
+            {sortOptions.map((option) => (
+              <ListItem key={option.value} disablePadding>
+                <ListItemButton
+                  selected={selectedSortOption === option.value}
+                  onClick={() => setSelectedSortOption(option.value)}
+                  className={styles.sortListItemButton}
+                >
+                  {selectedSortOption === option.value && (
+                    <span className={styles.bullet}>•</span>
                   )}
-                </IconButton>
-                No
-              </TableCell>
-              <TableCell>
-                <IconButton onClick={() => handleSort('title')}>
-                  {sortColumn === 'title' && sortOrder === 'asc' ? (
-                    <ArrowDownward />
-                  ) : (
-                    <ArrowUpward />
-                  )}
-                </IconButton>
-                Title
-              </TableCell>
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {displayedReports.map((report, index) => (
-              <TableRow key={report.id}>
-                <TableCell>{currentPage * itemsPerPage + index + 1}</TableCell>
-                <TableCell>{report.title}</TableCell>
-                <TableCell>
-                  <Button
-                    variant="outlined"
-                    component={RouterLink}
-                    to={`/reports/${report.id}`} // URL absolut menuju detail laporan
-                    size="small"
-                  >
-                    View
-                  </Button>
-                  {(userRole === 'owner' ||
-                    userRole === 'admin' ||
-                    report.userId === userId) && (
-                    <>
-                      <Button
-                        variant="outlined"
-                        color="warning"
-                        component={RouterLink}
-                        to={`/reports/edit/${report.id}`}
-                        size="small"
-                        sx={{ ml: 1 }}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        variant="contained"
-                        color="error"
-                        size="small"
-                        onClick={() => handleOpenDeleteDialog(report.id)}
-                        sx={{ ml: 1 }}
-                      >
-                        Delete
-                      </Button>
-                    </>
-                  )}
-                </TableCell>
-              </TableRow>
+                  <ListItemText primary={option.label} />
+                </ListItemButton>
+              </ListItem>
             ))}
-            {filteredReports.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={3} align="center">
-                  No reports found.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <Box display="flex" justifyContent="center" mt={3}>
+          </List>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setSortDialogOpen(false)}>Cancel</Button>
+          <Button
+            onClick={() => handleSortOption(selectedSortOption)}
+            variant="contained"
+            className={styles.applyButton}
+          >
+            Apply
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Tabel Reports (komponen terpisah) */}
+      <ReportsTable
+        reports={displayedReports}
+        currentPage={currentPage}
+        itemsPerPage={itemsPerPage}
+        formatDateWIB={formatDateWIB}
+        getReportTimestamp={getReportTimestamp}
+        userRole={userRole}
+        userId={userId}
+        handleOpenDeleteDialog={handleOpenDeleteDialog}
+      />
+
+      <Box
+        className={styles.paginationContainer}
+        display="flex"
+        justifyContent="center"
+        mt={3}
+      >
         <ReactPaginate
           previousLabel={'Previous'}
           nextLabel={'Next'}
           breakLabel={'...'}
           pageCount={pageCount}
           onPageChange={({ selected }) => setCurrentPage(selected)}
-          containerClassName={'pagination'}
-          activeClassName={'active'}
-          pageClassName={'page-item'}
-          pageLinkClassName={'page-link'}
-          previousClassName={'page-item'}
-          previousLinkClassName={'page-link'}
-          nextClassName={'page-item'}
-          nextLinkClassName={'page-link'}
+          containerClassName={styles.pagination}
+          activeClassName={styles.active}
+          pageClassName={styles.pageItem}
+          pageLinkClassName={styles.pageLink}
+          previousClassName={styles.pageItem}
+          previousLinkClassName={styles.pageLink}
+          nextClassName={styles.pageItem}
+          nextLinkClassName={styles.pageLink}
         />
       </Box>
       <Dialog open={deleteDialogOpen} onClose={handleCloseDeleteDialog}>
