@@ -16,7 +16,12 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import ReactPaginate from 'react-paginate';
 import { Link as RouterLink } from 'react-router-dom';
 
@@ -25,29 +30,39 @@ import ReportsTable from './ReportsTable';
 import api from '../../services/api';
 
 const Reports = () => {
+  const theme = useTheme();
+
+  // Data state
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  // User data
   const [userRole, setUserRole] = useState('');
   const [userId, setUserId] = useState('');
-  const [currentPage, setCurrentPage] = useState(0);
+
+  // Pencarian & Filter
   const [searchQuery, setSearchQuery] = useState('');
+  const [filterSender, setFilterSender] = useState('all'); // all, owner, admin, user
+  const [filterStatus, setFilterStatus] = useState('all'); // all, hoax, valid
 
   // Sorting state
   const [sortDialogOpen, setSortDialogOpen] = useState(false);
   const [selectedSortOption, setSelectedSortOption] = useState('title-asc');
-
-  // Delete dialog state
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedReportId, setSelectedReportId] = useState(null);
-
-  // Daftar opsi sorting
   const sortOptions = [
     { value: 'title-asc', label: 'Title (A-Z)' },
     { value: 'title-desc', label: 'Title (Z-A)' },
     { value: 'time-new', label: 'Waktu (Terbaru)' },
     { value: 'time-old', label: 'Waktu (Terlama)' },
   ];
+
+  // Delete dialog state
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedReportId, setSelectedReportId] = useState(null);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 5;
 
   useEffect(() => {
     const fetchReports = async () => {
@@ -68,14 +83,14 @@ const Reports = () => {
     fetchReports();
   }, []);
 
-  // Helper: gunakan updatedAt jika ada dan berbeda, jika tidak gunakan createdAt.
+  // Helper: gunakan updatedAt jika ada dan berbeda; jika tidak, gunakan createdAt.
   const getReportTimestamp = (report) => {
     return report.updatedAt && report.updatedAt !== report.createdAt
       ? report.updatedAt
       : report.createdAt;
   };
 
-  // Format tanggal sesuai locale 'id-ID' dan tambahkan "WIB"
+  // Format tanggal ke locale 'id-ID' dan tambahkan "WIB"
   const formatDateWIB = (dateStr) => {
     const options = {
       weekday: 'long',
@@ -89,7 +104,7 @@ const Reports = () => {
     return new Date(dateStr).toLocaleString('id-ID', options) + ' WIB';
   };
 
-  // Fungsi sorting: mengurutkan laporan sesuai opsi yang dipilih
+  // Sorting: fungsi untuk mengurutkan laporan berdasarkan opsi yang dipilih dari dialog
   const handleSortOption = (option) => {
     let newSortColumn, newSortOrder;
     if (option === 'title-asc') {
@@ -121,16 +136,35 @@ const Reports = () => {
     setSortDialogOpen(false);
   };
 
+  // Filter handlers
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
     setCurrentPage(0);
   };
 
-  const filteredReports = reports.filter((report) =>
-    report.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const handleFilterSenderChange = (e) => {
+    setFilterSender(e.target.value);
+    setCurrentPage(0);
+  };
 
-  const itemsPerPage = 5;
+  const handleFilterStatusChange = (e) => {
+    setFilterStatus(e.target.value);
+    setCurrentPage(0);
+  };
+
+  // Filter data: berdasarkan pencarian, filter pengirim, dan filter status
+  const filteredReports = reports.filter((report) => {
+    const matchesSearch = report.title
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+    const matchesSender =
+      filterSender === 'all' || report.user.role.toLowerCase() === filterSender;
+    const matchesStatus =
+      filterStatus === 'all' ||
+      report.validationStatus.toLowerCase() === filterStatus;
+    return matchesSearch && matchesSender && matchesStatus;
+  });
+
   const displayedReports = filteredReports.slice(
     currentPage * itemsPerPage,
     (currentPage + 1) * itemsPerPage
@@ -162,23 +196,42 @@ const Reports = () => {
     return (
       <Box
         className={styles.container}
+        sx={{
+          backgroundColor: theme.palette.background.default,
+          color: theme.palette.text.primary,
+        }}
         display="flex"
         justifyContent="center"
-        mt={5}
+        mt={3}
       >
         <CircularProgress />
       </Box>
     );
   }
+
   if (error) {
     return (
-      <Box className={styles.container} m={5}>
+      <Box
+        className={styles.container}
+        sx={{
+          backgroundColor: theme.palette.background.default,
+          color: theme.palette.text.primary,
+        }}
+        m={3}
+      >
         <Alert severity="error">{error}</Alert>
       </Box>
     );
   }
+
   return (
-    <Box className={styles.container}>
+    <Box
+      className={styles.container}
+      sx={{
+        backgroundColor: theme.palette.background.default,
+        color: theme.palette.text.primary,
+      }}
+    >
       <Box className={styles.header}>
         <Typography variant="h4">Reports</Typography>
         <Button variant="contained" component={RouterLink} to="/create-report">
@@ -194,6 +247,45 @@ const Reports = () => {
         className="mb-3"
       />
 
+      {/* Filter Controls */}
+      <Box className={styles.filterContainer}>
+        <FormControl
+          variant="outlined"
+          size="small"
+          className={styles.filterControl}
+        >
+          <InputLabel id="filter-sender-label">Pengirim</InputLabel>
+          <Select
+            labelId="filter-sender-label"
+            value={filterSender}
+            onChange={handleFilterSenderChange}
+            label="Pengirim"
+          >
+            <MenuItem value="all">Semua</MenuItem>
+            <MenuItem value="owner">Owner</MenuItem>
+            <MenuItem value="admin">Admin</MenuItem>
+            <MenuItem value="user">User</MenuItem>
+          </Select>
+        </FormControl>
+        <FormControl
+          variant="outlined"
+          size="small"
+          className={styles.filterControl}
+        >
+          <InputLabel id="filter-status-label">Status</InputLabel>
+          <Select
+            labelId="filter-status-label"
+            value={filterStatus}
+            onChange={handleFilterStatusChange}
+            label="Status"
+          >
+            <MenuItem value="all">Semua</MenuItem>
+            <MenuItem value="hoax">Hoax</MenuItem>
+            <MenuItem value="valid">Valid</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
+
       {/* Sorting Control */}
       <Box className={styles.sortContainer}>
         <Button
@@ -202,7 +294,8 @@ const Reports = () => {
           className={styles.sortButton}
         >
           <SortIcon fontSize="small" style={{ marginRight: '0.3rem' }} />
-          Sort By
+          Sort By:{' '}
+          {sortOptions.find((opt) => opt.value === selectedSortOption)?.label}
         </Button>
       </Box>
 
@@ -251,6 +344,7 @@ const Reports = () => {
         handleOpenDeleteDialog={handleOpenDeleteDialog}
       />
 
+      {/* Pagination */}
       <Box
         className={styles.paginationContainer}
         display="flex"
@@ -273,13 +367,18 @@ const Reports = () => {
           nextLinkClassName={styles.pageLink}
         />
       </Box>
-      <Dialog open={deleteDialogOpen} onClose={handleCloseDeleteDialog}>
+
+      {/* Delete Dialog */}
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+      >
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
           Are you sure you want to delete this report?
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDeleteDialog}>No</Button>
+          <Button onClick={() => setDeleteDialogOpen(false)}>No</Button>
           <Button
             onClick={handleConfirmDelete}
             variant="contained"

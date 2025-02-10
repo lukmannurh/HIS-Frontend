@@ -1,6 +1,6 @@
 .container {
-  padding-top: 80px; /* Ruang untuk top navbar */
-  padding-bottom: 40px;
+  padding-top: 20px;
+  padding-bottom: 20px;
   margin: 0 auto;
   max-width: 1200px;
   font-family: 'Roboto', sans-serif;
@@ -10,7 +10,18 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Filter Controls */
+.filterContainer {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.filterControl {
+  min-width: 150px;
 }
 
 /* Sorting Controls */
@@ -46,10 +57,11 @@
   padding: 0.75rem 1rem;
 }
 
+/* Bullet sebagai penanda opsi yang dipilih (diperbesar seukuran huruf) */
 .bullet {
   margin-right: 0.5rem;
   color: #43a047;
-  font-size: 1.5rem; /* diperbesar */
+  font-size: 1.8rem;
 }
 
 /* Dialog Apply Button */
@@ -68,39 +80,66 @@
 
 /* Table Styling */
 .tableContainer {
-  margin-top: 1.5rem;
+  margin-top: 1rem;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
 .table {
   font-size: 14px;
+  width: 100%;
+  border-collapse: collapse;
 }
 
-.table th {
-  background-color: #f8f9fa;
+/* Common cell styling */
+.cell {
+  border: 1px solid;
+  border-color: inherit;
+  padding: 0.75rem;
+  text-align: justify;
+  color: inherit;
+}
+
+.centerText {
+  text-align: center !important;
+}
+
+/* Header Styling */
+.tableHeader {
+  background-color: #88c273;  /* Header dengan tema hijau */
+}
+
+.tableHeader .cell {
   font-weight: bold;
+  color: #ffffff;
   text-align: center;
-  padding: 0.75rem;
 }
 
-.table td {
-  padding: 0.75rem;
-  text-align: justify; /* Semua teks justify */
+/* Alternating row background */
+.table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
 }
 
-.titleCell {
-  text-align: justify;
+.table tbody tr:nth-child(odd) {
+  background-color: #ffffff;
 }
 
-.justifyText {
-  text-align: justify;
+/* Styling khusus untuk status */
+.hoaxStatus {
+  color: #c62828;
+  font-weight: bold;
 }
 
-/* Override untuk kolom nomor dan actions agar tetap center */
-.table td:nth-child(1),
-.table td:nth-child(5),
-.table th:nth-child(1),
-.table th:nth-child(5) {
-  text-align: center;
+.validStatus {
+  color: #2e7d32;
+  font-weight: bold;
+}
+
+/* Link styling untuk Title */
+.link {
+  text-decoration: none;
+  color: inherit;
 }
 
 /* Pagination Styling dengan tema hijau */
@@ -143,4 +182,29 @@
 /* Custom Action Button */
 .actionButton {
   margin-left: 0.5rem;
+}
+
+/* Styling untuk light mode tabel */
+.tableLight {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+/* Styling untuk dark mode tabel:
+   - Background: #88c273 sesuai keinginan.
+   - Teks: override agar tetap hitam.
+   - Border: warna terang.
+*/
+.tableDark {
+  background-color: #88c273 !important;
+  color: #000000 !important;
+}
+
+.tableDark .cell {
+  border-color: #dcdcdc !important;
+}
+
+/* Pastikan link tetap terlihat */
+.tableDark .link {
+  color: #000000;
 }
