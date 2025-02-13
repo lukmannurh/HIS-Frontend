@@ -1,0 +1,208 @@
+.createReportContainer {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 2rem;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+}
+
+.heading {
+  font-family: 'Roboto', sans-serif;
+  color: #2c3e50;
+  margin-bottom: 1.5rem;
+}
+
+.alert {
+  margin-bottom: 1rem;
+}
+
+.form {
+  width: 100%;
+}
+
+.inputField {
+  margin-bottom: 1.5rem;
+}
+
+.buttonWrapper {
+  position: relative;
+  margin-top: 1.5rem;
+}
+
+.submitButton {
+  padding: 12px;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.submitButton:hover {
+  background-color: #0056b3;
+}
+
+/* Loading overlay (covers entire screen during processing) */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.95);
+  z-index: 1300;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  pointer-events: all;
+  padding: 1rem;
+}
+
+/* Progress container within overlay */
+.progressContainer {
+  width: 80%;
+  max-width: 400px;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.progressText {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #4caf50;
+  margin-bottom: 0.5rem;
+}
+
+.progressBar {
+  width: 100%;
+  background-color: #f0f0f0;
+  border-radius: 10px;
+  height: 10px;
+  margin-bottom: 1rem;
+}
+
+.progress {
+  height: 100%;
+  border-radius: 10px;
+}
+
+/* Processing text */
+.processingText {
+  font-size: 1.1rem;
+  margin-top: 0.5rem;
+  color: #007bff;
+}
+
+/* Envelope Animation */
+.letterImage {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  margin: 0 auto 1rem;
+}
+
+.animatedMail {
+  position: absolute;
+  width: 200px;
+  height: 150px;
+  transition: 0.2s;
+  animation-name: mail-animation;
+  animation-duration: 5s; /* 2x lebih cepat dari referensi */
+  animation-iteration-count: infinite;
+}
+
+.backFold,
+.topFold,
+.leftFold,
+.body {
+  display: none;
+}
+
+.letter {
+  position: relative;
+  width: 100%;
+  height: 120px;
+  background: #ffffff;
+  border: 2px solid #4caf50;
+  border-radius: 8px;
+}
+
+.letterBorder {
+  height: 6px;
+  width: 100%;
+  background: #4caf50;
+}
+
+.letterTitle {
+  margin-top: 10px;
+  margin-left: 5px;
+  height: 10px;
+  width: 60%;
+  background: #4caf50;
+}
+
+.letterContext {
+  margin-top: 10px;
+  margin-left: 5px;
+  height: 10px;
+  width: 20%;
+  background: #4caf50;
+}
+
+.letterStamp {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 30px;
+  height: 30px;
+  background-color: #4caf50;
+  border-radius: 4px;
+}
+
+.letterStampInner {
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+/* Optional Shadow for envelope */
+.shadow {
+  position: absolute;
+  top: 200px;
+  left: 50%;
+  width: 400px;
+  height: 30px;
+  transform: translateX(-50%);
+  border-radius: 100%;
+  background: radial-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.0), rgba(0,0,0,0.0));
+  animation-name: shadow-animation;
+  animation-duration: 5s; /* 2x lebih cepat */
+  animation-iteration-count: infinite;
+}
+
+@keyframes mail-animation {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-10px);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes shadow-animation {
+  0% { }
+  25% { width: 250px; }
+  90% { width: 250px; }
+  100% { }
+}
