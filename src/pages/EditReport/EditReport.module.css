@@ -1,0 +1,30 @@
+.editReportContainer {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 2rem;
+}
+
+.form {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.inputField {
+  margin-bottom: 1.5rem;
+}
+
+.alert {
+  margin-bottom: 1rem;
+}
+
+.loadingContainer {
+  margin-top: 2rem;
+}
+
+@media (max-width: 600px) {
+  .editReportContainer {
+    margin-top: 1rem;
+    padding: 10px;
+  }
+}

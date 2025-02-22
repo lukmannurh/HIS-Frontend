@@ -10,8 +10,10 @@ import {
 
 import Navbar from './components/Navbar/Navbar';
 import ProtectedRoute from './components/Routes/ProtectedRoute';
+import Archives from './pages/Archives/Archives';
 import CreateReport from './pages/CreateReport/CreateReport';
 import Dashboard from './pages/Dashboard/Dashboard';
+import EditReport from './pages/EditReport/EditReport';
 import LandingPage from './pages/LandingPage/LandingPage';
 import Login from './pages/Login/Login';
 import NotFound from './pages/NotFound/NotFound';
@@ -22,24 +24,20 @@ import Reports from './pages/Reports/Reports';
 import Unauthorized from './pages/Unauthorized/Unauthorized';
 import UserManagement from './pages/UserManagement/UserManagement';
 
-const DefaultLayout = () => {
-  return (
-    <Box sx={{ display: 'flex' }}>
-      <Box component="main" sx={{ flexGrow: 1, p: 1 }}>
-        {/* Toolbar sebagai spacer untuk mengkompensasi tinggi AppBar */}
-        <Toolbar />
-        <Outlet />
-      </Box>
+const DefaultLayout = () => (
+  <Box sx={{ display: 'flex' }}>
+    <Box component="main" sx={{ flexGrow: 1, p: 1 }}>
+      <Toolbar />
+      <Outlet />
     </Box>
-  );
-};
+  </Box>
+);
 
 function App() {
   return (
     <Router>
       <Navbar />
       <Routes>
-        {/* Landing page */}
         <Route path="/" element={<LandingPage />} />
         <Route element={<DefaultLayout />}>
           <Route path="/login" element={<Login />} />
@@ -52,7 +50,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-          {/* Sibling routes untuk Reports */}
           <Route
             path="/reports"
             element={
@@ -70,10 +67,26 @@ function App() {
             }
           />
           <Route
+            path="/reports/edit/:reportId"
+            element={
+              <ProtectedRoute>
+                <EditReport />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/create-report"
             element={
               <ProtectedRoute>
                 <CreateReport />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/archives"
+            element={
+              <ProtectedRoute>
+                <Archives />
               </ProtectedRoute>
             }
           />

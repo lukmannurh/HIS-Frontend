@@ -18,7 +18,8 @@ import api from '../../services/api';
 
 const CreateReport = () => {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ title: '', content: '' });
+  const [form, setForm] = useState({ title: '', content: '', link: '' });
+  const [file, setFile] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -34,13 +35,16 @@ const CreateReport = () => {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0] || null);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
     setProgress(0);
 
-    // Simulate progress from 0 to 99%
     let simulatedProgress = 0;
     const progressInterval = setInterval(() => {
       simulatedProgress += 10;
@@ -49,10 +53,18 @@ const CreateReport = () => {
         clearInterval(progressInterval);
       }
       setProgress(simulatedProgress);
-    }, 300); // 300ms interval, 2x faster than reference
+    }, 300);
 
     try {
-      const response = await api.post('/reports', form);
+      const formData = new FormData();
+      formData.append('title', form.title);
+      formData.append('content', form.content);
+      if (form.link) formData.append('link', form.link);
+      if (file) formData.append('document', file);
+
+      const response = await api.post('/reports', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
       const newReport = response.data.data;
       clearInterval(progressInterval);
       setProgress(100);
@@ -84,7 +96,6 @@ const CreateReport = () => {
 
   return (
     <Container maxWidth="sm" className={`mt-5 ${styles.createReportContainer}`}>
-      {/* Form visible only when not loading */}
       {!loading && (
         <div className={`card ${styles.card}`}>
           <div className="card-body">
@@ -101,7 +112,11 @@ const CreateReport = () => {
                 {error}
               </Alert>
             )}
-            <form onSubmit={handleSubmit} className={styles.form}>
+            <form
+              onSubmit={handleSubmit}
+              className={styles.form}
+              encType="multipart/form-data"
+            >
               <TextField
                 label="Title"
                 name="title"
@@ -126,6 +141,26 @@ const CreateReport = () => {
                 required
                 className={styles.inputField}
               />
+              <TextField
+                label="Link (opsional)"
+                name="link"
+                value={form.link}
+                onChange={handleChange}
+                fullWidth
+                margin="normal"
+                className={styles.inputField}
+              />
+              <Box mt={2}>
+                <Typography variant="body1" gutterBottom>
+                  Upload Document/Foto (opsional):
+                </Typography>
+                <input
+                  type="file"
+                  name="document"
+                  accept=".jpg,.jpeg,.png,.svg,.pdf,.doc,.docx"
+                  onChange={handleFileChange}
+                />
+              </Box>
               <Box className={styles.buttonWrapper}>
                 <Button
                   type="submit"
@@ -150,30 +185,9 @@ const CreateReport = () => {
           </div>
         </div>
       )}
-
-      {/* Full-page overlay displayed during processing */}
       {loading && (
         <Box className={styles.overlay}>
           <Box className={styles.progressContainer}>
-            {/* Envelope animation above the progress bar */}
-            <div className={styles.letterImage}>
-              <div className={styles.animatedMail}>
-                <div className={styles.backFold}></div>
-                <div className={styles.letter}>
-                  <div className={styles.letterBorder}></div>
-                  <div className={styles.letterTitle}></div>
-                  <div className={styles.letterContext}></div>
-                  <div className={styles.letterStamp}>
-                    <div className={styles.letterStampInner}></div>
-                  </div>
-                </div>
-                <div className={styles.topFold}></div>
-                <div className={styles.body}></div>
-                <div className={styles.leftFold}></div>
-              </div>
-              <div className={styles.shadow}></div>
-            </div>
-            {/* Progress Indicator */}
             <Typography variant="h6" className={styles.progressText}>
               Processing: {progress}%
             </Typography>
@@ -188,7 +202,6 @@ const CreateReport = () => {
           </Box>
         </Box>
       )}
-
       <Snackbar
         open={notification.open}
         autoHideDuration={5000}

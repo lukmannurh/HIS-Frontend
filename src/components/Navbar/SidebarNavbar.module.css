@@ -1,35 +1,47 @@
 .appBar {
-  z-index: 1201; /* Lebih tinggi dari Drawer */
-  background-color: #88c273; /* Gunakan warna #88c273 */
+  z-index: 1201; /* Lebih tinggi dari drawer */
+  background-color: #88c273;
 }
 
-.drawer {
+.drawerPaper {
   width: 250px;
+  background-color: #f8f9fa;
+  padding-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
-/* Styling untuk konten drawer */
-.drawerBox {
-  background-color: #88c273; /* Sidebar background dengan warna yang sama */
-  color: #ffffff; /* Pastikan teks terlihat dengan warna putih */
-  height: 100%;
+.drawerHeader {
+  padding: 0 16px;
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #2c3e50;
 }
 
-/* Styling untuk ListItem */
-.listItem {
-  color: #ffffff; /* Teks putih */
+.listItemButton {
+  padding: 12px 16px;
+  transition: background-color 0.3s;
 }
 
-/* Styling tambahan untuk ListItem menggunakan MUI */
-.drawer .MuiListItem-root {
-  padding: 12px 24px;
-  transition: background-color 0.3s ease;
+.listItemButton:hover {
+  background-color: #e9ecef;
 }
 
-.drawer .MuiListItem-root:hover {
-  background-color: #76a15c; /* Sedikit lebih gelap sebagai efek hover */
+.icon {
+  color: #2c3e50;
 }
 
-.drawer .MuiListItemText-primary {
-  font-size: 1rem;
-  font-weight: 500;
+.logoutContainer {
+  margin-top: auto;
+  padding: 8px 0;
+}
+
+.logoutButton {
+  padding: 12px 16px;
+  transition: background-color 0.3s;
+}
+
+.logoutButton:hover {
+  background-color: #f1f3f5;
 }

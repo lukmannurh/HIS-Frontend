@@ -1,6 +1,5 @@
 .container {
-  padding-top: 20px;
-  padding-bottom: 20px;
+  padding: 20px;
   margin: 0 auto;
   max-width: 1200px;
   font-family: 'Roboto', sans-serif;
@@ -13,7 +12,6 @@
   margin-bottom: 1rem;
 }
 
-/* Filter Controls */
 .filterContainer {
   display: flex;
   gap: 1rem;
@@ -24,61 +22,6 @@
   min-width: 150px;
 }
 
-/* Sorting Controls */
-.sortContainer {
-  display: flex;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.sortButton {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  font-weight: 500;
-  color: #007bff;
-  border: 1px solid #007bff;
-  border-radius: 4px;
-  padding: 0.5rem 1rem;
-  transition: background-color 0.3s ease;
-  cursor: pointer;
-}
-
-.sortButton:hover {
-  background-color: #e9ecef;
-}
-
-/* Dialog Sorting */
-.sortDialogListItem {
-  cursor: pointer;
-}
-
-.sortListItemButton {
-  padding: 0.75rem 1rem;
-}
-
-/* Bullet sebagai penanda opsi yang dipilih (diperbesar seukuran huruf) */
-.bullet {
-  margin-right: 0.5rem;
-  color: #43a047;
-  font-size: 1.8rem;
-}
-
-/* Dialog Apply Button */
-.applyButton {
-  background-color: #007bff;
-  color: #fff;
-  font-weight: 600;
-  border-radius: 4px;
-  padding: 0.5rem 1rem;
-  transition: background-color 0.3s ease;
-}
-
-.applyButton:hover {
-  background-color: #0056b3;
-}
-
-/* Table Styling */
 .tableContainer {
   margin-top: 1rem;
   border-radius: 6px;
@@ -87,27 +30,22 @@
 }
 
 .table {
-  font-size: 14px;
   width: 100%;
   border-collapse: collapse;
 }
 
-/* Common cell styling */
 .cell {
-  border: 1px solid;
-  border-color: inherit;
-  padding: 0.75rem;
-  text-align: justify;
-  color: inherit;
+  border: 1px solid #e0e0e0;
+  padding: 12px;
+  text-align: left;
 }
 
 .centerText {
-  text-align: center !important;
+  text-align: center;
 }
 
-/* Header Styling */
 .tableHeader {
-  background-color: #88c273;  /* Header dengan tema hijau */
+  background-color: #88c273;
 }
 
 .tableHeader .cell {
@@ -116,16 +54,7 @@
   text-align: center;
 }
 
-/* Alternating row background */
-.table tbody tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
-
-.table tbody tr:nth-child(odd) {
-  background-color: #ffffff;
-}
-
-/* Styling khusus untuk status */
+/* Styles untuk status validasi */
 .hoaxStatus {
   color: #c62828;
   font-weight: bold;
@@ -136,13 +65,25 @@
   font-weight: bold;
 }
 
-/* Link styling untuk Title */
-.link {
-  text-decoration: none;
-  color: inherit;
+.durigStatus {
+  color: #ff9800;
+  font-weight: bold;
 }
 
-/* Pagination Styling dengan tema hijau */
+/* Style untuk tombol aksi */
+.actionButton {
+  margin-left: 0.5rem;
+}
+
+.statusButton {
+  margin-left: 0.5rem;
+  font-size: 0.75rem;
+  border-color: #43a047;
+  color: #43a047;
+  padding: 4px 8px;
+}
+
+/* Pagination */
 .paginationContainer {
   margin-top: 1rem;
 }
@@ -166,7 +107,7 @@
   cursor: pointer;
   text-decoration: none;
   border-radius: 4px;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s;
 }
 
 .pageLink:hover {
@@ -176,35 +117,5 @@
 .active .pageLink {
   background-color: #43a047;
   border-color: #43a047;
-  color: white;
-}
-
-/* Custom Action Button */
-.actionButton {
-  margin-left: 0.5rem;
-}
-
-/* Styling untuk light mode tabel */
-.tableLight {
-  background-color: #ffffff;
-  color: #000000;
-}
-
-/* Styling untuk dark mode tabel:
-   - Background: #88c273 sesuai keinginan.
-   - Teks: override agar tetap hitam.
-   - Border: warna terang.
-*/
-.tableDark {
-  background-color: #88c273 !important;
-  color: #000000 !important;
-}
-
-.tableDark .cell {
-  border-color: #dcdcdc !important;
-}
-
-/* Pastikan link tetap terlihat */
-.tableDark .link {
-  color: #000000;
+  color: #ffffff;
 }

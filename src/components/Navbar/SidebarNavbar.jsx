@@ -1,19 +1,32 @@
 import React, { useState, useContext } from 'react';
 
+import ArchiveIcon from '@mui/icons-material/Archive';
+import ArticleIcon from '@mui/icons-material/Article';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import GroupIcon from '@mui/icons-material/Group';
+import LogoutIcon from '@mui/icons-material/Logout';
 import MenuIcon from '@mui/icons-material/Menu';
+import PersonIcon from '@mui/icons-material/Person';
 import {
+  Box,
   Drawer,
   List,
   ListItem,
+  ListItemButton,
+  ListItemIcon,
   ListItemText,
+  Divider,
   IconButton,
   AppBar,
   Toolbar,
   Typography,
-  Divider,
-  Box,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
 } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 
@@ -22,23 +35,46 @@ import { AuthContext } from '../../context/AuthContext';
 import { ThemeContext } from '../../context/ThemeContext';
 
 const SidebarNavbar = () => {
-  const [open, setOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
   const { auth, logout } = useContext(AuthContext);
   const { toggleTheme, mode } = useContext(ThemeContext);
 
   const toggleDrawer = () => {
-    setOpen(!open);
+    setDrawerOpen(!drawerOpen);
   };
 
+  // Daftar menu utama
   const menuItems = [
-    { text: 'Dashboard', path: '/dashboard' },
-    { text: 'Reports', path: '/reports' },
-    { text: 'Profile', path: '/profile' },
-    ...(auth.user.role === 'owner' || auth.user.role === 'admin'
-      ? [{ text: 'User Management', path: '/user-management' }]
+    { text: 'Dashboard', path: '/dashboard', icon: <DashboardIcon /> },
+    { text: 'Reports', path: '/reports', icon: <ArticleIcon /> },
+    { text: 'Archives', path: '/archives', icon: <ArchiveIcon /> },
+    { text: 'Profile', path: '/profile', icon: <PersonIcon /> },
+    // Menu tambahan untuk admin/owner
+    ...(auth.user && (auth.user.role === 'owner' || auth.user.role === 'admin')
+      ? [
+          {
+            text: 'User Management',
+            path: '/user-management',
+            icon: <GroupIcon />,
+          },
+        ]
       : []),
-    { text: 'Logout', action: logout },
   ];
+
+  // Fungsi untuk menangani logout
+  const handleLogoutConfirm = () => {
+    setLogoutDialogOpen(true);
+  };
+
+  const handleLogoutCancel = () => {
+    setLogoutDialogOpen(false);
+  };
+
+  const handleLogout = () => {
+    setLogoutDialogOpen(false);
+    logout();
+  };
 
   return (
     <>
@@ -47,52 +83,78 @@ const SidebarNavbar = () => {
           <IconButton
             edge="start"
             color="inherit"
-            aria-label="menu"
             onClick={toggleDrawer}
             sx={{ mr: 2 }}
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>
             HIS
           </Typography>
-          <IconButton sx={{ ml: 1 }} color="inherit" onClick={toggleTheme}>
+          <IconButton color="inherit" onClick={toggleTheme}>
             {mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
           </IconButton>
         </Toolbar>
       </AppBar>
-
       <Drawer
-        variant="temporary"
-        open={open}
+        anchor="left"
+        open={drawerOpen}
         onClose={toggleDrawer}
-        ModalProps={{ keepMounted: true }}
-        className={styles.drawer}
+        classes={{ paper: styles.drawerPaper }}
       >
-        <Box
-          sx={{ width: 250 }}
-          role="presentation"
-          onClick={toggleDrawer}
-          onKeyDown={toggleDrawer}
-          className={styles.drawerBox}
-        >
-          <List className="mt-3">
-            {menuItems.map((item, index) => (
-              <ListItem
-                button
-                key={index}
-                component={item.path ? RouterLink : 'button'}
+        <Box className={styles.drawerHeader}>
+          {/* Tampilkan username atau avatar pengguna di sini */}
+          <Typography variant="h6">
+            {auth.user ? auth.user.username : 'Menu'}
+          </Typography>
+          <Typography variant="caption" color="textSecondary">
+            {/* Misal, tampilkan role jika diinginkan */}
+            {auth.user && auth.user.role.toUpperCase()}
+          </Typography>
+        </Box>
+        <Divider />
+        <List>
+          {menuItems.map((item, index) => (
+            <ListItem key={index} disablePadding>
+              <ListItemButton
+                component={RouterLink}
                 to={item.path}
-                onClick={item.action ? item.action : null}
-                className={styles.listItem}
+                onClick={toggleDrawer}
+                className={styles.listItemButton}
               >
+                <ListItemIcon className={styles.icon}>{item.icon}</ListItemIcon>
                 <ListItemText primary={item.text} />
-              </ListItem>
-            ))}
-          </List>
-          <Divider />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+        <Box sx={{ flexGrow: 1 }} />
+        <Divider />
+        <Box className={styles.logoutContainer}>
+          <ListItemButton
+            onClick={handleLogoutConfirm}
+            className={styles.logoutButton}
+          >
+            <ListItemIcon className={styles.icon}>
+              <LogoutIcon />
+            </ListItemIcon>
+            <ListItemText primary="Logout" />
+          </ListItemButton>
         </Box>
       </Drawer>
+      {/* Dialog Konfirmasi Logout */}
+      <Dialog open={logoutDialogOpen} onClose={handleLogoutCancel}>
+        <DialogTitle>Confirm Logout</DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to logout?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleLogoutCancel}>Cancel</Button>
+          <Button onClick={handleLogout} color="error" variant="contained">
+            Logout
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CancelIcon from '@mui/icons-material/Cancel';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import InfoIcon from '@mui/icons-material/Info';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import UpdateIcon from '@mui/icons-material/Update';
@@ -23,9 +24,9 @@ import styles from './ReportDetail.module.css';
 import api from '../../services/api';
 
 const ReportDetail = () => {
-  const { reportId } = useParams(); // Ambil reportId dari URL
+  const { reportId } = useParams();
   const navigate = useNavigate();
-  const contentRef = useRef(null); // Ref untuk konten PDF
+  const contentRef = useRef(null);
 
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -55,7 +56,7 @@ const ReportDetail = () => {
         }
       } catch (err) {
         setError(
-          err.response?.data?.message || 'Failed to fetch report details'
+          err.response?.data?.message || 'Gagal mengambil detail laporan'
         );
       } finally {
         setLoading(false);
@@ -81,7 +82,7 @@ const ReportDetail = () => {
     return new Date(dateStr).toLocaleString('id-ID', options) + ' WIB';
   };
 
-  // Parsing validationDetails dan menghilangkan kata pertama saja
+  // Parsing validationDetails
   let fullValidationText = '';
   try {
     if (report.validationDetails) {
@@ -167,10 +168,35 @@ const ReportDetail = () => {
       </Container>
     );
   }
+
+  const renderStatusBadge = (status) => {
+    if (status === 'hoax') {
+      return (
+        <Box className={`${styles.statusBadge} ${styles.hoax}`}>
+          <CancelIcon className={styles.iconStatus} fontSize="large" />
+          Hoax
+        </Box>
+      );
+    } else if (status === 'valid') {
+      return (
+        <Box className={`${styles.statusBadge} ${styles.valid}`}>
+          <VerifiedUserIcon className={styles.iconStatus} fontSize="large" />
+          Valid
+        </Box>
+      );
+    } else {
+      return (
+        <Box className={`${styles.statusBadge} ${styles.doubtful}`}>
+          <HelpOutlineIcon className={styles.iconStatus} fontSize="large" />
+          Diragukan
+        </Box>
+      );
+    }
+  };
+
   return (
     <Container className={styles.container}>
       <Box className={styles.card}>
-        {/* Tombol Download PDF di pojok kanan atas */}
         <Box className={styles.downloadContainer}>
           <Button
             variant="outlined"
@@ -182,29 +208,9 @@ const ReportDetail = () => {
           </Button>
         </Box>
 
-        {/* Status Badge di pojok kiri atas */}
-        <Box
-          className={`${styles.statusBadge} ${report.validationStatus === 'hoax' ? styles.hoax : styles.valid}`}
-        >
-          {report.validationStatus === 'hoax' ? (
-            <>
-              <CancelIcon className={styles.iconStatus} fontSize="large" />
-              Hoax
-            </>
-          ) : (
-            <>
-              <VerifiedUserIcon
-                className={styles.iconStatus}
-                fontSize="large"
-              />
-              Valid
-            </>
-          )}
-        </Box>
+        {renderStatusBadge(report.validationStatus)}
 
-        {/* Konten PDF (tidak termasuk tombol download dan back) */}
         <Box className={styles.pdfContent} ref={contentRef}>
-          {/* Timestamps */}
           <Box className={styles.timestampBox}>
             <AccessTimeIcon className={styles.icon} fontSize="small" />
             <Typography variant="body2" className={styles.timestamp}>
@@ -216,16 +222,19 @@ const ReportDetail = () => {
                 <Typography variant="body2" className={styles.timestamp}>
                   Diubah pada: {formatDateWIB(report.updatedAt)}
                 </Typography>
+                {report.editedBy && (
+                  <Typography variant="body2" className={styles.editedBy}>
+                    Laporan ini diedit oleh {report.editedBy}
+                  </Typography>
+                )}
               </Box>
             )}
           </Box>
 
-          {/* Title */}
           <Typography variant="h3" className={styles.title} mt={2}>
             {report.title}
           </Typography>
 
-          {/* Content */}
           <Box mt={3}>
             <Typography variant="h6" className={styles.sectionHeader}>
               Isi Laporan:
@@ -234,10 +243,21 @@ const ReportDetail = () => {
               <Typography variant="body1" className={styles.contentText}>
                 Detail Laporan dari {report.user.username}: {report.content}
               </Typography>
+              {report.document && (
+                <Box mt={2}>
+                  <Typography variant="subtitle2">Dokumen/Lampiran:</Typography>
+                  <a
+                    href={report.document}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {report.document}
+                  </a>
+                </Box>
+              )}
             </Paper>
           </Box>
 
-          {/* Validation Details */}
           <Box mt={3}>
             <Typography variant="h6" className={styles.sectionHeader}>
               Detail Laporan:
@@ -252,19 +272,17 @@ const ReportDetail = () => {
             </Paper>
           </Box>
 
-          {/* User Information */}
           <Box mt={3}>
             <Typography variant="body2" className={styles.userInfo}>
               Laporan ini dibuat oleh {report.user.username}.
             </Typography>
           </Box>
 
-          {/* Related News */}
           <Box mt={3}>
             <Typography variant="h6" className={styles.sectionHeader}>
               Berita Terkait:
             </Typography>
-            {report.relatedNews.length > 0 ? (
+            {report.relatedNews && report.relatedNews.length > 0 ? (
               report.relatedNews.map((news, index) => (
                 <Box key={index} className={styles.relatedNewsItem}>
                   <Typography
@@ -296,7 +314,6 @@ const ReportDetail = () => {
         </Box>
       </Box>
 
-      {/* Tombol Back di luar konten PDF */}
       <Box className={styles.buttonContainer}>
         <Button
           variant="contained"
@@ -310,7 +327,7 @@ const ReportDetail = () => {
       <Snackbar
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         open={snackbar.open}
-        autoHideDuration={3000}
+        autoHideDuration={5000}
         onClose={handleCloseSnackbar}
       >
         <Alert

@@ -6,7 +6,6 @@ const api = axios.create({
   baseURL: API_URL,
 });
 
-// Interceptor untuk menambahkan Authorization header jika ada token
 api.interceptors.request.use(
   (config) => {
     const accessToken = localStorage.getItem('accessToken');
@@ -18,7 +17,6 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Interceptor untuk menangani error dan refresh token jika diperlukan
 api.interceptors.response.use(
   (response) => response,
   async (error) => {

@@ -13,8 +13,8 @@ import {
   Paper,
   IconButton,
   Tooltip,
+  Button,
 } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
 import { Link as RouterLink } from 'react-router-dom';
 
 import styles from './Reports.module.css';
@@ -27,26 +27,11 @@ const ReportsTable = ({
   getReportTimestamp,
   userRole,
   userId,
-  handleOpenDeleteDialog,
+  openStatusDialog,
 }) => {
-  const theme = useTheme();
-
   return (
-    <TableContainer
-      component={Paper}
-      className={styles.tableContainer}
-      sx={{
-        backgroundColor: theme.palette.mode === 'dark' ? '#88c273' : '#ffffff',
-      }}
-    >
-      <Table
-        className={styles.table}
-        sx={{
-          '& .MuiTableCell-root': {
-            color: theme.palette.mode === 'dark' ? '#000000' : '#000000',
-          },
-        }}
-      >
+    <TableContainer component={Paper} className={styles.tableContainer}>
+      <Table className={styles.table}>
         <TableHead className={styles.tableHeader}>
           <TableRow>
             <TableCell className={`${styles.cell} ${styles.centerText}`}>
@@ -55,7 +40,8 @@ const ReportsTable = ({
             <TableCell className={styles.cell}>Title</TableCell>
             <TableCell className={styles.cell}>Pengirim</TableCell>
             <TableCell className={styles.cell}>Waktu (WIB)</TableCell>
-            <TableCell className={styles.cell}>Status</TableCell>
+            <TableCell className={styles.cell}>Validasi</TableCell>
+            <TableCell className={styles.cell}>Status Laporan</TableCell>
             <TableCell className={`${styles.cell} ${styles.centerText}`}>
               Actions
             </TableCell>
@@ -65,7 +51,7 @@ const ReportsTable = ({
           {reports.map((report, index) => {
             const timestamp = getReportTimestamp(report);
             return (
-              <TableRow key={report.id} className={styles.tableRow}>
+              <TableRow key={report.id}>
                 <TableCell className={`${styles.cell} ${styles.centerText}`}>
                   {currentPage * itemsPerPage + index + 1}
                 </TableCell>
@@ -88,11 +74,18 @@ const ReportsTable = ({
                     className={
                       report.validationStatus === 'hoax'
                         ? styles.hoaxStatus
-                        : styles.validStatus
+                        : report.validationStatus === 'valid'
+                          ? styles.validStatus
+                          : styles.durigStatus
                     }
                   >
-                    {report.validationStatus === 'hoax' ? 'Hoax' : 'Valid'}
+                    {report.validationStatus.charAt(0).toUpperCase() +
+                      report.validationStatus.slice(1)}
                   </span>
+                </TableCell>
+                <TableCell className={styles.cell}>
+                  {/* Menampilkan status pemrosesan, misalnya "diproses" */}
+                  {report.status || 'diproses'}
                 </TableCell>
                 <TableCell className={`${styles.cell} ${styles.centerText}`}>
                   <Tooltip title="View" arrow>
@@ -100,7 +93,6 @@ const ReportsTable = ({
                       component={RouterLink}
                       to={`/reports/${report.id}`}
                       size="small"
-                      sx={{ color: '#000000' }}
                     >
                       <VisibilityIcon fontSize="small" />
                     </IconButton>
@@ -115,22 +107,34 @@ const ReportsTable = ({
                           to={`/reports/edit/${report.id}`}
                           size="small"
                           className={styles.actionButton}
-                          sx={{ color: '#000000' }}
                         >
                           <EditIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
                       <Tooltip title="Delete" arrow>
                         <IconButton
-                          variant="contained"
-                          color="error"
                           size="small"
-                          onClick={() => handleOpenDeleteDialog(report.id)}
+                          onClick={() => {
+                            // Tambahkan handler delete jika diperlukan
+                          }}
                           className={styles.actionButton}
+                          color="error"
                         >
                           <DeleteIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
+                      {(userRole === 'owner' || userRole === 'admin') && (
+                        <Tooltip title="Mark as Selesai" arrow>
+                          <Button
+                            size="small"
+                            variant="outlined"
+                            className={styles.statusButton}
+                            onClick={() => openStatusDialog(report)}
+                          >
+                            Selesai
+                          </Button>
+                        </Tooltip>
+                      )}
                     </>
                   )}
                 </TableCell>
@@ -141,7 +145,7 @@ const ReportsTable = ({
             <TableRow>
               <TableCell
                 className={`${styles.cell} ${styles.centerText}`}
-                colSpan={6}
+                colSpan={7}
               >
                 No reports found.
               </TableCell>
