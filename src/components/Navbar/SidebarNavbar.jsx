@@ -28,7 +28,7 @@ import {
   DialogActions,
   Button,
 } from '@mui/material';
-import { Link as RouterLink } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import styles from './SidebarNavbar.module.css';
 import { AuthContext } from '../../context/AuthContext';
@@ -37,20 +37,36 @@ import { ThemeContext } from '../../context/ThemeContext';
 const SidebarNavbar = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
+
   const { auth, logout } = useContext(AuthContext);
   const { toggleTheme, mode } = useContext(ThemeContext);
+  const navigate = useNavigate(); // untuk redirect
 
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen);
   };
 
-  // Daftar menu utama
+  const handleLogoutConfirm = () => {
+    setLogoutDialogOpen(true);
+  };
+
+  const handleLogoutCancel = () => {
+    setLogoutDialogOpen(false);
+  };
+
+  // Panggil logout dari context, lalu redirect
+  const handleLogout = () => {
+    setLogoutDialogOpen(false);
+    logout();
+    navigate('/login');
+  };
+
+  // Daftar menu
   const menuItems = [
     { text: 'Dashboard', path: '/dashboard', icon: <DashboardIcon /> },
     { text: 'Reports', path: '/reports', icon: <ArticleIcon /> },
     { text: 'Archives', path: '/archives', icon: <ArchiveIcon /> },
     { text: 'Profile', path: '/profile', icon: <PersonIcon /> },
-    // Menu tambahan untuk admin/owner
     ...(auth.user && (auth.user.role === 'owner' || auth.user.role === 'admin')
       ? [
           {
@@ -61,20 +77,6 @@ const SidebarNavbar = () => {
         ]
       : []),
   ];
-
-  // Fungsi untuk menangani logout
-  const handleLogoutConfirm = () => {
-    setLogoutDialogOpen(true);
-  };
-
-  const handleLogoutCancel = () => {
-    setLogoutDialogOpen(false);
-  };
-
-  const handleLogout = () => {
-    setLogoutDialogOpen(false);
-    logout();
-  };
 
   return (
     <>
@@ -103,12 +105,10 @@ const SidebarNavbar = () => {
         classes={{ paper: styles.drawerPaper }}
       >
         <Box className={styles.drawerHeader}>
-          {/* Tampilkan username atau avatar pengguna di sini */}
           <Typography variant="h6">
-            {auth.user ? auth.user.username : 'Menu'}
+            {auth.user ? auth.user.username.toUpperCase() : 'Menu'}
           </Typography>
           <Typography variant="caption" color="textSecondary">
-            {/* Misal, tampilkan role jika diinginkan */}
             {auth.user && auth.user.role.toUpperCase()}
           </Typography>
         </Box>
@@ -117,10 +117,9 @@ const SidebarNavbar = () => {
           {menuItems.map((item, index) => (
             <ListItem key={index} disablePadding>
               <ListItemButton
-                component={RouterLink}
-                to={item.path}
                 onClick={toggleDrawer}
-                className={styles.listItemButton}
+                component={item.path ? 'a' : 'button'}
+                href={item.path ? item.path : undefined}
               >
                 <ListItemIcon className={styles.icon}>{item.icon}</ListItemIcon>
                 <ListItemText primary={item.text} />
@@ -142,14 +141,15 @@ const SidebarNavbar = () => {
           </ListItemButton>
         </Box>
       </Drawer>
+
       {/* Dialog Konfirmasi Logout */}
       <Dialog open={logoutDialogOpen} onClose={handleLogoutCancel}>
-        <DialogTitle>Confirm Logout</DialogTitle>
+        <DialogTitle>Konfirmasi Logout</DialogTitle>
         <DialogContent>
-          <Typography>Are you sure you want to logout?</Typography>
+          <Typography>Apakah Anda yakin ingin logout?</Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleLogoutCancel}>Cancel</Button>
+          <Button onClick={handleLogoutCancel}>Batal</Button>
           <Button onClick={handleLogout} color="error" variant="contained">
             Logout
           </Button>

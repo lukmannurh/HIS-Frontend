@@ -16,15 +16,20 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState(() => {
-    // Coba ambil data user dari localStorage (jika disimpan)
     const storedUser = localStorage.getItem('user');
     return storedUser
       ? { isAuthenticated: true, user: JSON.parse(storedUser) }
       : { isAuthenticated: false, user: null };
   });
 
+  // Pastikan logout menghapus localStorage, state, dan memanggil API logout
   const logout = useCallback(async () => {
-    await logoutService();
+    try {
+      await logoutService(); // memanggil endpoint /api/auth/logout di backend
+    } catch (err) {
+      console.error('Logout API error:', err);
+      // walaupun error, tetap lanjut hapus local storage agar user dianggap logout
+    }
     localStorage.removeItem('user');
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');

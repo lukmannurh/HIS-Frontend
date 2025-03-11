@@ -36,8 +36,10 @@ api.interceptors.response.use(
         originalRequest.headers['Authorization'] = `Bearer ${accessToken}`;
         return api(originalRequest);
       } catch (err) {
+        // Refresh token gagal -> hapus token, paksa user logout
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user');
         window.location.href = '/login';
         return Promise.reject(err);
       }

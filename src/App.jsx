@@ -1,15 +1,9 @@
 import React from 'react';
 
-import { Box, Toolbar } from '@mui/material';
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Outlet,
-} from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
-import Navbar from './components/Navbar/Navbar';
 import ProtectedRoute from './components/Routes/ProtectedRoute';
+import DefaultLayout from './layouts/DefaultLayout';
 import Archives from './pages/Archives/Archives';
 import CreateReport from './pages/CreateReport/CreateReport';
 import Dashboard from './pages/Dashboard/Dashboard';
@@ -24,24 +18,21 @@ import Reports from './pages/Reports/Reports';
 import Unauthorized from './pages/Unauthorized/Unauthorized';
 import UserManagement from './pages/UserManagement/UserManagement';
 
-const DefaultLayout = () => (
-  <Box sx={{ display: 'flex' }}>
-    <Box component="main" sx={{ flexGrow: 1, p: 1 }}>
-      <Toolbar />
-      <Outlet />
-    </Box>
-  </Box>
-);
-
 function App() {
   return (
     <Router>
-      <Navbar />
       <Routes>
-        <Route path="/" element={<LandingPage />} />
+        {/* Semua route kita bungkus dengan DefaultLayout */}
         <Route element={<DefaultLayout />}>
+          {/* LandingPage tidak butuh ProtectedRoute */}
+          <Route path="/" element={<LandingPage />} />
+
+          {/* Halaman login & unauthorized juga di dalam layout,
+              tapi tidak perlu ProtectedRoute */}
           <Route path="/login" element={<Login />} />
           <Route path="/unauthorized" element={<Unauthorized />} />
+
+          {/* Sisanya perlu ProtectedRoute sesuai role */}
           <Route
             path="/dashboard"
             element={
@@ -114,8 +105,10 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* 404 Not Found */}
+          <Route path="*" element={<NotFound />} />
         </Route>
-        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );

@@ -1,7 +1,6 @@
 import React, { useState, useContext } from 'react';
 
 import {
-  Container,
   TextField,
   Button,
   Typography,
@@ -14,6 +13,7 @@ import {
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
+import styles from './Login.module.css';
 import { AuthContext } from '../../context/AuthContext';
 
 const Login = () => {
@@ -24,8 +24,9 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) =>
+  const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -36,7 +37,7 @@ const Login = () => {
       navigate('/dashboard');
     } catch (err) {
       const message =
-        err.response?.data?.message || 'Invalid username or password';
+        err.response?.data?.message || 'Username atau password salah';
       setError(message);
     } finally {
       setLoading(false);
@@ -44,25 +45,35 @@ const Login = () => {
   };
 
   return (
-    <Container maxWidth="sm">
-      <Box mt={5}>
-        <Typography variant="h4" gutterBottom>
+    <Box className={styles.loginPage}>
+      <Box className={styles.formContainer}>
+        <Typography variant="h4" className={styles.formTitle}>
           Login
         </Typography>
+        {/* Bisa tambahkan sub-teks ringkas
+        <Typography variant="body1" className={styles.formSubtitle}>
+          Silakan masukkan username dan password Anda 
+        </Typography> */}
+
         {error && (
-          <Alert severity="error" onClose={() => setError('')}>
+          <Alert
+            severity="error"
+            onClose={() => setError('')}
+            className={styles.errorAlert}
+          >
             {error}
           </Alert>
         )}
-        <form onSubmit={handleSubmit}>
+
+        <form onSubmit={handleSubmit} className={styles.loginForm}>
           <TextField
             label="Username"
             name="username"
             value={form.username}
             onChange={handleChange}
             fullWidth
-            margin="normal"
             required
+            className={styles.inputField}
           />
           <TextField
             label="Password"
@@ -71,13 +82,12 @@ const Login = () => {
             value={form.password}
             onChange={handleChange}
             fullWidth
-            margin="normal"
             required
+            className={styles.inputField}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
                   <IconButton
-                    aria-label="toggle password visibility"
                     onClick={() => setShowPassword((prev) => !prev)}
                     edge="end"
                   >
@@ -87,13 +97,14 @@ const Login = () => {
               ),
             }}
           />
-          <Box mt={2} position="relative">
+
+          <Box sx={{ position: 'relative', marginTop: '1.5rem' }}>
             <Button
               type="submit"
               variant="contained"
-              color="primary"
               fullWidth
               disabled={loading}
+              className={styles.loginButton}
             >
               Login
             </Button>
@@ -104,15 +115,15 @@ const Login = () => {
                   position: 'absolute',
                   top: '50%',
                   left: '50%',
-                  marginTop: '-12px',
-                  marginLeft: '-12px',
+                  mt: '-12px',
+                  ml: '-12px',
                 }}
               />
             )}
           </Box>
         </form>
       </Box>
-    </Container>
+    </Box>
   );
 };
 

@@ -1,27 +1,43 @@
-import React, { useContext } from 'react';
+import React from 'react';
 
-import Brightness4Icon from '@mui/icons-material/Brightness4';
-import Brightness7Icon from '@mui/icons-material/Brightness7';
-import { AppBar, Toolbar, Typography, Button, IconButton } from '@mui/material';
-import { Link as RouterLink } from 'react-router-dom';
+import { AppBar, Toolbar, Typography } from '@mui/material';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
 
-import { ThemeContext } from '../../context/ThemeContext';
+import styles from './TopNavbar.module.css';
 
 const TopNavbar = () => {
-  const { toggleTheme, mode } = useContext(ThemeContext);
+  // Hook untuk mengetahui path saat ini
+  const location = useLocation();
+
+  // Jika path saat ini adalah /login, kita sembunyikan link "Login"
+  const showLogin = location.pathname !== '/login';
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: '#88c273' }}>
-      <Toolbar>
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+    <AppBar position="static" className={styles.appBar}>
+      <Toolbar className={styles.toolbar}>
+        {/* Tulisan HIS di sisi kiri */}
+        <Typography
+          variant="h5"
+          component={RouterLink}
+          to="/"
+          className={styles.brand}
+        >
           HIS
         </Typography>
-        <Button color="inherit" component={RouterLink} to="/login">
-          Login
-        </Button>
-        <IconButton sx={{ ml: 1 }} color="inherit" onClick={toggleTheme}>
-          {mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
-        </IconButton>
+
+        {/* Di sisi kanan, tampilkan link "Login" jika bukan di /login */}
+        <div className={styles.rightSection}>
+          {showLogin && (
+            <Typography
+              variant="h5"
+              component={RouterLink}
+              to="/login"
+              className={styles.loginLink}
+            >
+              Login
+            </Typography>
+          )}
+        </div>
       </Toolbar>
     </AppBar>
   );

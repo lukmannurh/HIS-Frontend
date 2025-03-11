@@ -7,16 +7,12 @@ import { ThemeContext } from '../../context/ThemeContext';
 
 const Navbar = () => {
   const { auth } = useContext(AuthContext);
-  const { toggleTheme, mode } = useContext(ThemeContext); // Dapatkan mode dari ThemeContext
+  const { toggleTheme, mode } = useContext(ThemeContext);
 
-  return (
-    <>
-      {auth.isAuthenticated ? (
-        <SidebarNavbar toggleTheme={toggleTheme} mode={mode} />
-      ) : (
-        <TopNavbar toggleTheme={toggleTheme} mode={mode} />
-      )}
-    </>
+  return auth.isAuthenticated ? (
+    <SidebarNavbar toggleTheme={toggleTheme} mode={mode} />
+  ) : (
+    <TopNavbar toggleTheme={toggleTheme} mode={mode} />
   );
 };
 

@@ -1,0 +1,65 @@
+.loginPage {
+    /* Tetap menutupi seluruh tinggi layar */
+    height: 100vh;
+    background-color: #eafce5; /* Hijau muda lembut */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* sembunyikan scrollbar jika tidak perlu */
+  }
+  
+  .formContainer {
+    background-color: #fff;
+    width: 90%;
+    max-width: 450px; /* perbesar sedikit dari 400 */
+    padding: 3rem 2.5rem; /* lebih besar */
+    border-radius: 12px; /* sudut lebih melengkung */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* lebih halus & besar */
+    text-align: center;
+  }
+  
+  .formTitle {
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    font-weight: 700;
+    color: #2c3e50;
+  }
+  
+  /* Subtitle optional */
+  .formSubtitle {
+    margin-bottom: 1.5rem;
+    color: #666;
+    font-size: 0.95rem;
+  }
+  
+  .errorAlert {
+    margin-bottom: 1rem;
+  }
+  
+  .loginForm {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .inputField {
+    margin-top: 0.5rem;
+  }
+  
+  .loginButton {
+    background-color: #88c273;
+    color: #fff;
+    font-weight: 600;
+    text-transform: none;
+    padding: 0.75rem;
+    border-radius: 6px;
+    transition: background-color 0.3s ease;
+    font-size: 1rem; /* sedikit lebih besar */
+  }
+  
+  .loginButton:hover {
+    background-color: #6fa055;
+  }
+  
