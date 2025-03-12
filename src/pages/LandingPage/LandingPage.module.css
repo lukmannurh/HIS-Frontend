@@ -1,25 +1,174 @@
+/* Container utama */
 .landingContainer {
-  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
   width: 100%;
   margin: 0;
   padding: 0;
-}
-
-.parallax {
-  background-image: url('../../assets/images/landingPage.jpg');
-  height: 100vh;
-  background-attachment: fixed;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.landingContent {
-  background-color: rgba(0, 128, 0, 0.6); /* Hijau tua dengan transparansi */
-  padding: 40px;
-  border-radius: 10px;
   text-align: center;
+  font-family: 'Roboto', sans-serif;
+}
+
+/* HERO SECTION */
+.heroSection {
+  position: relative;
+  width: 100%;
+  height: 70vh; /* Tinggi hero disesuaikan */
+  background: url('../../assets/images/landingPage.jpg') center/cover no-repeat;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.heroOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 128, 0, 0.5); /* Overlay hijau dengan transparansi */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.heroContent {
+  position: relative;
+  max-width: 700px;
+  padding: 2rem;
+  color: #fff;
+  z-index: 2;
+  border-radius: 8px;
+}
+
+.heroTitle {
+  font-weight: 700;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  font-size: 2.5rem;
+}
+
+.heroSubtitle {
+  font-weight: 400;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  font-size: 1.2rem;
+}
+
+.heroButton {
+  background-color: #88c273;
+  color: #fff;
+  font-weight: 600;
+  text-transform: none;
+  padding: 0.8rem 2rem;
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+  font-size: 1.1rem;
+}
+
+.heroButton:hover {
+  background-color: #6fa055;
+}
+
+/* FEATURES SECTION */
+.featuresSection {
+  padding: 4rem 0;
+  background-color: #f7f7f7;
+}
+
+.sectionTitle {
+  font-weight: 700;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+}
+
+.featureCard {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 2rem 1.5rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.featureCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.featureIcon {
+  font-size: 3rem;
+  color: #88c273;
+  margin-bottom: 1rem;
+}
+
+.featureTitle {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: 1.25rem;
+}
+
+.featureDesc {
+  color: #666;
+  line-height: 1.4;
+  font-size: 0.95rem;
+}
+
+/* CTA SECTION */
+.ctaSection {
+  background-color: #eafce5; /* Hijau muda lembut */
+  padding: 3rem 0;
+}
+
+.ctaContainer {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+
+.ctaTitle {
+  font-weight: 700;
+  margin-bottom: 1rem;
+  font-size: 1.8rem;
+}
+
+.ctaSubtitle {
+  color: #555;
+  margin-bottom: 2rem;
+  line-height: 1.5;
+  font-size: 1rem;
+}
+
+.ctaButton {
+  background-color: #88c273;
+  color: #fff;
+  font-weight: 600;
+  text-transform: none;
+  padding: 0.8rem 2rem;
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+  font-size: 1rem;
+}
+
+.ctaButton:hover {
+  background-color: #6fa055;
+}
+
+/* FOOTER */
+.footer {
+  background-color: #f1f3f4;
+  padding: 1.5rem 0;
+  margin-top: auto;
+}
+
+.footerContent {
+  text-align: center;
+  color: #777;
+  font-size: 0.9rem;
 }
