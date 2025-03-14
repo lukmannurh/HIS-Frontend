@@ -1,0 +1,6 @@
+.dashboardWrapper {
+  margin-top: 80px; /* Pastikan tinggi Navbar (sesuaikan jika perlu) */
+  padding: 1rem;
+  min-height: calc(100vh - 80px);
+  background-color: #f5f5f5;
+}

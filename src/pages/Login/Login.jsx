@@ -1,14 +1,19 @@
 import React, { useState, useContext } from 'react';
 
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import {
+  Box,
+  Card,
+  CardContent,
+  Grid,
+  Typography,
   TextField,
   Button,
-  Typography,
-  Box,
   Alert,
   InputAdornment,
   IconButton,
   CircularProgress,
+  Avatar,
 } from '@mui/material';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
@@ -19,15 +24,18 @@ import { AuthContext } from '../../context/AuthContext';
 const Login = () => {
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
+
   const [form, setForm] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // Handle perubahan input
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  // Submit form login
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -46,83 +54,102 @@ const Login = () => {
 
   return (
     <Box className={styles.loginPage}>
-      <Box className={styles.formContainer}>
-        <Typography variant="h4" className={styles.formTitle}>
-          Login
-        </Typography>
-        {/* Bisa tambahkan sub-teks ringkas
-        <Typography variant="body1" className={styles.formSubtitle}>
-          Silakan masukkan username dan password Anda 
-        </Typography> */}
+      <Card className={styles.loginCard}>
+        <Grid container className={styles.gridContainer}>
+          {/* Bagian kiri: form login */}
+          <Grid item xs={12} md={6} className={styles.leftSide}>
+            <CardContent className={styles.cardContent}>
+              <Avatar className={styles.avatarIcon}>
+                <PersonOutlineIcon fontSize="large" />
+              </Avatar>
 
-        {error && (
-          <Alert
-            severity="error"
-            onClose={() => setError('')}
-            className={styles.errorAlert}
-          >
-            {error}
-          </Alert>
-        )}
+              <Typography
+                variant="h5"
+                className={styles.loginTitle}
+                gutterBottom
+              >
+                LOGIN
+              </Typography>
 
-        <form onSubmit={handleSubmit} className={styles.loginForm}>
-          <TextField
-            label="Username"
-            name="username"
-            value={form.username}
-            onChange={handleChange}
-            fullWidth
-            required
-            className={styles.inputField}
-          />
-          <TextField
-            label="Password"
-            name="password"
-            type={showPassword ? 'text' : 'password'}
-            value={form.password}
-            onChange={handleChange}
-            fullWidth
-            required
-            className={styles.inputField}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    onClick={() => setShowPassword((prev) => !prev)}
-                    edge="end"
+              {error && (
+                <Alert
+                  severity="error"
+                  onClose={() => setError('')}
+                  className={styles.errorAlert}
+                >
+                  {error}
+                </Alert>
+              )}
+
+              <form onSubmit={handleSubmit} className={styles.loginForm}>
+                <TextField
+                  label="Username"
+                  name="username"
+                  value={form.username}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                  className={styles.inputField}
+                />
+                <TextField
+                  label="Password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={form.password}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                  className={styles.inputField}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={() => setShowPassword((prev) => !prev)}
+                          edge="end"
+                        >
+                          {showPassword ? <FaEyeSlash /> : <FaEye />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+
+                <Box sx={{ position: 'relative', marginTop: '1.5rem' }}>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    fullWidth
+                    disabled={loading}
+                    className={styles.loginButton}
                   >
-                    {showPassword ? <FaEyeSlash /> : <FaEye />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
+                    Login
+                  </Button>
+                  {loading && (
+                    <CircularProgress
+                      size={24}
+                      sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                      }}
+                    />
+                  )}
+                </Box>
+              </form>
+            </CardContent>
+          </Grid>
 
-          <Box sx={{ position: 'relative', marginTop: '1.5rem' }}>
-            <Button
-              type="submit"
-              variant="contained"
-              fullWidth
-              disabled={loading}
-              className={styles.loginButton}
-            >
-              Login
-            </Button>
-            {loading && (
-              <CircularProgress
-                size={24}
-                sx={{
-                  position: 'absolute',
-                  top: '50%',
-                  left: '50%',
-                  mt: '-12px',
-                  ml: '-12px',
-                }}
-              />
-            )}
-          </Box>
-        </form>
-      </Box>
+          {/* Bagian kanan: gambar ilustrasi */}
+          <Grid item xs={12} md={6} className={styles.rightSide}>
+            <img
+              src={require('../../assets/images/loginPage.gif')}
+              alt="Login Illustration"
+              className={styles.loginImage}
+            />
+          </Grid>
+        </Grid>
+      </Card>
     </Box>
   );
 };
