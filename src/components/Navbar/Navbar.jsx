@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 
 import SidebarNavbar from './SidebarNavbar';
-import TopNavbar from './TopNavbar';
+import TopNavbar from './TopBar';
 import { AuthContext } from '../../context/AuthContext';
 import { ThemeContext } from '../../context/ThemeContext';
 

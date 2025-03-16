@@ -1,0 +1,65 @@
+.dashboardContainer {
+  padding: 2rem;
+  margin-top: 0px; /* agar tidak tertutup navbar */
+  min-height: calc(100vh - 64px);
+  background-color: #fafafa;
+}
+
+.dashboardTitle {
+  text-align: left;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: #2e7d32;
+}
+
+.summaryRow {
+  margin-bottom: 1rem;
+}
+
+.summaryCard {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.cardSubtitle {
+  color: #666;
+  font-weight: 500;
+}
+
+.cardValue {
+  font-weight: 600;
+  margin-top: 0.5rem;
+  color: #111;
+  font-size: 1.4rem;
+}
+
+.chartPaper {
+  padding: 1.5rem;
+  background-color: #fff;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.chartTitle {
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #555;
+  text-align: center;
+}
+
+/* Buat tinggi minimal agar 2 chart sebaris tampak sama */
+.equalBox {
+  min-height: 400px; 
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Bungkus canvas agar chart bisa expand */
+.chartWrapper {
+  flex: 1; 
+  position: relative;
+  /* bila perlu, atur margin/padding */
+}

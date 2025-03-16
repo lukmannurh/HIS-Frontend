@@ -2,8 +2,6 @@ import React, { useState, useContext } from 'react';
 
 import ArchiveIcon from '@mui/icons-material/Archive';
 import ArticleIcon from '@mui/icons-material/Article';
-import Brightness4Icon from '@mui/icons-material/Brightness4';
-import Brightness7Icon from '@mui/icons-material/Brightness7';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import GroupIcon from '@mui/icons-material/Group';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -11,17 +9,11 @@ import MenuIcon from '@mui/icons-material/Menu';
 import PersonIcon from '@mui/icons-material/Person';
 import {
   Box,
-  Drawer,
   List,
   ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Divider,
   IconButton,
-  AppBar,
-  Toolbar,
-  Typography,
+  Tooltip,
+  Divider,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -32,131 +24,187 @@ import { useNavigate } from 'react-router-dom';
 
 import styles from './SidebarNavbar.module.css';
 import { AuthContext } from '../../context/AuthContext';
-import { ThemeContext } from '../../context/ThemeContext';
 
-const SidebarNavbar = () => {
-  const [drawerOpen, setDrawerOpen] = useState(false);
+export default function SidebarNavbar({
+  collapsed,
+  setCollapsed,
+  sidebarWidth,
+}) {
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
-
   const { auth, logout } = useContext(AuthContext);
-  const { toggleTheme, mode } = useContext(ThemeContext);
-  const navigate = useNavigate(); // untuk redirect
+  const navigate = useNavigate();
 
-  const toggleDrawer = () => {
-    setDrawerOpen(!drawerOpen);
+  const menuItems = [
+    { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
+    {
+      text: 'Reports',
+      icon: <ArticleIcon />,
+      children: [
+        { text: 'Create Report', path: '/create-report' },
+        { text: 'Report Data', path: '/reports' },
+      ],
+    },
+    { text: 'Archives', icon: <ArchiveIcon />, path: '/archives' },
+    { text: 'Profile', icon: <PersonIcon />, path: '/profile' },
+  ];
+
+  const adminMenu = {
+    text: 'User Management',
+    icon: <GroupIcon />,
+    path: '/user-management',
+  };
+
+  const handleToggleCollapse = () => {
+    setCollapsed(!collapsed);
   };
 
   const handleLogoutConfirm = () => {
     setLogoutDialogOpen(true);
   };
-
   const handleLogoutCancel = () => {
     setLogoutDialogOpen(false);
   };
-
-  // Panggil logout dari context, lalu redirect
   const handleLogout = () => {
     setLogoutDialogOpen(false);
     logout();
     navigate('/login');
   };
 
-  // Daftar menu
-  const menuItems = [
-    { text: 'Dashboard', path: '/dashboard', icon: <DashboardIcon /> },
-    { text: 'Reports', path: '/reports', icon: <ArticleIcon /> },
-    { text: 'Archives', path: '/archives', icon: <ArchiveIcon /> },
-    { text: 'Profile', path: '/profile', icon: <PersonIcon /> },
-    ...(auth.user && (auth.user.role === 'owner' || auth.user.role === 'admin')
-      ? [
-          {
-            text: 'User Management',
-            path: '/user-management',
-            icon: <GroupIcon />,
-          },
-        ]
-      : []),
-  ];
+  const handleNav = (path) => {
+    navigate(path);
+  };
+
+  // Ambil role user
+  const userRole = auth?.user?.role || 'User';
 
   return (
-    <>
-      <AppBar position="fixed" className={styles.appBar}>
-        <Toolbar>
-          <IconButton
-            edge="start"
-            color="inherit"
-            onClick={toggleDrawer}
-            sx={{ mr: 2 }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            HIS
-          </Typography>
-          <IconButton color="inherit" onClick={toggleTheme}>
-            {mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
-          </IconButton>
-        </Toolbar>
-      </AppBar>
-      <Drawer
-        anchor="left"
-        open={drawerOpen}
-        onClose={toggleDrawer}
-        classes={{ paper: styles.drawerPaper }}
-      >
-        <Box className={styles.drawerHeader}>
-          <Typography variant="h6">
-            {auth.user ? auth.user.username.toUpperCase() : 'Menu'}
-          </Typography>
-          <Typography variant="caption" color="textSecondary">
-            {auth.user && auth.user.role.toUpperCase()}
-          </Typography>
-        </Box>
-        <Divider />
-        <List>
-          {menuItems.map((item, index) => (
-            <ListItem key={index} disablePadding>
-              <ListItemButton
-                onClick={toggleDrawer}
-                component={item.path ? 'a' : 'button'}
-                href={item.path ? item.path : undefined}
+    <Box
+      className={`${styles.sidebar} ${collapsed ? styles.collapsed : ''}`}
+      sx={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: sidebarWidth,
+        bottom: 0,
+        zIndex: 1300,
+      }}
+    >
+      {/* Brand + Collapse Button */}
+      <Box className={styles.brandSection}>
+        {!collapsed && (
+          <Box>
+            <div className={styles.brandName}>Hamlet Information System</div>
+            <div className={styles.roleLabel}>Role: {userRole}</div>
+          </Box>
+        )}
+        <IconButton
+          onClick={handleToggleCollapse}
+          className={styles.toggleButton}
+        >
+          <MenuIcon />
+        </IconButton>
+      </Box>
+
+      <Divider />
+
+      <List className={styles.menuList}>
+        {menuItems.map((item, idx) => {
+          if (item.children) {
+            return (
+              <Box key={idx}>
+                <Tooltip title={!collapsed ? '' : item.text} placement="right">
+                  <ListItem
+                    button
+                    onClick={() => handleNav(item.children[0].path)}
+                    className={styles.listItem}
+                  >
+                    <span className={styles.icon}>{item.icon}</span>
+                    {!collapsed && (
+                      <span className={styles.text}>{item.text}</span>
+                    )}
+                  </ListItem>
+                </Tooltip>
+                {!collapsed && (
+                  <Box className={styles.subMenu}>
+                    {item.children.map((subItem, subIdx) => (
+                      <ListItem
+                        button
+                        key={subIdx}
+                        onClick={() => handleNav(subItem.path)}
+                        className={styles.subMenuItem}
+                      >
+                        <span className={styles.subMenuText}>
+                          {subItem.text}
+                        </span>
+                      </ListItem>
+                    ))}
+                  </Box>
+                )}
+              </Box>
+            );
+          }
+          // Menu biasa
+          return (
+            <Tooltip
+              title={!collapsed ? '' : item.text}
+              placement="right"
+              key={idx}
+            >
+              <ListItem
+                button
+                onClick={() => handleNav(item.path)}
+                className={styles.listItem}
               >
-                <ListItemIcon className={styles.icon}>{item.icon}</ListItemIcon>
-                <ListItemText primary={item.text} />
-              </ListItemButton>
+                <span className={styles.icon}>{item.icon}</span>
+                {!collapsed && <span className={styles.text}>{item.text}</span>}
+              </ListItem>
+            </Tooltip>
+          );
+        })}
+
+        {/* Menu admin jika role owner/admin */}
+        {(userRole === 'owner' || userRole === 'admin') && (
+          <Tooltip title={!collapsed ? '' : adminMenu.text} placement="right">
+            <ListItem
+              button
+              onClick={() => handleNav(adminMenu.path)}
+              className={styles.listItem}
+            >
+              <span className={styles.icon}>{adminMenu.icon}</span>
+              {!collapsed && (
+                <span className={styles.text}>{adminMenu.text}</span>
+              )}
             </ListItem>
-          ))}
-        </List>
-        <Box sx={{ flexGrow: 1 }} />
-        <Divider />
-        <Box className={styles.logoutContainer}>
-          <ListItemButton
+          </Tooltip>
+        )}
+      </List>
+
+      <Box className={styles.footer}>
+        <Tooltip title={!collapsed ? '' : 'Logout'} placement="right">
+          <ListItem
+            button
             onClick={handleLogoutConfirm}
-            className={styles.logoutButton}
+            className={styles.listItem}
           >
-            <ListItemIcon className={styles.icon}>
+            <span className={styles.icon}>
               <LogoutIcon />
-            </ListItemIcon>
-            <ListItemText primary="Logout" />
-          </ListItemButton>
-        </Box>
-      </Drawer>
+            </span>
+            {!collapsed && <span className={styles.text}>Logout</span>}
+          </ListItem>
+        </Tooltip>
+      </Box>
 
       {/* Dialog Konfirmasi Logout */}
       <Dialog open={logoutDialogOpen} onClose={handleLogoutCancel}>
         <DialogTitle>Konfirmasi Logout</DialogTitle>
-        <DialogContent>
-          <Typography>Apakah Anda yakin ingin logout?</Typography>
-        </DialogContent>
+        <DialogContent>Anda yakin ingin logout?</DialogContent>
         <DialogActions>
           <Button onClick={handleLogoutCancel}>Batal</Button>
-          <Button onClick={handleLogout} color="error" variant="contained">
+          <Button onClick={handleLogout} variant="contained" color="error">
             Logout
           </Button>
         </DialogActions>
       </Dialog>
-    </>
+    </Box>
   );
-};
-
-export default SidebarNavbar;
+}

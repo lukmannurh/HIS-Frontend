@@ -1,47 +1,102 @@
-.appBar {
-  z-index: 1201; /* Lebih tinggi dari drawer */
-  background-color: #88c273;
-}
-
-.drawerPaper {
-  width: 250px;
-  background-color: #f8f9fa;
-  padding-top: 1rem;
+.sidebar {
+  background-color: #ffffff; /* Putih netral */
+  border-right: 1px solid #e0e0e0;
   display: flex;
   flex-direction: column;
+  transition: width 0.2s ease;
+  overflow-y: auto;
+  /* Sembunyikan scrollbar */
+  scrollbar-width: none; /* Firefox */
+}
+.sidebar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
+.collapsed {
+  /* Lebar diatur inline, tapi bisa tambahkan style opsional */
+}
+
+.brandSection {
+  display: flex;
+  align-items: center;
   justify-content: space-between;
+  padding: 16px;
 }
 
-.drawerHeader {
-  padding: 0 16px;
-  font-weight: bold;
-  font-size: 1.2rem;
-  color: #2c3e50;
+.brandName {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #333;
 }
 
-.listItemButton {
-  padding: 12px 16px;
-  transition: background-color 0.3s;
+.roleLabel {
+  font-size: 0.8rem;
+  color: #888;
 }
 
-.listItemButton:hover {
-  background-color: #e9ecef;
+.toggleButton {
+  color: #666;
+  transition: transform 0.2s ease;
+}
+.toggleButton:hover {
+  transform: scale(1.1);
+}
+
+.menuList {
+  flex-grow: 1;
+  padding: 0;
+  margin: 0;
+}
+
+.listItem {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 8px 16px;
+  margin: 4px 8px;
+  border-radius: 4px;
+  transition: background-color 0.15s ease;
+}
+.listItem:hover {
+  background-color: #f5f5f5;
 }
 
 .icon {
-  color: #2c3e50;
+  color: #666;
+  margin-right: 12px;
 }
 
-.logoutContainer {
+.text {
+  color: #333;
+  font-size: 0.95rem;
+}
+
+/* Submenu */
+.subMenu {
+  margin-left: 48px;
+  display: flex;
+  flex-direction: column;
+  margin-top: 4px;
+  margin-bottom: 8px;
+}
+
+.subMenuItem {
+  padding: 6px 16px;
+  margin: 2px 0;
+  border-radius: 4px;
+  transition: background-color 0.15s ease;
+}
+.subMenuItem:hover {
+  background-color: #eaeaea;
+}
+
+.subMenuText {
+  color: #555;
+  font-size: 0.9rem;
+}
+
+/* Footer (Logout) di bawah */
+.footer {
   margin-top: auto;
-  padding: 8px 0;
-}
-
-.logoutButton {
-  padding: 12px 16px;
-  transition: background-color 0.3s;
-}
-
-.logoutButton:hover {
-  background-color: #f1f3f5;
+  border-top: 1px solid #e0e0e0;
 }

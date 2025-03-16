@@ -5,7 +5,7 @@ import { Box, Typography, Paper, Grid } from '@mui/material';
 import { Bar } from 'react-chartjs-2';
 
 import styles from './UserDashboard.module.css';
-import api from '../../services/api';
+import api from '../../../services/api';
 
 const UserDashboard = () => {
   const [userReports, setUserReports] = useState([]);

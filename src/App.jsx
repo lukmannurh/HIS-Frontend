@@ -3,7 +3,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import ProtectedRoute from './components/Routes/ProtectedRoute';
-import DefaultLayout from './layouts/DefaultLayout';
+import DefaultLayout from './layouts/AppLayout';
 import Archives from './pages/Archives/Archives';
 import CreateReport from './pages/CreateReport/CreateReport';
 import Dashboard from './pages/Dashboard/Dashboard';
