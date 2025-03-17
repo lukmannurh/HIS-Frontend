@@ -359,7 +359,7 @@ const OwnerDashboard = () => {
         <Grid item xs={12} md={6}>
           <Paper className={`${styles.chartPaper} ${styles.equalBox}`}>
             <Typography variant="h6" className={styles.chartTitle}>
-              Distribusi Pengguna (Role)
+              Distribusi Pengguna
             </Typography>
             <div className={styles.chartWrapper}>
               <Bar data={userRoleData} options={chartOptions} />
@@ -403,7 +403,7 @@ const OwnerDashboard = () => {
         <Grid item xs={12} md={6}>
           <Paper className={`${styles.chartPaper} ${styles.equalBox}`}>
             <Typography variant="h6" className={styles.chartTitle}>
-              Trend Validasi Harian (Stacked)
+              Trend Validasi Harian
             </Typography>
             <div className={styles.chartWrapper}>
               <Bar

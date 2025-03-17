@@ -1,14 +1,37 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 import GroupIcon from '@mui/icons-material/Group';
 import SecurityIcon from '@mui/icons-material/Security';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
-import { Box, Container, Typography, Button, Grid } from '@mui/material';
-import { Link as RouterLink } from 'react-router-dom';
+import {
+  Box,
+  Container,
+  Typography,
+  Button,
+  Grid,
+  Snackbar,
+  Alert,
+} from '@mui/material';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
 
 import styles from './LandingPage.module.css';
 
 const LandingPage = () => {
+  const location = useLocation();
+  const [logoutSuccess, setLogoutSuccess] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('logoutSuccess') === 'true') {
+      setLogoutSuccess(true);
+    }
+  }, [location.search]);
+
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === 'clickaway') return;
+    setLogoutSuccess(false);
+  };
+
   return (
     <Box className={styles.landingContainer}>
       {/* HERO SECTION */}
@@ -126,6 +149,22 @@ const LandingPage = () => {
           </Typography>
         </Container>
       </Box>
+
+      {/* Notifikasi berhasil logout */}
+      <Snackbar
+        open={logoutSuccess}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity="success"
+          sx={{ width: '100%' }}
+        >
+          Berhasil logout!
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

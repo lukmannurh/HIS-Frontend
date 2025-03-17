@@ -1,5 +1,6 @@
 import React, { useState, useContext } from 'react';
 
+import LoginIcon from '@mui/icons-material/Login';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import {
   Box,
@@ -91,6 +92,7 @@ const Login = () => {
                   required
                   className={styles.inputField}
                 />
+
                 <TextField
                   label="Password"
                   name="password"
@@ -114,28 +116,24 @@ const Login = () => {
                   }}
                 />
 
-                <Box sx={{ position: 'relative', marginTop: '1.5rem' }}>
+                <div className={styles.formButtonContainer}>
                   <Button
                     type="submit"
                     variant="contained"
-                    fullWidth
                     disabled={loading}
                     className={styles.loginButton}
                   >
-                    Login
+                    <LoginIcon className={styles.loginButtonIcon} />
+                    <span className={styles.loginButtonText}>Login</span>
                   </Button>
+
                   {loading && (
                     <CircularProgress
+                      className={styles.loadingIndicator}
                       size={24}
-                      sx={{
-                        position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)',
-                      }}
                     />
                   )}
-                </Box>
+                </div>
               </form>
             </CardContent>
           </Grid>

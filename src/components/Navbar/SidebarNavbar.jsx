@@ -14,26 +14,21 @@ import {
   IconButton,
   Tooltip,
   Divider,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Button,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 import styles from './SidebarNavbar.module.css';
+import logoNavbar from '../../assets/images/logo-navbar.png';
 import { AuthContext } from '../../context/AuthContext';
+import LogoutDialog from '../LogoutDialog/LogoutDialog';
 
-export default function SidebarNavbar({
-  collapsed,
-  setCollapsed,
-  sidebarWidth,
-}) {
-  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
+export default function SidebarNavbar({ collapsed, setCollapsed }) {
+  const [logoutOpen, setLogoutOpen] = useState(false);
   const { auth, logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  // Menu utama
   const menuItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
     {
@@ -48,53 +43,50 @@ export default function SidebarNavbar({
     { text: 'Profile', icon: <PersonIcon />, path: '/profile' },
   ];
 
+  // Menu admin
   const adminMenu = {
     text: 'User Management',
     icon: <GroupIcon />,
     path: '/user-management',
   };
 
+  const userRole = auth?.user?.role || 'User';
+
+  // Toggle collapse
   const handleToggleCollapse = () => {
     setCollapsed(!collapsed);
   };
 
-  const handleLogoutConfirm = () => {
-    setLogoutDialogOpen(true);
-  };
-  const handleLogoutCancel = () => {
-    setLogoutDialogOpen(false);
-  };
-  const handleLogout = () => {
-    setLogoutDialogOpen(false);
-    logout();
-    navigate('/login');
+  // Buka dialog logout
+  const handleLogoutClick = () => {
+    setLogoutOpen(true);
   };
 
+  // Tutup dialog logout
+  const handleLogoutClose = () => {
+    setLogoutOpen(false);
+  };
+
+  // Eksekusi logout
+  const handleLogoutConfirm = () => {
+    logout();
+  };
+
+  // Navigasi menu
   const handleNav = (path) => {
     navigate(path);
   };
 
-  // Ambil role user
-  const userRole = auth?.user?.role || 'User';
-
   return (
-    <Box
-      className={`${styles.sidebar} ${collapsed ? styles.collapsed : ''}`}
-      sx={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: sidebarWidth,
-        bottom: 0,
-        zIndex: 1300,
-      }}
-    >
-      {/* Brand + Collapse Button */}
+    <Box className={`${styles.sidebar} ${collapsed ? styles.collapsed : ''}`}>
+      {/* Brand Section */}
       <Box className={styles.brandSection}>
         {!collapsed && (
-          <Box>
-            <div className={styles.brandName}>Hamlet Information System</div>
-            <div className={styles.roleLabel}>Role: {userRole}</div>
+          <Box className={styles.logoContainer}>
+            <img src={logoNavbar} alt="Logo" className={styles.logoImage} />
+            <Button variant="outlined" className={styles.roleButton}>
+              Role: {userRole}
+            </Button>
           </Box>
         )}
         <IconButton
@@ -105,14 +97,15 @@ export default function SidebarNavbar({
         </IconButton>
       </Box>
 
-      <Divider />
+      <Divider className={styles.divider} />
 
+      {/* Menu */}
       <List className={styles.menuList}>
         {menuItems.map((item, idx) => {
           if (item.children) {
             return (
               <Box key={idx}>
-                <Tooltip title={!collapsed ? '' : item.text} placement="right">
+                <Tooltip title={collapsed ? item.text : ''} placement="right">
                   <ListItem
                     button
                     onClick={() => handleNav(item.children[0].path)}
@@ -143,10 +136,9 @@ export default function SidebarNavbar({
               </Box>
             );
           }
-          // Menu biasa
           return (
             <Tooltip
-              title={!collapsed ? '' : item.text}
+              title={collapsed ? item.text : ''}
               placement="right"
               key={idx}
             >
@@ -162,9 +154,8 @@ export default function SidebarNavbar({
           );
         })}
 
-        {/* Menu admin jika role owner/admin */}
         {(userRole === 'owner' || userRole === 'admin') && (
-          <Tooltip title={!collapsed ? '' : adminMenu.text} placement="right">
+          <Tooltip title={collapsed ? adminMenu.text : ''} placement="right">
             <ListItem
               button
               onClick={() => handleNav(adminMenu.path)}
@@ -179,11 +170,12 @@ export default function SidebarNavbar({
         )}
       </List>
 
+      {/* Footer: Logout di bagian paling bawah */}
       <Box className={styles.footer}>
-        <Tooltip title={!collapsed ? '' : 'Logout'} placement="right">
+        <Tooltip title={collapsed ? 'Logout' : ''} placement="right">
           <ListItem
             button
-            onClick={handleLogoutConfirm}
+            onClick={handleLogoutClick}
             className={styles.listItem}
           >
             <span className={styles.icon}>
@@ -194,17 +186,13 @@ export default function SidebarNavbar({
         </Tooltip>
       </Box>
 
-      {/* Dialog Konfirmasi Logout */}
-      <Dialog open={logoutDialogOpen} onClose={handleLogoutCancel}>
-        <DialogTitle>Konfirmasi Logout</DialogTitle>
-        <DialogContent>Anda yakin ingin logout?</DialogContent>
-        <DialogActions>
-          <Button onClick={handleLogoutCancel}>Batal</Button>
-          <Button onClick={handleLogout} variant="contained" color="error">
-            Logout
-          </Button>
-        </DialogActions>
-      </Dialog>
+      {/* Dialog logout */}
+      <LogoutDialog
+        open={logoutOpen}
+        onClose={handleLogoutClose}
+        onLogout={handleLogoutConfirm}
+        onRedirect={() => navigate('/')}
+      />
     </Box>
   );
 }

@@ -1,0 +1,59 @@
+.dialogContainer .MuiPaper-root {
+    border-radius: 16px;
+    padding: 8px;
+  }
+  
+  .dialogTitle {
+    font-weight: bold;
+    text-align: center;
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+  }
+  
+  .dialogContent {
+    text-align: center;
+  }
+  
+  .illustrationBox {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 8px;
+  }
+  
+  .illustration {
+    max-width: 120px;
+    height: auto;
+    object-fit: contain;
+  }
+  
+  .dialogText {
+    margin-top: 8px;
+    margin-bottom: 16px;
+    line-height: 1.4;
+    color: #555;
+  }
+  
+  .dialogActions {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+  }
+  
+  .cancelButton {
+    color: #555;
+    text-transform: none;
+    border: 1px solid #ccc;
+  }
+  
+  .logoutButton {
+    background-color: #d32f2f;
+    color: #fff;
+    text-transform: none;
+  }
+  
+  .homeButton {
+    color: #333;
+    border: 1px solid #999;
+    text-transform: none;
+  }
+  

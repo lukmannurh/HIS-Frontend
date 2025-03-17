@@ -1,4 +1,3 @@
-/* Container utama */
 .landingContainer {
   display: flex;
   flex-direction: column;
@@ -10,11 +9,10 @@
   font-family: 'Roboto', sans-serif;
 }
 
-/* HERO SECTION */
 .heroSection {
   position: relative;
   width: 100%;
-  height: 70vh; /* Tinggi hero disesuaikan */
+  height: 70vh;
   background: url('../../assets/images/landingPage.jpg') center/cover no-repeat;
   display: flex;
   justify-content: center;
@@ -27,7 +25,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 128, 0, 0.5); /* Overlay hijau dengan transparansi */
+  background-color: rgba(0, 128, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -71,7 +69,6 @@
   background-color: #6fa055;
 }
 
-/* FEATURES SECTION */
 .featuresSection {
   padding: 4rem 0;
   background-color: #f7f7f7;
@@ -118,9 +115,8 @@
   font-size: 0.95rem;
 }
 
-/* CTA SECTION */
 .ctaSection {
-  background-color: #eafce5; /* Hijau muda lembut */
+  background-color: #eafce5;
   padding: 3rem 0;
 }
 
@@ -160,7 +156,6 @@
   background-color: #6fa055;
 }
 
-/* FOOTER */
 .footer {
   background-color: #f1f3f4;
   padding: 1.5rem 0;

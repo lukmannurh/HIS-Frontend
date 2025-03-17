@@ -1,21 +1,25 @@
 .topBar {
-  background-color: #388e3c; /* Hijau brand color */
-  color: #fff; /* Teks putih */
+  background-color: #388e3c; /* Brand green */
+  color: #fff;
 }
 
 .title {
-  flex-grow: 1;
   font-weight: bold;
   color: #fff;
-}
-
-.userInfo {
-  display: flex;
-  align-items: center;
 }
 
 .username {
-  color: #fff;
   font-weight: bold;
-  margin-right: 16px;
+  color: #fff;
+}
+
+.loginIcon {
+  color: #fff;
+  font-size: 1.2rem;
+}
+
+.loginText {
+  font-weight: bold;
+  color: #fff;
+  margin-left: 8px;
 }

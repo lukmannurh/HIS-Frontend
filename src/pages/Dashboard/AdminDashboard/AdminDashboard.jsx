@@ -289,7 +289,7 @@ const AdminDashboard = () => {
           <Card className={styles.summaryCard}>
             <CardContent>
               <Typography variant="subtitle2" className={styles.cardSubtitle}>
-                Total Laporan (Filtered)
+                Total Laporan
               </Typography>
               <Typography variant="h5" className={styles.cardValue}>
                 {totalReports}
@@ -313,7 +313,7 @@ const AdminDashboard = () => {
           <Card className={styles.summaryCard}>
             <CardContent>
               <Typography variant="subtitle2" className={styles.cardSubtitle}>
-                Pengguna (role=user)
+                Pengguna
               </Typography>
               <Typography variant="h5" className={styles.cardValue}>
                 {totalUsers}
@@ -394,7 +394,7 @@ const AdminDashboard = () => {
         <Grid item xs={12} md={6}>
           <Paper className={`${styles.chartPaper} ${styles.equalBox}`}>
             <Typography variant="h6" className={styles.chartTitle}>
-              Laporan oleh Admin (Self)
+              Laporan oleh Admin
             </Typography>
             <div className={styles.chartWrapper}>
               <Bar data={adminReportData} options={chartOptions} />
@@ -406,7 +406,7 @@ const AdminDashboard = () => {
         <Grid item xs={12} md={6}>
           <Paper className={`${styles.chartPaper} ${styles.equalBox}`}>
             <Typography variant="h6" className={styles.chartTitle}>
-              Top 5 Pelapor (User)
+              Top 5 Pelapor
             </Typography>
             <div className={styles.chartWrapper}>
               <Bar data={topUserData} options={chartOptions} />
@@ -416,7 +416,7 @@ const AdminDashboard = () => {
         <Grid item xs={12} md={6}>
           <Paper className={`${styles.chartPaper} ${styles.equalBox}`}>
             <Typography variant="h6" className={styles.chartTitle}>
-              Trend Validasi Harian (Stacked)
+              Trend Validasi Harian
             </Typography>
             <div className={styles.chartWrapper}>
               <Bar
