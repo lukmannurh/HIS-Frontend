@@ -1,0 +1,220 @@
+.archivesContainer {
+  padding: 2rem;
+}
+
+.pageTitle {
+  margin-bottom: 1.5rem;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+}
+
+.loader {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.groupContainer {
+  margin-bottom: 2rem;
+}
+
+.groupHeader {
+  font-weight: bold;
+  color: #555;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 0.5rem;
+}
+
+/* File view cards */
+.archiveCard {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.3s ease;
+  padding: 8px;
+}
+
+.archiveCard:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.archiveCardContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.fileIcon {
+  color: #388e3c;
+  margin-bottom: 8px;
+}
+
+.archiveTitle {
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #333;
+}
+
+.archiveDate {
+  font-size: 0.8rem;
+  color: #888;
+  margin-bottom: 4px;
+}
+
+.cardActions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.actionButton {
+  text-transform: none;
+  font-weight: 600;
+}
+
+/* Detail Modal Styling */
+.detailContainer {
+  padding: 2rem;
+}
+
+.detailCard {
+  padding: 16px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.downloadContainer {
+  text-align: right;
+  margin-bottom: 8px;
+}
+
+.downloadButton {
+  text-transform: none;
+}
+
+.pdfContent {
+  margin-top: 16px;
+}
+
+.timestampBox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.icon {
+  color: #666;
+}
+
+.timestamp {
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.updatedBox {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.title {
+  font-weight: bold;
+  margin-top: 16px;
+  text-align: center;
+}
+
+.sectionHeader {
+  font-weight: bold;
+  margin-bottom: 8px;
+  text-align: left;
+}
+
+.paperContent {
+  padding: 16px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
+
+.contentText {
+  font-size: 1rem;
+  color: #555;
+  text-align: left;
+  white-space: pre-line;
+}
+
+.userInfo {
+  font-size: 0.9rem;
+  color: #777;
+  margin-top: 16px;
+  text-align: center;
+}
+
+.relatedNewsItem {
+  margin-top: 16px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.relatedNewsLink {
+  font-weight: 600;
+  color: #388e3c;
+  text-decoration: none;
+}
+
+.backButton {
+  margin-top: 16px;
+  text-transform: none;
+}
+
+.buttonContainer {
+  text-align: center;
+  margin-top: 16px;
+}
+
+/* Status badges */
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.hoax {
+  background-color: #ffebee;
+  color: #d32f2f;
+}
+
+.valid {
+  background-color: #e8f5e9;
+  color: #388e3c;
+}
+
+.doubtful {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+/* Global dialog styling for modals */
+.MuiDialogTitle-root {
+  font-weight: bold;
+  text-align: center;
+}
+
+.MuiDialogContent-root {
+  text-align: center;
+}
+
+.MuiDialogActions-root {
+  justify-content: center;
+  gap: 8px;
+}
