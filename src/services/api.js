@@ -6,6 +6,20 @@ const api = axios.create({
   baseURL: API_URL,
 });
 
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
 api.interceptors.request.use(
   (config) => {
     const accessToken = localStorage.getItem('accessToken');
@@ -26,22 +40,44 @@ api.interceptors.response.use(
       error.response.status === 401 &&
       !originalRequest._retry
     ) {
+      if (isRefreshing) {
+        return new Promise(function (resolve, reject) {
+          failedQueue.push({ resolve, reject });
+        })
+          .then((token) => {
+            originalRequest.headers['Authorization'] = 'Bearer ' + token;
+            return api(originalRequest);
+          })
+          .catch((err) => Promise.reject(err));
+      }
       originalRequest._retry = true;
+      isRefreshing = true;
+      const refreshToken = localStorage.getItem('refreshToken');
+      if (!refreshToken) {
+        alert('Sesi Anda telah habis. Silahkan login kembali.');
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+        return Promise.reject(error);
+      }
       try {
-        const refreshToken = localStorage.getItem('refreshToken');
-        if (!refreshToken) throw new Error('No refresh token available');
         const response = await api.post('/auth/refresh', { refreshToken });
-        const { accessToken } = response.data;
-        localStorage.setItem('accessToken', accessToken);
-        originalRequest.headers['Authorization'] = `Bearer ${accessToken}`;
+        const { accessToken: newAccessToken } = response.data;
+        localStorage.setItem('accessToken', newAccessToken);
+        originalRequest.headers['Authorization'] = 'Bearer ' + newAccessToken;
+        processQueue(null, newAccessToken);
         return api(originalRequest);
       } catch (err) {
-        // Refresh token gagal -> hapus token, paksa user logout
+        processQueue(err, null);
+        alert('Sesi Anda telah habis. Silahkan login kembali.');
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('user');
         window.location.href = '/login';
         return Promise.reject(err);
+      } finally {
+        isRefreshing = false;
       }
     }
     return Promise.reject(error);

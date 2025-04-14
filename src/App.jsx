@@ -11,7 +11,8 @@ import EditReport from './pages/EditReport/EditReport';
 import LandingPage from './pages/LandingPage/LandingPage';
 import Login from './pages/Login/Login';
 import NotFound from './pages/NotFound/NotFound';
-import Profile from './pages/Profile/Profile';
+import ProfileEdit from './pages/Profile/ProfileEdit';
+import ProfileView from './pages/Profile/ProfileView';
 import Register from './pages/Register/Register';
 import ReportDetail from './pages/ReportDetail/ReportDetail';
 import Reports from './pages/Reports/Reports';
@@ -22,17 +23,11 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Semua route kita bungkus dengan DefaultLayout */}
         <Route element={<DefaultLayout />}>
-          {/* LandingPage tidak butuh ProtectedRoute */}
           <Route path="/" element={<LandingPage />} />
-
-          {/* Halaman login & unauthorized juga di dalam layout,
-              tapi tidak perlu ProtectedRoute */}
           <Route path="/login" element={<Login />} />
           <Route path="/unauthorized" element={<Unauthorized />} />
 
-          {/* Sisanya perlu ProtectedRoute sesuai role */}
           <Route
             path="/dashboard"
             element={
@@ -85,7 +80,15 @@ function App() {
             path="/profile"
             element={
               <ProtectedRoute>
-                <Profile />
+                <ProfileView />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile/edit"
+            element={
+              <ProtectedRoute>
+                <ProfileEdit />
               </ProtectedRoute>
             }
           />
@@ -105,8 +108,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
-          {/* 404 Not Found */}
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>

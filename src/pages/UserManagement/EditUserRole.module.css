@@ -1,0 +1,27 @@
+.dialogPaper {
+  padding: 16px;
+  border-radius: 12px;
+}
+
+.dialogTitle {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+.error {
+  margin-bottom: 1rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+}
+
+.cancelButton {
+  text-transform: none;
+}
+
+.submitButton {
+  text-transform: none;
+}

@@ -1,0 +1,29 @@
+.dialogTitle {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+  padding: 16px;
+}
+
+.instruction {
+  margin-bottom: 0.5rem;
+}
+
+.expectedText {
+  font-style: italic;
+  margin-bottom: 1rem;
+  color: #555;
+}
+
+.dialogActions {
+  justify-content: center;
+  padding: 8px 16px;
+}
+
+.cancelButton {
+  text-transform: none;
+}
+
+.deleteButton {
+  text-transform: none;
+}

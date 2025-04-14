@@ -1,243 +1,171 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 
+import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import {
   Container,
   Typography,
-  Box,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
   Button,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Alert,
+  Paper,
+  TableContainer,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  IconButton,
 } from '@mui/material';
 
+import CreateUser from './CreateUser';
+import DeleteUserDialog from './DeleteUserDialog';
+import EditUserRole from './EditUserRole';
+import styles from './UserManagement.module.css';
+import { AuthContext } from '../../context/AuthContext';
 import api from '../../services/api';
 
 const UserManagement = () => {
+  const { auth } = useContext(AuthContext);
+
   const [users, setUsers] = useState([]);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const [openDialog, setOpenDialog] = useState(false);
-  const [newUser, setNewUser] = useState({
-    username: '',
-    email: '',
-    password: '',
-    role: 'user',
-  });
+  const [showCreate, setShowCreate] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
+  const [deletingUser, setDeletingUser] = useState(null);
+
+  useEffect(() => {
+    fetchUsers();
+    // eslint-disable-next-line
+  }, []);
 
   const fetchUsers = async () => {
     try {
       const response = await api.get('/users');
-      setUsers(response.data);
-    } catch (err) {
-      setError('Gagal mengambil data pengguna.');
+      // Filter agar akun yang sedang login tidak muncul di tabel
+      const filteredUsers = response.data.filter(
+        (user) => user.id !== auth.user.id
+      );
+      setUsers(filteredUsers);
+    } catch (error) {
+      console.error('Failed to fetch users:', error);
     }
   };
 
-  useEffect(() => {
+  const handleCreateNew = () => {
+    setShowCreate(true);
+  };
+
+  const handleCloseCreate = () => {
+    setShowCreate(false);
     fetchUsers();
-  }, []);
-
-  const handleDelete = async (userId) => {
-    if (window.confirm('Apakah Anda yakin ingin menghapus pengguna ini?')) {
-      try {
-        await api.delete(`/users/${userId}`);
-        setSuccess('Pengguna berhasil dihapus.');
-        fetchUsers();
-      } catch (err) {
-        setError('Gagal menghapus pengguna.');
-      }
-    }
   };
 
-  const handleOpenDialog = () => {
-    setOpenDialog(true);
+  const handleEditRole = (user) => {
+    setEditingUser(user);
   };
 
-  const handleCloseDialog = () => {
-    setNewUser({
-      username: '',
-      email: '',
-      password: '',
-      role: 'user',
-    });
-    setOpenDialog(false);
-    setError('');
-    setSuccess('');
+  const handleCloseEdit = () => {
+    setEditingUser(null);
+    fetchUsers();
   };
 
-  const handleChange = (e) => {
-    setNewUser({
-      ...newUser,
-      [e.target.name]: e.target.value,
-    });
+  const handleDeleteUser = (user) => {
+    setDeletingUser(user);
   };
 
-  const handleRegister = async () => {
-    const { username, email, password, role } = newUser;
-    if (!username || !email || !password || !role) {
-      setError('Semua field wajib diisi.');
-      return;
-    }
+  const handleCloseDelete = () => {
+    setDeletingUser(null);
+  };
+
+  const handleConfirmDelete = async () => {
     try {
-      await api.post('/auth/register', { username, email, password, role });
-      setSuccess('Pengguna baru berhasil didaftarkan.');
+      await api.delete(`/users/${deletingUser.id}`);
+      setDeletingUser(null);
       fetchUsers();
-      handleCloseDialog();
-    } catch (err) {
-      setError(err.response?.data?.message || 'Gagal mendaftarkan pengguna.');
+    } catch (error) {
+      console.error('Failed to delete user:', error);
+      // Tambahkan notifikasi error jika diperlukan
     }
   };
 
   return (
-    <Container>
-      <Box mt={5}>
-        <Typography variant="h4" gutterBottom>
-          Manajemen Pengguna
-        </Typography>
-        {error && (
-          <Alert severity="error" onClose={() => setError('')}>
-            {error}
-          </Alert>
-        )}
-        {success && (
-          <Alert severity="success" onClose={() => setSuccess('')}>
-            {success}
-          </Alert>
-        )}
-        <Box mb={2}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleOpenDialog}
-          >
-            Tambah Pengguna
-          </Button>
-        </Box>
-        <TableContainer component={Paper}>
-          <Table aria-label="user table">
-            <TableHead>
-              <TableRow>
-                <TableCell>ID</TableCell>
-                <TableCell>Username</TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell>Role</TableCell>
-                <TableCell>Nama Lengkap</TableCell>
-                <TableCell>Aksi</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {users.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell>{user.id}</TableCell>
-                  <TableCell>{user.username}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.role}</TableCell>
-                  <TableCell>{user.fullName || '-'}</TableCell>
-                  <TableCell>
-                    {/* Tambahkan aksi lain seperti edit jika diperlukan */}
-                    <Button
-                      variant="outlined"
-                      color="secondary"
-                      onClick={() => handleDelete(user.id)}
-                    >
-                      Hapus
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-              {users.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={6} align="center">
-                    Tidak ada pengguna ditemukan.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Box>
+    <Container className={styles.container}>
+      <Typography variant="h4" className={styles.title}>
+        User Management
+      </Typography>
 
-      {/* Dialog untuk Menambah Pengguna */}
-      <Dialog open={openDialog} onClose={handleCloseDialog}>
-        <DialogTitle>Tambah Pengguna Baru</DialogTitle>
-        <DialogContent>
-          {error && (
-            <Alert severity="error" onClose={() => setError('')}>
-              {error}
-            </Alert>
-          )}
-          {success && (
-            <Alert severity="success" onClose={() => setSuccess('')}>
-              {success}
-            </Alert>
-          )}
-          <TextField
-            // Hapus autoFocus jika ada
-            // autoFocus
-            margin="dense"
-            label="Username"
-            name="username"
-            type="text"
-            fullWidth
-            variant="standard"
-            value={newUser.username}
-            onChange={handleChange}
-          />
-          <TextField
-            margin="dense"
-            label="Email"
-            name="email"
-            type="email"
-            fullWidth
-            variant="standard"
-            value={newUser.email}
-            onChange={handleChange}
-          />
-          <TextField
-            margin="dense"
-            label="Password"
-            name="password"
-            type="password"
-            fullWidth
-            variant="standard"
-            value={newUser.password}
-            onChange={handleChange}
-          />
-          <FormControl fullWidth margin="dense" variant="standard">
-            <InputLabel id="role-label">Role</InputLabel>
-            <Select
-              labelId="role-label"
-              name="role"
-              value={newUser.role}
-              onChange={handleChange}
-            >
-              <MenuItem value="user">User</MenuItem>
-              <MenuItem value="admin">Admin</MenuItem>
-              <MenuItem value="owner">Owner</MenuItem>
-            </Select>
-          </FormControl>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog}>Batal</Button>
-          <Button onClick={handleRegister} variant="contained" color="primary">
-            Daftar
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleCreateNew}
+        className={styles.createButton}
+      >
+        CREATE NEW USER
+      </Button>
+
+      <TableContainer component={Paper} className={styles.tableContainer}>
+        <Table>
+          <TableHead>
+            <TableRow className={styles.tableHeaderRow}>
+              <TableCell className={styles.tableHeader}>Username</TableCell>
+              <TableCell className={styles.tableHeader}>Full Name</TableCell>
+              <TableCell className={styles.tableHeader}>Email</TableCell>
+              <TableCell className={styles.tableHeader}>Role</TableCell>
+              <TableCell className={styles.tableHeader} align="center">
+                Actions
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {users.map((user) => (
+              <TableRow key={user.id} className={styles.tableBodyRow}>
+                <TableCell className={styles.tableCell}>
+                  {user.username}
+                </TableCell>
+                <TableCell className={styles.tableCell}>
+                  {user.fullName || '-'}
+                </TableCell>
+                <TableCell className={styles.tableCell}>{user.email}</TableCell>
+                <TableCell className={styles.tableCell}>{user.role}</TableCell>
+                <TableCell align="center" className={styles.tableCell}>
+                  <IconButton
+                    onClick={() => handleEditRole(user)}
+                    color="primary"
+                    size="small"
+                    className={styles.iconButton}
+                  >
+                    <EditIcon fontSize="inherit" />
+                  </IconButton>
+                  <IconButton
+                    onClick={() => handleDeleteUser(user)}
+                    color="error"
+                    size="small"
+                    className={styles.iconButton}
+                  >
+                    <DeleteIcon fontSize="inherit" />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+      {showCreate && (
+        <CreateUser open={showCreate} onClose={handleCloseCreate} />
+      )}
+      {editingUser && (
+        <EditUserRole
+          open={Boolean(editingUser)}
+          user={editingUser}
+          onClose={handleCloseEdit}
+        />
+      )}
+      {deletingUser && (
+        <DeleteUserDialog
+          open={Boolean(deletingUser)}
+          user={deletingUser}
+          onClose={handleCloseDelete}
+          onConfirm={handleConfirmDelete}
+        />
+      )}
     </Container>
   );
 };

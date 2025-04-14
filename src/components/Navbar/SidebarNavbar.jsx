@@ -11,6 +11,8 @@ import {
   Box,
   List,
   ListItem,
+  ListItemIcon,
+  ListItemText,
   IconButton,
   Tooltip,
   Divider,
@@ -27,52 +29,59 @@ export default function SidebarNavbar({ collapsed, setCollapsed }) {
   const [logoutOpen, setLogoutOpen] = useState(false);
   const { auth, logout } = useContext(AuthContext);
   const navigate = useNavigate();
-
-  // Menu utama
-  const menuItems = [
-    { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
-    {
-      text: 'Reports',
-      icon: <ArticleIcon />,
-      children: [
-        { text: 'Create Report', path: '/create-report' },
-        { text: 'Report Data', path: '/reports' },
-      ],
-    },
-    { text: 'Archives', icon: <ArchiveIcon />, path: '/archives' },
-    { text: 'Profile', icon: <PersonIcon />, path: '/profile' },
-  ];
-
-  // Menu admin
-  const adminMenu = {
-    text: 'User Management',
-    icon: <GroupIcon />,
-    path: '/user-management',
-  };
-
   const userRole = auth?.user?.role || 'User';
 
-  // Toggle collapse
+  let menuItems = [];
+  if (userRole.toLowerCase() === 'user') {
+    menuItems = [
+      { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
+      {
+        text: 'Reports',
+        icon: <ArticleIcon />,
+        children: [
+          { text: 'Create Report', path: '/create-report' },
+          { text: 'Report Data', path: '/reports' },
+        ],
+      },
+      { text: 'Profile', icon: <PersonIcon />, path: '/profile' },
+    ];
+  } else {
+    menuItems = [
+      { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
+      {
+        text: 'Reports',
+        icon: <ArticleIcon />,
+        children: [
+          { text: 'Create Report', path: '/create-report' },
+          { text: 'Report Data', path: '/reports' },
+        ],
+      },
+      { text: 'Archives', icon: <ArchiveIcon />, path: '/archives' },
+      { text: 'Profile', icon: <PersonIcon />, path: '/profile' },
+      {
+        text: 'User Management',
+        icon: <GroupIcon />,
+        path: '/user-management',
+      },
+    ];
+  }
+
   const handleToggleCollapse = () => {
     setCollapsed(!collapsed);
   };
 
-  // Buka dialog logout
   const handleLogoutClick = () => {
     setLogoutOpen(true);
   };
 
-  // Tutup dialog logout
   const handleLogoutClose = () => {
     setLogoutOpen(false);
   };
 
-  // Eksekusi logout
   const handleLogoutConfirm = () => {
     logout();
   };
 
-  // Navigasi menu
   const handleNav = (path) => {
     navigate(path);
   };
@@ -111,9 +120,14 @@ export default function SidebarNavbar({ collapsed, setCollapsed }) {
                     onClick={() => handleNav(item.children[0].path)}
                     className={styles.listItem}
                   >
-                    <span className={styles.icon}>{item.icon}</span>
+                    <ListItemIcon className={styles.icon}>
+                      {item.icon}
+                    </ListItemIcon>
                     {!collapsed && (
-                      <span className={styles.text}>{item.text}</span>
+                      <ListItemText
+                        primary={item.text}
+                        className={styles.text}
+                      />
                     )}
                   </ListItem>
                 </Tooltip>
@@ -126,9 +140,10 @@ export default function SidebarNavbar({ collapsed, setCollapsed }) {
                         onClick={() => handleNav(subItem.path)}
                         className={styles.subMenuItem}
                       >
-                        <span className={styles.subMenuText}>
-                          {subItem.text}
-                        </span>
+                        <ListItemText
+                          primary={subItem.text}
+                          className={styles.subMenuText}
+                        />
                       </ListItem>
                     ))}
                   </Box>
@@ -147,30 +162,17 @@ export default function SidebarNavbar({ collapsed, setCollapsed }) {
                 onClick={() => handleNav(item.path)}
                 className={styles.listItem}
               >
-                <span className={styles.icon}>{item.icon}</span>
-                {!collapsed && <span className={styles.text}>{item.text}</span>}
+                <ListItemIcon className={styles.icon}>{item.icon}</ListItemIcon>
+                {!collapsed && (
+                  <ListItemText primary={item.text} className={styles.text} />
+                )}
               </ListItem>
             </Tooltip>
           );
         })}
-
-        {(userRole === 'owner' || userRole === 'admin') && (
-          <Tooltip title={collapsed ? adminMenu.text : ''} placement="right">
-            <ListItem
-              button
-              onClick={() => handleNav(adminMenu.path)}
-              className={styles.listItem}
-            >
-              <span className={styles.icon}>{adminMenu.icon}</span>
-              {!collapsed && (
-                <span className={styles.text}>{adminMenu.text}</span>
-              )}
-            </ListItem>
-          </Tooltip>
-        )}
       </List>
 
-      {/* Footer: Logout di bagian paling bawah */}
+      {/* Footer: Logout */}
       <Box className={styles.footer}>
         <Tooltip title={collapsed ? 'Logout' : ''} placement="right">
           <ListItem
@@ -178,15 +180,16 @@ export default function SidebarNavbar({ collapsed, setCollapsed }) {
             onClick={handleLogoutClick}
             className={styles.listItem}
           >
-            <span className={styles.icon}>
+            <ListItemIcon className={styles.icon}>
               <LogoutIcon />
-            </span>
-            {!collapsed && <span className={styles.text}>Logout</span>}
+            </ListItemIcon>
+            {!collapsed && (
+              <ListItemText primary="Logout" className={styles.text} />
+            )}
           </ListItem>
         </Tooltip>
       </Box>
 
-      {/* Dialog logout */}
       <LogoutDialog
         open={logoutOpen}
         onClose={handleLogoutClose}
