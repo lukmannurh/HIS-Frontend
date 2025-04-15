@@ -1,7 +1,15 @@
 import React, { useEffect, useState, useContext } from 'react';
 
 import LoginIcon from '@mui/icons-material/Login';
-import { AppBar, Toolbar, Typography, Box } from '@mui/material';
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Box,
+  IconButton,
+  Tooltip,
+} from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import styles from './TopBar.module.css';
@@ -30,6 +38,7 @@ export default function TopBar({ topBarHeight, leftOffset }) {
     setPageTitle(pageTitleMap[pathname] || 'HIS');
   }, [location]);
 
+  // Klik judul di kiri => ke dashboard atau landing page
   const handleLeftClick = () => {
     if (auth.user) {
       navigate('/dashboard');
@@ -38,6 +47,7 @@ export default function TopBar({ topBarHeight, leftOffset }) {
     }
   };
 
+  // Klik di kanan => ke profile atau login
   const handleRightClick = () => {
     if (auth.user) {
       navigate('/profile');
@@ -45,6 +55,9 @@ export default function TopBar({ topBarHeight, leftOffset }) {
       navigate('/login');
     }
   };
+
+  // Pastikan selalu menampilkan fullName jika ada, kalau tidak ada gunakan username
+  const displayName = auth.user?.fullName || auth.user?.username;
 
   return (
     <AppBar
@@ -59,28 +72,44 @@ export default function TopBar({ topBarHeight, leftOffset }) {
       className={styles.topBar}
       elevation={2}
     >
-      <Toolbar sx={{ minHeight: topBarHeight }}>
-        <Box sx={{ flexGrow: 1, cursor: 'pointer' }} onClick={handleLeftClick}>
+      <Toolbar sx={{ minHeight: topBarHeight, px: 2 }}>
+        {/* Bagian Kiri (Judul Halaman) */}
+        <Box
+          sx={{
+            flexGrow: 1,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+          }}
+          onClick={handleLeftClick}
+        >
           <Typography variant="h6" className={styles.title}>
             {pageTitle}
           </Typography>
         </Box>
+
+        {/* Bagian Kanan (User Info atau Login) */}
         <Box
-          sx={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+          sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
           onClick={handleRightClick}
         >
           {auth.user ? (
-            <Typography variant="body1" className={styles.username}>
-              {auth.user.fullName || auth.user.username}
-            </Typography>
+            <Tooltip title="Go to Profile">
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <PersonOutlineIcon className={styles.userIcon} />
+                <Typography variant="body1" className={styles.username}>
+                  {displayName}
+                </Typography>
+              </Box>
+            </Tooltip>
           ) : (
             location.pathname !== '/login' && (
-              <>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <LoginIcon className={styles.loginIcon} />
                 <Typography variant="body1" className={styles.loginText}>
                   Login
                 </Typography>
-              </>
+              </Box>
             )
           )}
         </Box>

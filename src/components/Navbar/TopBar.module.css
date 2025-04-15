@@ -1,16 +1,24 @@
 .topBar {
-  background-color: #388e3c; /* Brand green */
+  background-color: #2e7d32; /* Hijau lebih gelap */
   color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .title {
-  font-weight: bold;
+  font-weight: 700;
   color: #fff;
+  transition: opacity 0.2s ease;
+}
+
+.userIcon {
+  color: #fff;
+  font-size: 1.2rem;
 }
 
 .username {
-  font-weight: bold;
+  font-weight: 600;
   color: #fff;
+  white-space: nowrap; /* mencegah teks terpotong ke baris baru */
 }
 
 .loginIcon {
@@ -19,7 +27,7 @@
 }
 
 .loginText {
-  font-weight: bold;
+  font-weight: 600;
   color: #fff;
-  margin-left: 8px;
+  margin-left: 4px;
 }

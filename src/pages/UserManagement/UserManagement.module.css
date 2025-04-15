@@ -1,25 +1,38 @@
-/* Kontainer halaman utama */
+/* Kontainer utama dengan batas lebar agar tidak terlalu memanjang di layar besar */
 .container {
   margin: 0 auto;
   padding: 2rem 1.5rem;
-  max-width: 1200px; /* Batas lebar agar tampilan tidak terlalu memanjang di layar besar */
+  max-width: 1200px;
 }
 
-/* Judul utama */
-.title {
+/* Page Header */
+.pageHeader {
   margin-bottom: 2rem;
-  font-weight: 600;
-  color: #333;
+  text-align: center;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 1rem;
 }
 
-/* Tombol "CREATE NEW USER" */
+.pageTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 0.25rem;
+}
+
+.pageSubtitle {
+  font-size: 1rem;
+  color: #666;
+}
+
+/* Tombol "Create New User" */
 .createButton {
   text-transform: none;
   font-weight: 600;
   margin-bottom: 2rem;
 }
 
-/* Pembungkus tabel (Paper + TableContainer) */
+/* Pembungkus tabel */
 .tableContainer {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
@@ -29,19 +42,19 @@
   margin-top: 1rem;
 }
 
-/* Baris header */
+/* Baris header tabel */
 .tableHeaderRow {
   background-color: #f9f9f9;
 }
 
-/* Sel header */
+/* Sel header tabel */
 .tableHeader {
   font-weight: 600;
   color: #444;
   padding: 16px;
 }
 
-/* Baris body */
+/* Baris body tabel */
 .tableBodyRow {
   transition: background-color 0.2s ease;
 }
@@ -50,7 +63,7 @@
   background-color: #f5f5f5;
 }
 
-/* Sel body */
+/* Sel body tabel */
 .tableCell {
   padding: 16px;
   vertical-align: middle;

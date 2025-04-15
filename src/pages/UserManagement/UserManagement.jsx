@@ -13,6 +13,7 @@ import {
   TableRow,
   TableCell,
   IconButton,
+  Box,
 } from '@mui/material';
 
 import CreateUser from './CreateUser';
@@ -24,7 +25,6 @@ import api from '../../services/api';
 
 const UserManagement = () => {
   const { auth } = useContext(AuthContext);
-
   const [users, setUsers] = useState([]);
   const [showCreate, setShowCreate] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
@@ -81,15 +81,21 @@ const UserManagement = () => {
       fetchUsers();
     } catch (error) {
       console.error('Failed to delete user:', error);
-      // Tambahkan notifikasi error jika diperlukan
     }
   };
 
   return (
     <Container className={styles.container}>
-      <Typography variant="h4" className={styles.title}>
-        User Management
-      </Typography>
+      {/* Page Header */}
+      <Box className={styles.pageHeader}>
+        <Typography variant="h3" className={styles.pageTitle}>
+          User Management
+        </Typography>
+        <Typography variant="subtitle1" className={styles.pageSubtitle}>
+          Kelola akun pengguna pada sistem. Buat, edit, dan hapus user sesuai
+          kebutuhan.
+        </Typography>
+      </Box>
 
       <Button
         variant="contained"
@@ -97,7 +103,7 @@ const UserManagement = () => {
         onClick={handleCreateNew}
         className={styles.createButton}
       >
-        CREATE NEW USER
+        Create New User
       </Button>
 
       <TableContainer component={Paper} className={styles.tableContainer}>
