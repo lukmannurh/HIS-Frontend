@@ -7,14 +7,11 @@ import {
 } from '@mui/icons-material';
 import {
   Container,
-  Grid,
-  Card,
-  CardContent,
-  CardActions,
-  Typography,
-  Button,
-  CircularProgress,
+  Paper,
   Box,
+  Typography,
+  IconButton,
+  CircularProgress,
 } from '@mui/material';
 
 import ArchiveDetailModal from './ArchiveDetailModal';
@@ -28,8 +25,8 @@ const Archives = () => {
   const [archives, setArchives] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [selectedArchive, setSelectedArchive] = useState(null);
-  const [deleteArchive, setDeleteArchive] = useState(null);
+  const [selected, setSelected] = useState(null);
+  const [toDelete, setToDelete] = useState(null);
 
   useEffect(() => {
     fetchArchives();
@@ -41,80 +38,69 @@ const Archives = () => {
     try {
       const res = await api.get('/archives');
       setArchives(res.data);
-    } catch (err) {
-      setError('Gagal mengambil data archives');
+    } catch {
+      setError('Gagal mengambil data arsip.');
     } finally {
       setLoading(false);
     }
   };
 
-  // Pastikan hook sudah dipanggil, baru cek role
-  if (auth.user && auth.user.role !== 'owner' && auth.user.role !== 'admin') {
+  const ArchivesHeader = () => (
+    <Paper
+      elevation={0}
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 2,
+        backgroundColor: '#e8f5e9',
+        p: 2,
+        borderRadius: 2,
+        mb: 4,
+      }}
+    >
+      <DescriptionIcon sx={{ color: '#2e7d32', fontSize: 32 }} />
+      <Box>
+        <Typography variant="h5" sx={{ fontWeight: 700, color: '#2e7d32' }}>
+          Archives
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Telusuri, lihat detail, unduh, atau hapus arsip dengan mudah.
+        </Typography>
+      </Box>
+    </Paper>
+  );
+
+  // Hanya Owner/Admin
+  if (auth.user && !['owner', 'admin'].includes(auth.user.role)) {
     return (
-      <Container className={styles.archivesContainer}>
+      <Container maxWidth="lg" className={styles.archivesContainer}>
         <Typography variant="h6" color="error" align="center">
-          Akses ditolak: Fitur archives hanya tersedia untuk Owner dan Admin.
+          Akses ditolak: hanya Owner/Admin yang dapat melihat arsip.
         </Typography>
       </Container>
     );
   }
 
-  // Kelompokkan archives berdasarkan bulan dan tahun (contoh: "Des 2023")
-  const groupedArchives = archives.reduce((groups, archive) => {
-    const date = new Date(archive.archivedAt);
-    const groupKey = date.toLocaleString('id-ID', {
-      month: 'short',
+  // Group by "Mon YYYY"
+  const grouped = archives.reduce((acc, arc) => {
+    const key = new Date(arc.archivedAt).toLocaleString('id-ID', {
+      month: 'long',
       year: 'numeric',
     });
-    if (!groups[groupKey]) {
-      groups[groupKey] = [];
-    }
-    groups[groupKey].push(archive);
-    return groups;
+    acc[key] = acc[key] || [];
+    acc[key].push(arc);
+    return acc;
   }, {});
-
-  const groupKeys = Object.keys(groupedArchives).sort((a, b) => {
-    const [monthA, yearA] = a.split(' ');
-    const [monthB, yearB] = b.split(' ');
-    const dateA = new Date(
-      yearA,
-      new Date(Date.parse(`${monthA} 1, ${yearA}`)).getMonth()
-    );
-    const dateB = new Date(
-      yearB,
-      new Date(Date.parse(`${monthB} 1, ${yearB}`)).getMonth()
-    );
-    return dateB - dateA;
+  const months = Object.keys(grouped).sort((a, b) => {
+    const da = new Date(a),
+      db = new Date(b);
+    return db - da;
   });
 
-  const handleView = (archive) => {
-    setSelectedArchive(archive);
-  };
-
-  const handleDelete = (archive) => {
-    setDeleteArchive(archive);
-  };
-
-  const confirmDelete = async () => {
-    try {
-      await api.delete(`/archives/${deleteArchive.id}`);
-      setDeleteArchive(null);
-      fetchArchives();
-    } catch (err) {
-      alert('Gagal menghapus archive');
-    }
-  };
-
   return (
-    <Container className={styles.archivesContainer}>
-      <Typography
-        variant="h4"
-        className={styles.pageTitle}
-        align="center"
-        gutterBottom
-      >
-        Archives
-      </Typography>
+    <Container maxWidth="lg" className={styles.archivesContainer}>
+      <ArchivesHeader />
+
       {loading ? (
         <Box className={styles.loader}>
           <CircularProgress />
@@ -124,77 +110,71 @@ const Archives = () => {
           {error}
         </Typography>
       ) : archives.length === 0 ? (
-        <Typography align="center">Tidak ada archive</Typography>
+        <Typography align="center">Belum ada arsip.</Typography>
       ) : (
-        groupKeys.map((group) => (
-          <Box key={group} className={styles.groupContainer}>
+        months.map((month) => (
+          <Box key={month} className={styles.groupContainer}>
             <Typography variant="h6" className={styles.groupHeader}>
-              {group}
+              {month}
             </Typography>
-            <Grid container spacing={2}>
-              {groupedArchives[group].map((archive) => (
-                <Grid item xs={12} sm={6} md={4} key={archive.id}>
-                  <Card className={styles.archiveCard}>
-                    <CardContent className={styles.archiveCardContent}>
-                      <Box className={styles.fileIcon}>
-                        <DescriptionIcon fontSize="large" />
-                      </Box>
-                      <Typography
-                        variant="subtitle1"
-                        className={styles.archiveTitle}
-                      >
-                        {archive.title}
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        className={styles.archiveDate}
-                      >
-                        {new Date(archive.archivedAt).toLocaleDateString(
-                          'id-ID'
-                        )}
-                      </Typography>
-                    </CardContent>
-                    <CardActions className={styles.cardActions}>
-                      <Button
-                        size="small"
-                        onClick={() => handleView(archive)}
-                        className={styles.actionButton}
-                        startIcon={<VisibilityIcon />}
-                      >
-                        Lihat
-                      </Button>
-                      <Button
-                        size="small"
-                        color="error"
-                        onClick={() => handleDelete(archive)}
-                        className={styles.actionButton}
-                        startIcon={<DeleteIcon />}
-                      >
-                        Hapus
-                      </Button>
-                    </CardActions>
-                  </Card>
-                </Grid>
+            <Box className={styles.cardsGrid}>
+              {grouped[month].map((arc) => (
+                <Paper
+                  key={arc.id}
+                  elevation={2}
+                  className={styles.archiveCard}
+                >
+                  <Box className={styles.cardContent}>
+                    <DescriptionIcon
+                      className={styles.archiveIcon}
+                      fontSize="large"
+                    />
+                    <Typography className={styles.archiveTitle}>
+                      {arc.title}
+                    </Typography>
+                    <Typography className={styles.archiveDate}>
+                      {new Date(arc.archivedAt).toLocaleDateString('id-ID')}
+                    </Typography>
+                  </Box>
+                  <Box className={styles.cardActions}>
+                    <IconButton
+                      onClick={() => setSelected(arc)}
+                      className={styles.viewBtn}
+                    >
+                      <VisibilityIcon />
+                    </IconButton>
+                    <IconButton
+                      onClick={() => setToDelete(arc)}
+                      className={styles.deleteBtn}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
+                </Paper>
               ))}
-            </Grid>
+            </Box>
           </Box>
         ))
       )}
 
-      {selectedArchive && (
+      {/* Modals */}
+      {selected && (
         <ArchiveDetailModal
-          open={Boolean(selectedArchive)}
-          archive={selectedArchive}
-          onClose={() => setSelectedArchive(null)}
+          open
+          archive={selected}
+          onClose={() => setSelected(null)}
         />
       )}
-
-      {deleteArchive && (
+      {toDelete && (
         <DeleteArchiveDialog
-          open={Boolean(deleteArchive)}
-          archive={deleteArchive}
-          onClose={() => setDeleteArchive(null)}
-          onConfirm={confirmDelete}
+          open
+          archive={toDelete}
+          onClose={() => setToDelete(null)}
+          onConfirm={async () => {
+            await api.delete(`/archives/${toDelete.id}`);
+            setToDelete(null);
+            fetchArchives();
+          }}
         />
       )}
     </Container>

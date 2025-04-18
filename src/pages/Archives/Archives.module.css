@@ -2,6 +2,23 @@
   padding: 2rem;
 }
 
+/* Header Section (baru) */
+.headerPaper {
+  background-color: #e8f5e9; /* light HIS green */
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  border-radius: 8px;
+}
+.headerTitle {
+  color: #2e7d32; /* dark HIS green */
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+.headerSubtitle {
+  color: #33691e;
+}
+
+/* Judul halaman (lama) */
 .pageTitle {
   margin-bottom: 1.5rem;
   font-weight: bold;
@@ -9,37 +26,47 @@
   text-align: center;
 }
 
+/* Loader (lama) */
 .loader {
   display: flex;
   justify-content: center;
   margin-top: 2rem;
 }
 
+/* Group (bulan) container (lama) */
 .groupContainer {
   margin-bottom: 2rem;
 }
-
+/* Group header (bulan) — perbarui border dan warna */
 .groupHeader {
   font-weight: bold;
-  color: #555;
+  color: #2e7d32; /* gunakan hijau brand */
   margin-bottom: 1rem;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 2px solid #a5d6a7; /* hijau muda */
   padding-bottom: 0.5rem;
 }
 
-/* File view cards */
+/* Grid responsif untuk kartu (baru) */
+.cardsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+/* File view cards (lama + ditambahkan border kiri) */
 .archiveCard {
   margin-bottom: 1rem;
   display: flex;
   flex-direction: column;
   transition: box-shadow 0.3s ease;
   padding: 8px;
+  border-left: 4px solid #81c784; /* aksen hijau */
 }
-
 .archiveCard:hover {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
+/* Konten kartu (lama, plus center) */
 .archiveCardContent {
   display: flex;
   flex-direction: column;
@@ -47,138 +74,128 @@
   text-align: center;
 }
 
+/* Ikon dan teks (lama + warna brand) */
 .fileIcon {
-  color: #388e3c;
+  color: #66bb6a;
   margin-bottom: 8px;
 }
-
 .archiveTitle {
   font-weight: 600;
   margin-bottom: 4px;
   color: #333;
 }
-
 .archiveDate {
   font-size: 0.8rem;
-  color: #888;
+  color: #555;
   margin-bottom: 4px;
 }
 
+/* Tombol aksi (lama) */
 .cardActions {
   display: flex;
   justify-content: center;
   gap: 8px;
   margin-top: 8px;
 }
-
 .actionButton {
   text-transform: none;
   font-weight: 600;
 }
 
-/* Detail Modal Styling */
+/* Tombol lihat/hapus (baru) */
+.viewBtn {
+  color: #2e7d32;
+}
+.deleteBtn {
+  color: #c62828;
+}
+
+/* Detail Modal Styling (lama) */
 .detailContainer {
   padding: 2rem;
 }
-
 .detailCard {
   padding: 16px;
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
-
 .downloadContainer {
   text-align: right;
   margin-bottom: 8px;
 }
-
 .downloadButton {
   text-transform: none;
 }
-
 .pdfContent {
   margin-top: 16px;
 }
-
 .timestampBox {
   display: flex;
   align-items: center;
   gap: 8px;
   margin-bottom: 8px;
 }
-
 .icon {
   color: #666;
 }
-
 .timestamp {
   font-size: 0.8rem;
   color: #888;
 }
-
 .updatedBox {
   display: flex;
   align-items: center;
   gap: 4px;
 }
-
 .title {
   font-weight: bold;
   margin-top: 16px;
   text-align: center;
 }
-
 .sectionHeader {
   font-weight: bold;
   margin-bottom: 8px;
   text-align: left;
 }
-
 .paperContent {
   padding: 16px;
   background-color: #f9f9f9;
   border-radius: 8px;
 }
-
 .contentText {
   font-size: 1rem;
   color: #555;
   text-align: left;
   white-space: pre-line;
 }
-
 .userInfo {
   font-size: 0.9rem;
   color: #777;
   margin-top: 16px;
   text-align: center;
 }
-
 .relatedNewsItem {
   margin-top: 16px;
   padding: 8px;
   border: 1px solid #ddd;
   border-radius: 4px;
 }
-
 .relatedNewsLink {
   font-weight: 600;
   color: #388e3c;
   text-decoration: none;
 }
-
 .backButton {
   margin-top: 16px;
   text-transform: none;
 }
-
 .buttonContainer {
   text-align: center;
   margin-top: 16px;
 }
 
-/* Status badges */
+/* Status badges (lama) */
 .statusBadge {
   display: inline-flex;
   align-items: center;
@@ -188,32 +205,27 @@
   font-weight: bold;
   margin-bottom: 8px;
 }
-
 .hoax {
   background-color: #ffebee;
   color: #d32f2f;
 }
-
 .valid {
   background-color: #e8f5e9;
   color: #388e3c;
 }
-
 .doubtful {
   background-color: #fff3e0;
   color: #f57c00;
 }
 
-/* Global dialog styling for modals */
+/* Global dialog styling for modals (lama) */
 .MuiDialogTitle-root {
   font-weight: bold;
   text-align: center;
 }
-
 .MuiDialogContent-root {
   text-align: center;
 }
-
 .MuiDialogActions-root {
   justify-content: center;
   gap: 8px;

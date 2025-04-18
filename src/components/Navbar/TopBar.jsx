@@ -2,14 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 
 import LoginIcon from '@mui/icons-material/Login';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  Box,
-  IconButton,
-  Tooltip,
-} from '@mui/material';
+import { AppBar, Toolbar, Typography, Box, Tooltip } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import styles from './TopBar.module.css';

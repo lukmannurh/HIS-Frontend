@@ -1,82 +1,142 @@
-/* Kontainer utama dengan batas lebar agar tidak terlalu memanjang di layar besar */
+/* ===================================
+   Container & Header
+   =================================== */
 .container {
-  margin: 0 auto;
-  padding: 2rem 1.5rem;
-  max-width: 1200px;
+  max-width: 1140px;
+  margin: 2rem auto;
+  padding: 0 1rem;
 }
 
-/* Page Header */
-.pageHeader {
-  margin-bottom: 2rem;
-  text-align: center;
-  border-bottom: 1px solid #e0e0e0;
-  padding-bottom: 1rem;
+.headerPaper {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background-color: #2e7d32;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
 }
 
-.pageTitle {
-  font-size: 2rem;
+.headerIcon {
+  color: #88c273;
+  font-size: 2rem !important;
+}
+
+.headerTitle {
+  margin: 0;
+  font-size: 1.5rem;
   font-weight: 700;
-  color: #333;
-  margin-bottom: 0.25rem;
+  color: #2e7d32;
 }
 
-.pageSubtitle {
-  font-size: 1rem;
-  color: #666;
+.headerSubtitle {
+  margin-top: 0.25rem;
+  font-size: 0.95rem;
+  color: #555;
 }
 
-/* Tombol "Create New User" */
+/* ===================================
+     Create Button
+     =================================== */
 .createButton {
   text-transform: none;
   font-weight: 600;
-  margin-bottom: 2rem;
+  border-radius: 4px;
+  padding: 0.5rem 1.5rem;
+  margin-bottom: 1.5rem; /* spacing below button */
 }
 
-/* Pembungkus tabel */
+/* ===================================
+     Table Container
+     =================================== */
 .tableContainer {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   overflow: hidden;
-  background-color: #fff;
-  margin-bottom: 2rem;
-  margin-top: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-/* Baris header tabel */
-.tableHeaderRow {
-  background-color: #f9f9f9;
+/* ===================================
+     Column Widths
+     =================================== */
+.colUsername {
+  width: 15%;
+}
+.colFullName {
+  width: 25%;
+}
+.colEmail {
+  width: 30%;
+}
+.colRole {
+  width: 15%;
+}
+.colActions {
+  width: 15%;
 }
 
-/* Sel header tabel */
-.tableHeader {
+/* ===================================
+     Table Header Cells
+     =================================== */
+.th {
+  background-color: #f1f8e9;
+  color: #33691e;
   font-weight: 600;
-  color: #444;
-  padding: 16px;
+  padding: 1rem;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+  letter-spacing: 0.5px;
 }
 
-/* Baris body tabel */
-.tableBodyRow {
-  transition: background-color 0.2s ease;
-}
-
-.tableBodyRow:hover {
-  background-color: #f5f5f5;
-}
-
-/* Sel body tabel */
-.tableCell {
-  padding: 16px;
+/* ===================================
+     Table Body Cells
+     =================================== */
+.td {
+  padding: 1rem;
+  font-size: 0.9375rem;
+  color: #424242;
   vertical-align: middle;
-  color: #555;
-  font-size: 0.95rem;
 }
 
-/* Ikon tombol aksi */
+/* Zebra striping */
+.oddRow {
+  background-color: #fafafa;
+}
+
+/* ===================================
+     Actions Cell & Icons
+     =================================== */
+.actionsCell {
+  padding: 0.5rem !important;
+}
+
+.actionsGroup {
+  display: inline-flex;
+  gap: 0.5rem;
+}
+
 .iconButton {
-  margin: 0 4px;
-  transition: transform 0.2s ease;
+  background-color: #fff;
+  transition: all 0.2s ease;
+}
+
+.iconButton.edit {
+  color: #33691e;
+}
+
+.iconButton.delete {
+  color: #d32f2f;
 }
 
 .iconButton:hover {
-  transform: scale(1.1);
+  background-color: rgba(200, 230, 201, 0.4);
+  border-radius: 4px;
+}
+
+.iconButton.delete:hover {
+  background-color: rgba(255, 205, 210, 0.5);
+}
+
+/* Override default margin */
+.MuiIconButton-root {
+  margin: 0 !important;
 }
