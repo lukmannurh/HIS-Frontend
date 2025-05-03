@@ -43,7 +43,7 @@
   font-weight: 600;
   border-radius: 4px;
   padding: 0.5rem 1.5rem;
-  margin-bottom: 1.5rem; /* spacing below button */
+  margin-bottom: 14px; /* spacing below button */
 }
 
 /* ===================================
@@ -51,6 +51,7 @@
      =================================== */
 .tableContainer {
   border-radius: 8px;
+  margin-top: 22px;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
