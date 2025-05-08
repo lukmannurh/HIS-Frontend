@@ -4,6 +4,9 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
+  Tooltip,
+  IconButton,
+  Button,
   TableContainer,
   Table,
   TableHead,
@@ -11,13 +14,10 @@ import {
   TableCell,
   TableBody,
   Paper,
-  IconButton,
-  Tooltip,
-  Button,
-} from '@mui/material';
+} from '@mui/material'; // Menambahkan impor yang hilang
 import { Link as RouterLink } from 'react-router-dom';
 
-import styles from './Reports.module.css';
+import styles from './ReportsTable.module.css'; // Mengimpor CSS modul terpisah
 
 const ReportsTable = ({
   reports,
@@ -28,6 +28,7 @@ const ReportsTable = ({
   userRole,
   userId,
   openStatusDialog,
+  openDeleteDialog, // Menambahkan fungsi openDeleteDialog
 }) => {
   return (
     <TableContainer component={Paper} className={styles.tableContainer}>
@@ -84,7 +85,6 @@ const ReportsTable = ({
                   </span>
                 </TableCell>
                 <TableCell className={styles.cell}>
-                  {/* Menampilkan status pemrosesan, misalnya "diproses" */}
                   {report.status || 'diproses'}
                 </TableCell>
                 <TableCell className={`${styles.cell} ${styles.centerText}`}>
@@ -114,9 +114,7 @@ const ReportsTable = ({
                       <Tooltip title="Delete" arrow>
                         <IconButton
                           size="small"
-                          onClick={() => {
-                            // Tambahkan handler delete jika diperlukan
-                          }}
+                          onClick={() => openDeleteDialog(report)} // Memanggil fungsi openDeleteDialog
                           className={styles.actionButton}
                           color="error"
                         >

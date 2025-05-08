@@ -20,6 +20,7 @@ import ReactPaginate from 'react-paginate';
 import { Link as RouterLink } from 'react-router-dom';
 
 import styles from './Reports.module.css';
+import { handleDeleteReport } from './reportsActions/reportsActions'; // Import aksi delete
 import ReportsTable from './ReportsTable';
 import api from '../../services/api';
 
@@ -27,6 +28,9 @@ const Reports = () => {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [reportToDelete, setReportToDelete] = useState(null);
+  const [confirmationText, setConfirmationText] = useState('');
 
   // Data user dari localStorage
   const storedUser = JSON.parse(localStorage.getItem('user'));
@@ -121,6 +125,27 @@ const Reports = () => {
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to update status');
       closeStatusDialog();
+    }
+  };
+
+  // Handler untuk membuka dialog konfirmasi delete
+  const openDeleteDialog = (report) => {
+    setReportToDelete(report);
+    setDeleteDialogOpen(true);
+  };
+
+  const closeDeleteDialog = () => {
+    setDeleteDialogOpen(false);
+    setReportToDelete(null);
+    setConfirmationText('');
+  };
+
+  const handleDeleteConfirmation = async () => {
+    if (confirmationText === `hapus ${reportToDelete.title}`) {
+      await handleDeleteReport(reportToDelete, setReports, setError);
+      closeDeleteDialog();
+    } else {
+      setError('Teks konfirmasi tidak sesuai!');
     }
   };
 
@@ -222,6 +247,7 @@ const Reports = () => {
         userRole={userRole}
         userId={userId}
         openStatusDialog={openStatusDialog}
+        openDeleteDialog={openDeleteDialog} // Pass fungsi ke ReportsTable
       />
       <Box
         className={styles.paginationContainer}
@@ -245,6 +271,33 @@ const Reports = () => {
           nextLinkClassName={styles.pageLink}
         />
       </Box>
+      <Dialog open={deleteDialogOpen} onClose={closeDeleteDialog}>
+        <DialogTitle>Konfirmasi Hapus Laporan</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Ketik <strong>hapus {reportToDelete?.title}</strong> untuk menghapus
+            laporan ini.
+          </Typography>
+          <TextField
+            label="Teks Konfirmasi"
+            fullWidth
+            value={confirmationText}
+            onChange={(e) => setConfirmationText(e.target.value)}
+            margin="normal"
+          />
+          {error && <Alert severity="error">{error}</Alert>}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeDeleteDialog}>Batal</Button>
+          <Button
+            onClick={handleDeleteConfirmation}
+            variant="contained"
+            color="error"
+          >
+            Hapus
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Dialog open={statusDialogOpen} onClose={closeStatusDialog}>
         <DialogTitle>Update Report Status</DialogTitle>
         <DialogContent>

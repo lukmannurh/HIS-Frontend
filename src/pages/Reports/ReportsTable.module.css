@@ -1,30 +1,4 @@
-/* Global container styles */
-.container {
-  padding: 20px;
-  margin: 0 auto;
-  max-width: 1200px;
-  font-family: 'Roboto', sans-serif;
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-/* Filter controls for sender and validation */
-.filterContainer {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.filterControl {
-  min-width: 150px;
-}
-
-/* Table styles */
+/* Table Container */
 .tableContainer {
   margin-top: 1rem;
   border-radius: 6px;
@@ -32,6 +6,7 @@
   overflow: hidden;
 }
 
+/* General Table Styles */
 .table {
   width: 100%;
   border-collapse: collapse;
@@ -57,7 +32,7 @@
   text-align: center;
 }
 
-/* Status validation styles */
+/* Status Validation Styles */
 .hoaxStatus {
   color: #c62828;
   font-weight: bold;
@@ -73,7 +48,7 @@
   font-weight: bold;
 }
 
-/* Style for action buttons */
+/* Action Buttons */
 .actionButton {
   margin-left: 0.5rem;
 }
@@ -86,7 +61,7 @@
   padding: 4px 8px;
 }
 
-/* Pagination styles */
+/* Pagination Styles */
 .paginationContainer {
   margin-top: 1rem;
 }
