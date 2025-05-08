@@ -20,7 +20,6 @@ import ReactPaginate from 'react-paginate';
 import { Link as RouterLink } from 'react-router-dom';
 
 import styles from './Reports.module.css';
-import { handleDeleteReport } from './reportsActions/reportsActions'; // Import aksi delete
 import ReportsTable from './ReportsTable';
 import api from '../../services/api';
 
@@ -140,12 +139,23 @@ const Reports = () => {
     setConfirmationText('');
   };
 
+  // Mengaktifkan atau menonaktifkan tombol delete
+  // eslint-disable-next-line no-unused-vars
+  const isDeleteButtonDisabled =
+    confirmationText !== `hapus ${reportToDelete?.title}`;
+
+  // Handle delete action directly inside Reports.jsx
   const handleDeleteConfirmation = async () => {
     if (confirmationText === `hapus ${reportToDelete.title}`) {
-      await handleDeleteReport(reportToDelete, setReports, setError);
-      closeDeleteDialog();
-    } else {
-      setError('Teks konfirmasi tidak sesuai!');
+      try {
+        await api.delete(`/reports/${reportToDelete.id}`);
+        setReports((prevReports) =>
+          prevReports.filter((r) => r.id !== reportToDelete.id)
+        );
+        closeDeleteDialog();
+      } catch (err) {
+        setError('Failed to delete report');
+      }
     }
   };
 
@@ -285,7 +295,6 @@ const Reports = () => {
             onChange={(e) => setConfirmationText(e.target.value)}
             margin="normal"
           />
-          {error && <Alert severity="error">{error}</Alert>}
         </DialogContent>
         <DialogActions>
           <Button onClick={closeDeleteDialog}>Batal</Button>
@@ -293,6 +302,7 @@ const Reports = () => {
             onClick={handleDeleteConfirmation}
             variant="contained"
             color="error"
+            disabled={confirmationText !== `hapus ${reportToDelete?.title}`} // Tombol di-disable jika teks tidak sesuai
           >
             Hapus
           </Button>
