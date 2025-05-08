@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
+import CloseIcon from '@mui/icons-material/Close'; // Untuk tombol tutup Snackbar
 import {
   Box,
   TextField,
@@ -15,6 +16,8 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Snackbar,
+  IconButton,
 } from '@mui/material';
 import ReactPaginate from 'react-paginate';
 import { Link as RouterLink } from 'react-router-dom';
@@ -30,6 +33,9 @@ const Reports = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [reportToDelete, setReportToDelete] = useState(null);
   const [confirmationText, setConfirmationText] = useState('');
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [setSnackbarSeverity] = useState('success');
 
   // Data user dari localStorage
   const storedUser = JSON.parse(localStorage.getItem('user'));
@@ -152,9 +158,14 @@ const Reports = () => {
         setReports((prevReports) =>
           prevReports.filter((r) => r.id !== reportToDelete.id)
         );
+        setSnackbarMessage('Laporan berhasil dihapus!');
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
         closeDeleteDialog();
       } catch (err) {
-        setError('Failed to delete report');
+        setSnackbarMessage('Gagal menghapus laporan!');
+        setSnackbarSeverity('error');
+        setSnackbarOpen(true);
       }
     }
   };
@@ -172,6 +183,10 @@ const Reports = () => {
   const handleFilterValidationChange = (e) => {
     setFilterValidation(e.target.value);
     setCurrentPage(0);
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
   };
 
   if (loading) {
@@ -308,6 +323,24 @@ const Reports = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Snackbar untuk notifikasi */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={4000}
+        onClose={handleSnackbarClose}
+        message={snackbarMessage}
+        action={
+          <IconButton
+            size="small"
+            aria-label="close"
+            color="inherit"
+            onClick={handleSnackbarClose}
+          >
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        }
+      />
       <Dialog open={statusDialogOpen} onClose={closeStatusDialog}>
         <DialogTitle>Update Report Status</DialogTitle>
         <DialogContent>
