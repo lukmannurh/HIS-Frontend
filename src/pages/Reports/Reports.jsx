@@ -33,9 +33,8 @@ const Reports = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [reportToDelete, setReportToDelete] = useState(null);
   const [confirmationText, setConfirmationText] = useState('');
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false); // Untuk mengelola status Snackbar
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [setSnackbarSeverity] = useState('success');
 
   // Data user dari localStorage
   const storedUser = JSON.parse(localStorage.getItem('user'));
@@ -159,12 +158,10 @@ const Reports = () => {
           prevReports.filter((r) => r.id !== reportToDelete.id)
         );
         setSnackbarMessage('Laporan berhasil dihapus!');
-        setSnackbarSeverity('success');
         setSnackbarOpen(true);
         closeDeleteDialog();
       } catch (err) {
         setSnackbarMessage('Gagal menghapus laporan!');
-        setSnackbarSeverity('error');
         setSnackbarOpen(true);
       }
     }
