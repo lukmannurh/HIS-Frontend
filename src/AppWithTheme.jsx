@@ -12,7 +12,7 @@ const AppWithTheme = () => {
     palette: {
       mode,
       primary: {
-        main: '#fff',
+        main: '#88c273',
       },
     },
   });
