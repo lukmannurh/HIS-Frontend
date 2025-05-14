@@ -1,6 +1,8 @@
+// src/pages/Reports/Reports.jsx
+
 import React, { useEffect, useState } from 'react';
 
-import CloseIcon from '@mui/icons-material/Close'; // Untuk tombol tutup Snackbar
+import CloseIcon from '@mui/icons-material/Close';
 import {
   Box,
   TextField,
@@ -23,7 +25,8 @@ import ReactPaginate from 'react-paginate';
 import { Link as RouterLink } from 'react-router-dom';
 
 import styles from './Reports.module.css';
-import ReportsTable from './ReportsTable';
+import ReportsTableAdmin from './ReportsTableAdmin';
+import ReportsTableUser from './ReportsTableUser';
 import api from '../../services/api';
 
 const Reports = () => {
@@ -33,24 +36,20 @@ const Reports = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [reportToDelete, setReportToDelete] = useState(null);
   const [confirmationText, setConfirmationText] = useState('');
-  const [snackbarOpen, setSnackbarOpen] = useState(false); // Untuk mengelola status Snackbar
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
 
-  // Data user dari localStorage
   const storedUser = JSON.parse(localStorage.getItem('user'));
   const userRole = storedUser?.role || '';
   const userId = storedUser?.id || '';
 
-  // State untuk pencarian & filter
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterSender, setFilterSender] = useState('all'); // all, owner, admin, user
-  const [filterValidation, setFilterValidation] = useState('all'); // all, valid, hoax, diragukan
+  const [filterSender, setFilterSender] = useState('all');
+  const [filterValidation, setFilterValidation] = useState('all');
 
-  // Pagination
   const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = 5;
 
-  // Dialog untuk update status laporan (ubah status menjadi "selesai")
   const [statusDialogOpen, setStatusDialogOpen] = useState(false);
   const [selectedReport, setSelectedReport] = useState(null);
 
@@ -59,7 +58,7 @@ const Reports = () => {
       try {
         const response = await api.get('/reports');
         setReports(response.data);
-      } catch (err) {
+      } catch {
         setError('Failed to fetch reports');
       } finally {
         setLoading(false);
@@ -68,7 +67,6 @@ const Reports = () => {
     fetchReports();
   }, []);
 
-  // Filter laporan
   const filteredReports = reports.filter((report) => {
     const matchesSearch = report.title
       .toLowerCase()
@@ -87,12 +85,10 @@ const Reports = () => {
   );
   const pageCount = Math.ceil(filteredReports.length / itemsPerPage);
 
-  // Helper: gunakan updatedAt jika sudah diedit, jika tidak gunakan createdAt
-  const getReportTimestamp = (report) => {
-    return report.updatedAt && report.updatedAt !== report.createdAt
+  const getReportTimestamp = (report) =>
+    report.updatedAt && report.updatedAt !== report.createdAt
       ? report.updatedAt
       : report.createdAt;
-  };
 
   const formatDateWIB = (dateStr) => {
     const options = {
@@ -107,23 +103,19 @@ const Reports = () => {
     return new Date(dateStr).toLocaleString('id-ID', options) + ' WIB';
   };
 
-  // Handler untuk membuka dialog update status laporan
   const openStatusDialog = (report) => {
     setSelectedReport(report);
     setStatusDialogOpen(true);
   };
-
   const closeStatusDialog = () => {
     setStatusDialogOpen(false);
     setSelectedReport(null);
   };
-
   const handleStatusUpdate = async () => {
     try {
       await api.put(`/reports/${selectedReport.id}/status`, {
         status: 'selesai',
       });
-      // Hapus laporan dari daftar setelah diupdate (karena status selesai akan dipindahkan ke arsip)
       setReports((prev) => prev.filter((r) => r.id !== selectedReport.id));
       closeStatusDialog();
     } catch (err) {
@@ -132,35 +124,24 @@ const Reports = () => {
     }
   };
 
-  // Handler untuk membuka dialog konfirmasi delete
   const openDeleteDialog = (report) => {
     setReportToDelete(report);
     setDeleteDialogOpen(true);
   };
-
   const closeDeleteDialog = () => {
     setDeleteDialogOpen(false);
     setReportToDelete(null);
     setConfirmationText('');
   };
-
-  // Mengaktifkan atau menonaktifkan tombol delete
-  // eslint-disable-next-line no-unused-vars
-  const isDeleteButtonDisabled =
-    confirmationText !== `hapus ${reportToDelete?.title}`;
-
-  // Handle delete action directly inside Reports.jsx
   const handleDeleteConfirmation = async () => {
     if (confirmationText === `hapus ${reportToDelete.title}`) {
       try {
         await api.delete(`/reports/${reportToDelete.id}`);
-        setReports((prevReports) =>
-          prevReports.filter((r) => r.id !== reportToDelete.id)
-        );
+        setReports((prev) => prev.filter((r) => r.id !== reportToDelete.id));
         setSnackbarMessage('Laporan berhasil dihapus!');
         setSnackbarOpen(true);
         closeDeleteDialog();
-      } catch (err) {
+      } catch {
         setSnackbarMessage('Gagal menghapus laporan!');
         setSnackbarOpen(true);
       }
@@ -171,20 +152,15 @@ const Reports = () => {
     setSearchQuery(e.target.value);
     setCurrentPage(0);
   };
-
   const handleFilterSenderChange = (e) => {
     setFilterSender(e.target.value);
     setCurrentPage(0);
   };
-
   const handleFilterValidationChange = (e) => {
     setFilterValidation(e.target.value);
     setCurrentPage(0);
   };
-
-  const handleSnackbarClose = () => {
-    setSnackbarOpen(false);
-  };
+  const handleSnackbarClose = () => setSnackbarOpen(false);
 
   if (loading) {
     return (
@@ -215,6 +191,7 @@ const Reports = () => {
           Create Report
         </Button>
       </Box>
+
       <TextField
         fullWidth
         placeholder="Search by Title"
@@ -222,6 +199,7 @@ const Reports = () => {
         onChange={handleSearch}
         margin="normal"
       />
+
       <Box className={styles.filterContainer}>
         <FormControl
           variant="outlined"
@@ -241,6 +219,7 @@ const Reports = () => {
             <MenuItem value="user">User</MenuItem>
           </Select>
         </FormControl>
+
         <FormControl
           variant="outlined"
           size="small"
@@ -260,17 +239,29 @@ const Reports = () => {
           </Select>
         </FormControl>
       </Box>
-      <ReportsTable
-        reports={displayedReports}
-        currentPage={currentPage}
-        itemsPerPage={itemsPerPage}
-        formatDateWIB={formatDateWIB}
-        getReportTimestamp={getReportTimestamp}
-        userRole={userRole}
-        userId={userId}
-        openStatusDialog={openStatusDialog}
-        openDeleteDialog={openDeleteDialog} // Pass fungsi ke ReportsTable
-      />
+
+      {userRole === 'user' ? (
+        <ReportsTableUser
+          reports={displayedReports}
+          currentPage={currentPage}
+          itemsPerPage={itemsPerPage}
+          formatDateWIB={formatDateWIB}
+          getReportTimestamp={getReportTimestamp}
+        />
+      ) : (
+        <ReportsTableAdmin
+          reports={displayedReports}
+          currentPage={currentPage}
+          itemsPerPage={itemsPerPage}
+          formatDateWIB={formatDateWIB}
+          getReportTimestamp={getReportTimestamp}
+          userRole={userRole}
+          userId={userId}
+          openStatusDialog={openStatusDialog}
+          openDeleteDialog={openDeleteDialog}
+        />
+      )}
+
       <Box
         className={styles.paginationContainer}
         display="flex"
@@ -293,6 +284,7 @@ const Reports = () => {
           nextLinkClassName={styles.pageLink}
         />
       </Box>
+
       <Dialog open={deleteDialogOpen} onClose={closeDeleteDialog}>
         <DialogTitle>Konfirmasi Hapus Laporan</DialogTitle>
         <DialogContent>
@@ -314,14 +306,13 @@ const Reports = () => {
             onClick={handleDeleteConfirmation}
             variant="contained"
             color="error"
-            disabled={confirmationText !== `hapus ${reportToDelete?.title}`} // Tombol di-disable jika teks tidak sesuai
+            disabled={confirmationText !== `hapus ${reportToDelete?.title}`}
           >
             Hapus
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* Snackbar untuk notifikasi */}
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={4000}
@@ -338,6 +329,7 @@ const Reports = () => {
           </IconButton>
         }
       />
+
       <Dialog open={statusDialogOpen} onClose={closeStatusDialog}>
         <DialogTitle>Update Report Status</DialogTitle>
         <DialogContent>

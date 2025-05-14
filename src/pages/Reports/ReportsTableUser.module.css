@@ -1,0 +1,55 @@
+.tableContainer {
+  margin-top: 1rem;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.cell {
+  border: 1px solid #e0e0e0;
+  padding: 12px;
+  text-align: left;
+}
+
+.centerText {
+  text-align: center;
+}
+
+.tableHeader {
+  background-color: #88c273;
+}
+
+.tableHeader .cell {
+  font-weight: bold;
+  color: #ffffff;
+  text-align: center;
+}
+
+.hoaxStatus {
+  color: #c62828;
+  font-weight: bold;
+}
+
+.validStatus {
+  color: #2e7d32;
+  font-weight: bold;
+}
+
+.durigStatus {
+  color: #ff9800;
+  font-weight: bold;
+}
+
+.link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
