@@ -9,7 +9,7 @@ import {
   TableCell,
   TableBody,
   Paper,
-  IconButton,
+  Button,
   Box,
 } from '@mui/material';
 
@@ -51,22 +51,24 @@ const UsersTable = ({
             </TableCell>
             <TableCell className={styles.cell}>{user.email}</TableCell>
             <TableCell className={styles.cell}>{user.role}</TableCell>
-            <TableCell className={`${styles.cell} ${styles.centerText}`}>
+            <TableCell className={`${styles.cell} ${styles.actionsCell}`}>
               <Box className={styles.actionsGroup}>
-                <IconButton
+                <Button
+                  size="small"
+                  startIcon={<EditIcon />}
                   onClick={() => onEditRole(user)}
-                  size="small"
-                  className={`${styles.iconButton} ${styles.edit}`}
+                  className={styles.editButton}
                 >
-                  <EditIcon fontSize="inherit" />
-                </IconButton>
-                <IconButton
+                  Edit
+                </Button>
+                <Button
+                  size="small"
+                  startIcon={<DeleteIcon />}
                   onClick={() => onDelete(user)}
-                  size="small"
-                  className={`${styles.iconButton} ${styles.delete}`}
+                  className={styles.deleteButton}
                 >
-                  <DeleteIcon fontSize="inherit" />
-                </IconButton>
+                  Delete
+                </Button>
               </Box>
             </TableCell>
           </TableRow>

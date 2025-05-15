@@ -1,3 +1,6 @@
+/* src/pages/usermanagement/UsersTable.module.css */
+
+/* Table container */
 .tableContainer {
   margin-top: 1rem;
   border-radius: 8px;
@@ -23,31 +26,32 @@
   background-color: #fafafa;
 }
 
-/* Aksi di kanan */
+/* Actions cell styling */
+.actionsCell {
+  padding: 8px;
+}
+
 .actionsGroup {
   display: inline-flex;
   gap: 0.5rem;
-  justify-content: flex-end;
+  justify-content: center;
   width: 100%;
 }
 
-.iconButton {
-  transition: all 0.2s ease;
-}
-
-.iconButton.edit {
+.editButton {
   color: #33691e;
+  text-transform: none;
 }
 
-.iconButton.delete {
-  color: #d32f2f;
-}
-
-.iconButton:hover {
+.editButton:hover {
   background-color: rgba(200,230,201,0.4);
-  border-radius: 4px;
 }
 
-.iconButton.delete:hover {
+.deleteButton {
+  color: #d32f2f;
+  text-transform: none;
+}
+
+.deleteButton:hover {
   background-color: rgba(255,205,210,0.5);
 }
