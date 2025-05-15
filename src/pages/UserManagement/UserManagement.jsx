@@ -1,193 +1,246 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useMemo } from 'react';
 
 import {
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-  Group as GroupIcon,
-} from '@mui/icons-material';
-import {
-  Container,
-  Typography,
-  Button,
-  Paper,
-  TableContainer,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  IconButton,
   Box,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Button,
+  CircularProgress,
+  Alert,
 } from '@mui/material';
+import ReactPaginate from 'react-paginate';
 
 import CreateUser from './CreateUser';
 import DeleteUserDialog from './DeleteUserDialog';
 import EditUserRole from './EditUserRole';
 import styles from './UserManagement.module.css';
+import UsersTable from './UsersTable';
 import { AuthContext } from '../../context/AuthContext';
 import api from '../../services/api';
 
-// Inline header component with your new wording
-const UserManagementHeader = () => (
-  <Paper
-    elevation={0}
-    sx={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: 2,
-      backgroundColor: '#e8f5e9',
-      p: 2,
-      borderRadius: 2,
-      mb: 3,
-    }}
-  >
-    <GroupIcon sx={{ color: '#88c273', fontSize: 32 }} />
-    <Box>
-      <Typography variant="h5" sx={{ fontWeight: 700, color: '#2e7d32' }}>
-        User Management
-      </Typography>
-      <Typography variant="body2" color="text.secondary">
-        Tambah pengguna baru, atur peran, atau hapus akun yang tidak aktif.
-      </Typography>
-    </Box>
-  </Paper>
-);
+const SORT_FIELDS = {
+  USERNAME: 'username',
+  CREATED_AT: 'createdAt',
+};
 
 const UserManagement = () => {
   const { auth } = useContext(AuthContext);
   const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
   const [showCreate, setShowCreate] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [deletingUser, setDeletingUser] = useState(null);
 
+  // search/filter/sort/pagination
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterRole, setFilterRole] = useState('all');
+  const [sortField, setSortField] = useState(SORT_FIELDS.USERNAME);
+  const [sortDirection, setSortDirection] = useState('asc');
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 10;
+
   useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const res = await api.get('/users');
+        // exclude current admin
+        setUsers(res.data.filter((u) => u.id !== auth.user.id));
+      } catch {
+        setError('Failed to fetch users');
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchUsers();
-    // eslint-disable-next-line
-  }, []);
+  }, [auth.user.id]);
 
-  const fetchUsers = async () => {
-    try {
-      const response = await api.get('/users');
-      const filtered = response.data.filter((u) => u.id !== auth.user.id);
-      setUsers(filtered);
-    } catch (err) {
-      console.error('Failed to fetch users:', err);
-    }
-  };
+  // Filter
+  const filtered = useMemo(
+    () =>
+      users.filter((u) => {
+        const matchesSearch = u.username
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase());
+        const matchesRole = filterRole === 'all' || u.role === filterRole;
+        return matchesSearch && matchesRole;
+      }),
+    [users, searchQuery, filterRole]
+  );
 
-  // dialog handlers ...
-  const handleCreateNew = () => setShowCreate(true);
-  const handleCloseCreate = () => {
-    setShowCreate(false);
-    fetchUsers();
-  };
-  const handleEditRole = (user) => setEditingUser(user);
-  const handleCloseEdit = () => {
-    setEditingUser(null);
-    fetchUsers();
-  };
-  const handleDeleteUser = (user) => setDeletingUser(user);
-  const handleCloseDelete = () => setDeletingUser(null);
-  const handleConfirmDelete = async () => {
-    try {
-      await api.delete(`/users/${deletingUser.id}`);
-      setDeletingUser(null);
-      fetchUsers();
-    } catch (err) {
-      console.error('Failed to delete user:', err);
-    }
-  };
+  // Sort
+  const sorted = useMemo(
+    () =>
+      [...filtered].sort((a, b) => {
+        const aVal = a[sortField],
+          bVal = b[sortField];
+        if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
+        if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
+        return 0;
+      }),
+    [filtered, sortField, sortDirection]
+  );
+
+  // Paginate
+  const pageCount = Math.ceil(sorted.length / itemsPerPage);
+  const displayedUsers = sorted.slice(
+    currentPage * itemsPerPage,
+    (currentPage + 1) * itemsPerPage
+  );
+
+  if (loading) {
+    return (
+      <Box
+        className={styles.container}
+        display="flex"
+        justifyContent="center"
+        mt={3}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+  if (error) {
+    return (
+      <Box className={styles.container} m={3}>
+        <Alert severity="error">{error}</Alert>
+      </Box>
+    );
+  }
 
   return (
-    <Container className={styles.container}>
-      <UserManagementHeader />
-
+    <Box className={styles.container}>
       <Button
         variant="contained"
         color="primary"
-        onClick={handleCreateNew}
+        onClick={() => setShowCreate(true)}
         className={styles.createButton}
       >
         Create New User
       </Button>
 
-      <TableContainer component={Paper} className={styles.tableContainer}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell className={`${styles.th} ${styles.colUsername}`}>
-                Username
-              </TableCell>
-              <TableCell className={`${styles.th} ${styles.colFullName}`}>
-                Full Name
-              </TableCell>
-              <TableCell className={`${styles.th} ${styles.colEmail}`}>
-                Email
-              </TableCell>
-              <TableCell className={`${styles.th} ${styles.colRole}`}>
-                Role
-              </TableCell>
-              <TableCell
-                className={`${styles.th} ${styles.colActions}`}
-                align="center"
-              >
-                Actions
-              </TableCell>
-            </TableRow>
-          </TableHead>
+      <Box className={styles.filterContainer}>
+        <TextField
+          label="Search Username"
+          size="small"
+          value={searchQuery}
+          onChange={(e) => {
+            setSearchQuery(e.target.value);
+            setCurrentPage(0);
+          }}
+          className={styles.control}
+        />
+        <FormControl size="small" className={styles.control}>
+          <InputLabel>Role</InputLabel>
+          <Select
+            value={filterRole}
+            onChange={(e) => {
+              setFilterRole(e.target.value);
+              setCurrentPage(0);
+            }}
+            label="Role"
+          >
+            <MenuItem value="all">All</MenuItem>
+            <MenuItem value="owner">Owner</MenuItem>
+            <MenuItem value="admin">Admin</MenuItem>
+            <MenuItem value="user">User</MenuItem>
+          </Select>
+        </FormControl>
+        <FormControl size="small" className={styles.control}>
+          <InputLabel>Sort By</InputLabel>
+          <Select
+            value={sortField}
+            onChange={(e) => setSortField(e.target.value)}
+            label="Sort By"
+          >
+            <MenuItem value={SORT_FIELDS.USERNAME}>Username</MenuItem>
+            <MenuItem value={SORT_FIELDS.CREATED_AT}>Created At</MenuItem>
+          </Select>
+        </FormControl>
+        <FormControl size="small" className={styles.control}>
+          <InputLabel>Direction</InputLabel>
+          <Select
+            value={sortDirection}
+            onChange={(e) => setSortDirection(e.target.value)}
+            label="Direction"
+          >
+            <MenuItem value="asc">Asc</MenuItem>
+            <MenuItem value="desc">Desc</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
 
-          <TableBody>
-            {users.map((user, idx) => (
-              <TableRow
-                key={user.id}
-                className={idx % 2 === 0 ? styles.oddRow : ''}
-              >
-                <TableCell className={styles.td}>{user.username}</TableCell>
-                <TableCell className={styles.td}>
-                  {user.fullName || '-'}
-                </TableCell>
-                <TableCell className={styles.td}>{user.email}</TableCell>
-                <TableCell className={styles.td}>{user.role}</TableCell>
-                <TableCell
-                  align="center"
-                  className={`${styles.td} ${styles.actionsCell}`}
-                >
-                  <Box className={styles.actionsGroup}>
-                    <IconButton
-                      onClick={() => handleEditRole(user)}
-                      size="small"
-                      className={`${styles.iconButton} ${styles.edit}`}
-                    >
-                      <EditIcon fontSize="inherit" />
-                    </IconButton>
-                    <IconButton
-                      onClick={() => handleDeleteUser(user)}
-                      size="small"
-                      className={`${styles.iconButton} ${styles.delete}`}
-                    >
-                      <DeleteIcon fontSize="inherit" />
-                    </IconButton>
-                  </Box>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <UsersTable
+        users={displayedUsers}
+        currentPage={currentPage}
+        itemsPerPage={itemsPerPage}
+        onEditRole={setEditingUser}
+        onDelete={setDeletingUser}
+      />
 
-      {showCreate && <CreateUser open onClose={handleCloseCreate} />}
+      <Box
+        className={styles.paginationContainer}
+        display="flex"
+        justifyContent="center"
+        mt={3}
+      >
+        <ReactPaginate
+          previousLabel="Prev"
+          nextLabel="Next"
+          pageCount={pageCount}
+          onPageChange={({ selected }) => setCurrentPage(selected)}
+          containerClassName={styles.pagination}
+          activeClassName={styles.active}
+          pageClassName={styles.pageItem}
+          pageLinkClassName={styles.pageLink}
+        />
+      </Box>
+
+      {showCreate && (
+        <CreateUser
+          open
+          onClose={() => {
+            setShowCreate(false);
+            // refetch
+            api
+              .get('/users')
+              .then((res) =>
+                setUsers(res.data.filter((u) => u.id !== auth.user.id))
+              );
+          }}
+        />
+      )}
       {editingUser && (
-        <EditUserRole open user={editingUser} onClose={handleCloseEdit} />
+        <EditUserRole
+          open
+          user={editingUser}
+          onClose={() => {
+            setEditingUser(null);
+            api
+              .get('/users')
+              .then((res) =>
+                setUsers(res.data.filter((u) => u.id !== auth.user.id))
+              );
+          }}
+        />
       )}
       {deletingUser && (
         <DeleteUserDialog
           open
           user={deletingUser}
-          onClose={handleCloseDelete}
-          onConfirm={handleConfirmDelete}
+          onClose={() => setDeletingUser(null)}
+          onConfirm={async () => {
+            await api.delete(`/users/${deletingUser.id}`);
+            setDeletingUser(null);
+            setUsers(users.filter((u) => u.id !== deletingUser.id));
+          }}
         />
       )}
-    </Container>
+    </Box>
   );
 };
 
