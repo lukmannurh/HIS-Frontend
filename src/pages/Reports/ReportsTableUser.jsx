@@ -2,8 +2,6 @@ import React from 'react';
 
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
-  Tooltip,
-  IconButton,
   TableContainer,
   Table,
   TableHead,
@@ -11,6 +9,8 @@ import {
   TableCell,
   TableBody,
   Paper,
+  Button,
+  Box,
 } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 
@@ -73,16 +73,18 @@ const ReportsTableUser = ({
               <TableCell className={styles.cell}>
                 {report.status || 'diproses'}
               </TableCell>
-              <TableCell className={`${styles.cell} ${styles.centerText}`}>
-                <Tooltip title="View" arrow>
-                  <IconButton
+              <TableCell className={`${styles.cell} ${styles.actionsCell}`}>
+                <Box className={styles.actionsGroup}>
+                  <Button
+                    size="small"
+                    startIcon={<VisibilityIcon />}
                     component={RouterLink}
                     to={`/reports/${report.id}`}
-                    size="small"
+                    className={styles.viewButton}
                   >
-                    <VisibilityIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
+                    Lihat Laporan
+                  </Button>
+                </Box>
               </TableCell>
             </TableRow>
           );
@@ -103,3 +105,5 @@ const ReportsTableUser = ({
 );
 
 export default ReportsTableUser;
+
+//test

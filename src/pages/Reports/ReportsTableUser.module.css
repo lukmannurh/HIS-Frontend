@@ -53,3 +53,24 @@
 .link:hover {
   text-decoration: underline;
 }
+
+/* Actions */
+.actionsCell {
+  padding: 8px;
+}
+
+.actionsGroup {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.viewButton {
+  text-transform: none;
+  color: #1565c0;
+  background-color: transparent;
+}
+
+.viewButton:hover {
+  background-color: rgba(21, 101, 192, 0.1);
+}
