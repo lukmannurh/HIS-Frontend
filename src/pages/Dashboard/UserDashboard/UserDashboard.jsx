@@ -16,19 +16,14 @@ import api from '../../../services/api';
 
 const UserDashboard = () => {
   const [reports, setReports] = useState([]);
-  const [archives, setArchives] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchAll = async () => {
       try {
-        const [rRes, aRes] = await Promise.all([
-          api.get('/reports'),
-          api.get('/archives'),
-        ]);
+        const [rRes] = await Promise.all([api.get('/reports')]);
         setReports(rRes.data);
-        setArchives(aRes.data);
       } catch (err) {
         setError('Gagal memuat data dashboard');
       } finally {
@@ -68,21 +63,14 @@ const UserDashboard = () => {
   const valid = statusCounts.valid || 0;
   const hoax = statusCounts.hoax || 0;
   const diragukan = statusCounts.diragukan || 0;
-  const diarsip = archives.length;
 
   const chartData = {
-    labels: ['Total', 'Valid', 'Hoax', 'Diragukan', 'Arsip'],
+    labels: ['Total', 'Valid', 'Hoax', 'Diragukan'],
     datasets: [
       {
         label: 'Jumlah Laporan',
-        data: [total, valid, hoax, diragukan, diarsip],
-        backgroundColor: [
-          '#42a5f5',
-          '#66bb6a',
-          '#ef5350',
-          '#ffa726',
-          '#9e9e9e',
-        ],
+        data: [total, valid, hoax, diragukan],
+        backgroundColor: ['#42a5f5', '#66bb6a', '#ef5350', '#ffa726'],
       },
     ],
   };
@@ -90,7 +78,7 @@ const UserDashboard = () => {
   return (
     <Box className={styles.dashboardContainer}>
       <Typography variant="h4" className={styles.dashboardTitle}>
-        Dashboard Laporan
+        User Dashboard
       </Typography>
 
       <Grid container spacing={3} className={styles.cardsGrid}>
@@ -99,7 +87,6 @@ const UserDashboard = () => {
           { label: 'Valid', value: valid, color: '#66bb6a' },
           { label: 'Hoax', value: hoax, color: '#ef5350' },
           { label: 'Diragukan', value: diragukan, color: '#ffa726' },
-          { label: 'Diarsip', value: diarsip, color: '#9e9e9e' },
         ].map((card) => (
           <Grid item xs={12} sm={6} md={2.4} key={card.label}>
             <Paper
