@@ -3,13 +3,12 @@ import React, { useEffect, useState, useContext, useMemo } from 'react';
 import {
   Box,
   TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Button,
   CircularProgress,
   Alert,
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography,
 } from '@mui/material';
 import ReactPaginate from 'react-paginate';
 
@@ -21,11 +20,6 @@ import UsersTable from './UsersTable';
 import { AuthContext } from '../../context/AuthContext';
 import api from '../../services/api';
 
-const SORT_FIELDS = {
-  USERNAME: 'username',
-  CREATED_AT: 'createdAt',
-};
-
 const UserManagement = () => {
   const { auth } = useContext(AuthContext);
   const [users, setUsers] = useState([]);
@@ -36,56 +30,40 @@ const UserManagement = () => {
   const [editingUser, setEditingUser] = useState(null);
   const [deletingUser, setDeletingUser] = useState(null);
 
-  // search/filter/sort/pagination
+  // hanya search & sort
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterRole, setFilterRole] = useState('all');
-  const [sortField, setSortField] = useState(SORT_FIELDS.USERNAME);
-  const [sortDirection, setSortDirection] = useState('asc');
+  const [sortDirection, setSortDirection] = useState('asc'); // asc = A–Z, desc = Z–A
+
+  // pagination
   const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = 10;
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const res = await api.get('/users');
-        // exclude current admin
+    api
+      .get('/users')
+      .then((res) => {
         setUsers(res.data.filter((u) => u.id !== auth.user.id));
-      } catch {
-        setError('Failed to fetch users');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchUsers();
+      })
+      .catch(() => setError('Failed to fetch users'))
+      .finally(() => setLoading(false));
   }, [auth.user.id]);
 
-  // Filter
-  const filtered = useMemo(
-    () =>
-      users.filter((u) => {
-        const matchesSearch = u.username
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase());
-        const matchesRole = filterRole === 'all' || u.role === filterRole;
-        return matchesSearch && matchesRole;
-      }),
-    [users, searchQuery, filterRole]
-  );
+  // filter by search
+  const filtered = useMemo(() => {
+    return users.filter((u) =>
+      u.username.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [users, searchQuery]);
 
-  // Sort
-  const sorted = useMemo(
-    () =>
-      [...filtered].sort((a, b) => {
-        const aVal = a[sortField],
-          bVal = b[sortField];
-        if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
-        if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
-        return 0;
-      }),
-    [filtered, sortField, sortDirection]
-  );
+  // sort by username only
+  const sorted = useMemo(() => {
+    return [...filtered].sort((a, b) => {
+      if (a.username < b.username) return sortDirection === 'asc' ? -1 : 1;
+      if (a.username > b.username) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }, [filtered, sortDirection]);
 
-  // Paginate
   const pageCount = Math.ceil(sorted.length / itemsPerPage);
   const displayedUsers = sorted.slice(
     currentPage * itemsPerPage,
@@ -98,7 +76,7 @@ const UserManagement = () => {
         className={styles.container}
         display="flex"
         justifyContent="center"
-        mt={3}
+        mt={4}
       >
         <CircularProgress />
       </Box>
@@ -106,7 +84,7 @@ const UserManagement = () => {
   }
   if (error) {
     return (
-      <Box className={styles.container} m={3}>
+      <Box className={styles.container} mt={4}>
         <Alert severity="error">{error}</Alert>
       </Box>
     );
@@ -114,64 +92,42 @@ const UserManagement = () => {
 
   return (
     <Box className={styles.container}>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={() => setShowCreate(true)}
-        className={styles.createButton}
-      >
-        Create New User
-      </Button>
+      <Box className={styles.topBar}>
+        <Typography variant="h5" className={styles.title}>
+          User Management
+        </Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => setShowCreate(true)}
+          className={styles.createButton}
+        >
+          Create New User
+        </Button>
+      </Box>
 
-      <Box className={styles.filterContainer}>
+      <Box className={styles.controls}>
         <TextField
-          label="Search Username"
-          size="small"
+          placeholder="Search by username…"
           value={searchQuery}
           onChange={(e) => {
             setSearchQuery(e.target.value);
             setCurrentPage(0);
           }}
-          className={styles.control}
+          size="small"
+          className={styles.searchField}
         />
-        <FormControl size="small" className={styles.control}>
-          <InputLabel>Role</InputLabel>
-          <Select
-            value={filterRole}
-            onChange={(e) => {
-              setFilterRole(e.target.value);
-              setCurrentPage(0);
-            }}
-            label="Role"
-          >
-            <MenuItem value="all">All</MenuItem>
-            <MenuItem value="owner">Owner</MenuItem>
-            <MenuItem value="admin">Admin</MenuItem>
-            <MenuItem value="user">User</MenuItem>
-          </Select>
-        </FormControl>
-        <FormControl size="small" className={styles.control}>
-          <InputLabel>Sort By</InputLabel>
-          <Select
-            value={sortField}
-            onChange={(e) => setSortField(e.target.value)}
-            label="Sort By"
-          >
-            <MenuItem value={SORT_FIELDS.USERNAME}>Username</MenuItem>
-            <MenuItem value={SORT_FIELDS.CREATED_AT}>Created At</MenuItem>
-          </Select>
-        </FormControl>
-        <FormControl size="small" className={styles.control}>
-          <InputLabel>Direction</InputLabel>
-          <Select
-            value={sortDirection}
-            onChange={(e) => setSortDirection(e.target.value)}
-            label="Direction"
-          >
-            <MenuItem value="asc">Asc</MenuItem>
-            <MenuItem value="desc">Desc</MenuItem>
-          </Select>
-        </FormControl>
+
+        <ToggleButtonGroup
+          value={sortDirection}
+          exclusive
+          onChange={(_, dir) => dir && setSortDirection(dir)}
+          size="small"
+          className={styles.toggleGroup}
+        >
+          <ToggleButton value="asc">A–Z</ToggleButton>
+          <ToggleButton value="desc">Z–A</ToggleButton>
+        </ToggleButtonGroup>
       </Box>
 
       <UsersTable
@@ -182,20 +138,14 @@ const UserManagement = () => {
         onDelete={setDeletingUser}
       />
 
-      <Box
-        className={styles.paginationContainer}
-        display="flex"
-        justifyContent="center"
-        mt={3}
-      >
+      <Box className={styles.pagination} mt={2}>
         <ReactPaginate
-          previousLabel="Prev"
-          nextLabel="Next"
           pageCount={pageCount}
           onPageChange={({ selected }) => setCurrentPage(selected)}
-          containerClassName={styles.pagination}
+          previousLabel="Prev"
+          nextLabel="Next"
+          containerClassName={styles.paginateContainer}
           activeClassName={styles.active}
-          pageClassName={styles.pageItem}
           pageLinkClassName={styles.pageLink}
         />
       </Box>
@@ -235,8 +185,8 @@ const UserManagement = () => {
           onClose={() => setDeletingUser(null)}
           onConfirm={async () => {
             await api.delete(`/users/${deletingUser.id}`);
+            setUsers((prev) => prev.filter((u) => u.id !== deletingUser.id));
             setDeletingUser(null);
-            setUsers(users.filter((u) => u.id !== deletingUser.id));
           }}
         />
       )}
