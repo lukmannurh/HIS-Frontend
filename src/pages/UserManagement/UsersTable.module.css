@@ -23,9 +23,12 @@
   background-color: #fafafa;
 }
 
+/* Aksi di kanan */
 .actionsGroup {
   display: inline-flex;
   gap: 0.5rem;
+  justify-content: flex-end;
+  width: 100%;
 }
 
 .iconButton {

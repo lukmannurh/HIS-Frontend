@@ -1,4 +1,3 @@
-/* Container & Title */
 .container {
   max-width: 1140px;
   margin: 2rem auto;
@@ -24,7 +23,7 @@
   background-color: #4caf50;
 }
 
-/* Controls: search + sort */
+/* Controls */
 .controls {
   display: flex;
   flex-wrap: wrap;
@@ -38,38 +37,18 @@
   min-width: 220px;
 }
 
-.toggleGroup {
-  border: 1px solid #c8e6c9;
-  border-radius: 4px;
+.sortButton {
+  text-transform: none;
+  border-color: #a5d6a7;
+  color: #33691e;
   background-color: #f1f8e9;
 }
+
+/* Table action cell is right-aligned in UsersTable.module.css */
 
 /* Pagination */
 .pagination {
   display: flex;
   justify-content: center;
-  margin-top: 1rem;
-}
-
-.paginateContainer {
-  display: flex;
-  list-style: none;
-  gap: 0.5rem;
-  padding: 0;
-}
-
-.pageLink {
-  padding: 0.4rem 0.8rem;
-  border: 1px solid #c8e6c9;
-  border-radius: 4px;
-  color: #388e3c;
-  cursor: pointer;
-  text-decoration: none;
-  font-size: 0.875rem;
-}
-
-.active .pageLink {
-  background-color: #4caf50;
-  border-color: #4caf50;
-  color: #fff;
+  margin-top: 1.5rem;
 }

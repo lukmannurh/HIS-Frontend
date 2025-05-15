@@ -1,16 +1,17 @@
 import React, { useEffect, useState, useContext, useMemo } from 'react';
 
+import { ArrowDropDown } from '@mui/icons-material';
 import {
   Box,
   TextField,
   Button,
   CircularProgress,
   Alert,
-  ToggleButton,
-  ToggleButtonGroup,
+  Menu,
+  MenuItem,
+  Pagination,
   Typography,
 } from '@mui/material';
-import ReactPaginate from 'react-paginate';
 
 import CreateUser from './CreateUser';
 import DeleteUserDialog from './DeleteUserDialog';
@@ -30,14 +31,25 @@ const UserManagement = () => {
   const [editingUser, setEditingUser] = useState(null);
   const [deletingUser, setDeletingUser] = useState(null);
 
-  // hanya search & sort
+  // Search & Sort
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortDirection, setSortDirection] = useState('asc'); // asc = A–Z, desc = Z–A
+  const [sortDirection, setSortDirection] = useState('asc'); // 'asc' = A–Z, 'desc' = Z–A
 
-  // pagination
+  // Pagination
   const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = 10;
 
+  // Sort menu anchor
+  const [anchorEl, setAnchorEl] = useState(null);
+  const openMenu = Boolean(anchorEl);
+  const handleSortClick = (e) => setAnchorEl(e.currentTarget);
+  const handleSortClose = () => setAnchorEl(null);
+  const handleSortSelect = (dir) => {
+    setSortDirection(dir);
+    handleSortClose();
+  };
+
+  // Fetch users
   useEffect(() => {
     api
       .get('/users')
@@ -48,14 +60,16 @@ const UserManagement = () => {
       .finally(() => setLoading(false));
   }, [auth.user.id]);
 
-  // filter by search
-  const filtered = useMemo(() => {
-    return users.filter((u) =>
-      u.username.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [users, searchQuery]);
+  // Filter by search
+  const filtered = useMemo(
+    () =>
+      users.filter((u) =>
+        u.username.toLowerCase().includes(searchQuery.toLowerCase())
+      ),
+    [users, searchQuery]
+  );
 
-  // sort by username only
+  // Sort by username
   const sorted = useMemo(() => {
     return [...filtered].sort((a, b) => {
       if (a.username < b.username) return sortDirection === 'asc' ? -1 : 1;
@@ -118,16 +132,18 @@ const UserManagement = () => {
           className={styles.searchField}
         />
 
-        <ToggleButtonGroup
-          value={sortDirection}
-          exclusive
-          onChange={(_, dir) => dir && setSortDirection(dir)}
-          size="small"
-          className={styles.toggleGroup}
+        <Button
+          variant="outlined"
+          endIcon={<ArrowDropDown />}
+          onClick={handleSortClick}
+          className={styles.sortButton}
         >
-          <ToggleButton value="asc">A–Z</ToggleButton>
-          <ToggleButton value="desc">Z–A</ToggleButton>
-        </ToggleButtonGroup>
+          Sort: {sortDirection === 'asc' ? 'A–Z' : 'Z–A'}
+        </Button>
+        <Menu anchorEl={anchorEl} open={openMenu} onClose={handleSortClose}>
+          <MenuItem onClick={() => handleSortSelect('asc')}>A–Z</MenuItem>
+          <MenuItem onClick={() => handleSortSelect('desc')}>Z–A</MenuItem>
+        </Menu>
       </Box>
 
       <UsersTable
@@ -138,15 +154,12 @@ const UserManagement = () => {
         onDelete={setDeletingUser}
       />
 
-      <Box className={styles.pagination} mt={2}>
-        <ReactPaginate
-          pageCount={pageCount}
-          onPageChange={({ selected }) => setCurrentPage(selected)}
-          previousLabel="Prev"
-          nextLabel="Next"
-          containerClassName={styles.paginateContainer}
-          activeClassName={styles.active}
-          pageLinkClassName={styles.pageLink}
+      <Box className={styles.pagination}>
+        <Pagination
+          count={pageCount}
+          page={currentPage + 1}
+          onChange={(_, page) => setCurrentPage(page - 1)}
+          color="primary"
         />
       </Box>
 
@@ -155,7 +168,6 @@ const UserManagement = () => {
           open
           onClose={() => {
             setShowCreate(false);
-            // refetch
             api
               .get('/users')
               .then((res) =>
