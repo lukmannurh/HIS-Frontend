@@ -20,17 +20,11 @@ const UserDashboard = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const fetchAll = async () => {
-      try {
-        const [rRes] = await Promise.all([api.get('/reports')]);
-        setReports(rRes.data);
-      } catch (err) {
-        setError('Gagal memuat data dashboard');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchAll();
+    api
+      .get('/reports')
+      .then((res) => setReports(res.data))
+      .catch(() => setError('Gagal memuat data dashboard'))
+      .finally(() => setLoading(false));
   }, []);
 
   if (loading) {
@@ -47,7 +41,7 @@ const UserDashboard = () => {
   }
   if (error) {
     return (
-      <Box className={styles.dashboardContainer} m={3}>
+      <Box className={styles.dashboardContainer}>
         <Alert severity="error">{error}</Alert>
       </Box>
     );
@@ -78,17 +72,17 @@ const UserDashboard = () => {
   return (
     <Box className={styles.dashboardContainer}>
       <Typography variant="h4" className={styles.dashboardTitle}>
-        User Dashboard
+        Dashboard Laporan
       </Typography>
 
-      <Grid container spacing={3} className={styles.cardsGrid}>
+      <Grid container spacing={2} className={styles.cardsGrid}>
         {[
           { label: 'Total Laporan', value: total, color: '#42a5f5' },
           { label: 'Valid', value: valid, color: '#66bb6a' },
           { label: 'Hoax', value: hoax, color: '#ef5350' },
           { label: 'Diragukan', value: diragukan, color: '#ffa726' },
         ].map((card) => (
-          <Grid item xs={12} sm={6} md={2.4} key={card.label}>
+          <Grid item xs={6} sm={3} key={card.label}>
             <Paper
               className={styles.statCard}
               style={{ borderTopColor: card.color }}
