@@ -72,7 +72,7 @@ const UserDashboard = () => {
   return (
     <Box className={styles.dashboardContainer}>
       <Typography variant="h4" className={styles.dashboardTitle}>
-        Dashboard Laporan
+        User Dashboard
       </Typography>
 
       <Grid container spacing={2} className={styles.cardsGrid}>
