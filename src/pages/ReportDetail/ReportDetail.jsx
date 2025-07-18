@@ -1,3 +1,5 @@
+/* eslint-disable no-empty */
+/* eslint-disable jsx-a11y/media-has-caption */
 import React, { useEffect, useState, useRef } from 'react';
 
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
@@ -23,7 +25,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import styles from './ReportDetail.module.css';
 import api from '../../services/api';
 
-const ReportDetail = () => {
+export default function ReportDetail() {
   const { reportId } = useParams();
   const navigate = useNavigate();
   const contentRef = useRef(null);
@@ -39,19 +41,11 @@ const ReportDetail = () => {
   });
 
   useEffect(() => {
-    if (!reportId) {
-      setError('ID laporan tidak ditemukan.');
-      setLoading(false);
-      return;
-    }
-    const fetchReport = async () => {
+    (async () => {
       try {
-        const response = await api.get(`/reports/${reportId}`);
-        setReport(response.data);
-        if (
-          response.data.updatedAt &&
-          response.data.updatedAt !== response.data.createdAt
-        ) {
+        const { data } = await api.get(`/reports/${reportId}`);
+        setReport(data);
+        if (data.updatedAt && data.updatedAt !== data.createdAt) {
           setIsEdited(true);
         }
       } catch (err) {
@@ -61,16 +55,13 @@ const ReportDetail = () => {
       } finally {
         setLoading(false);
       }
-    };
-    fetchReport();
+    })();
   }, [reportId]);
 
-  const handleBack = () => {
-    navigate('/reports');
-  };
+  const handleBack = () => navigate('/reports');
 
-  const formatDateWIB = (dateStr) => {
-    const options = {
+  const formatDateWIB = (dateStr) =>
+    new Date(dateStr).toLocaleString('id-ID', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
@@ -78,64 +69,56 @@ const ReportDetail = () => {
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit',
-    };
-    return new Date(dateStr).toLocaleString('id-ID', options) + ' WIB';
-  };
+    }) + ' WIB';
 
-  // Parsing validationDetails
-  let fullValidationText = '';
-  try {
-    if (report.validationDetails) {
+  let validationExplanation = '';
+  if (report?.validationDetails) {
+    try {
       const parsed = JSON.parse(report.validationDetails);
-      fullValidationText = parsed.gemini?.output || '';
-    }
-  } catch (err) {
-    fullValidationText = '';
+      validationExplanation = parsed.gemini?.explanation || '';
+    } catch {}
   }
-  const validationText =
-    fullValidationText.trim().split(/\s+/).length > 1
-      ? fullValidationText.trim().split(/\s+/).slice(1).join(' ')
-      : fullValidationText || 'N/A';
+
+  const senderName = report
+    ? report.user.fullName?.trim() || report.user.username
+    : '';
 
   const handleDownloadPDF = () => {
-    if (contentRef.current) {
-      setSnackbar({
-        open: true,
-        message: 'Downloading PDF...',
-        severity: 'info',
-      });
-      const opt = {
+    if (!contentRef.current) return;
+    setSnackbar({
+      open: true,
+      message: 'Downloading PDF...',
+      severity: 'info',
+    });
+    html2pdf()
+      .set({
         margin: 0.5,
         filename: `${report.title}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2 },
         jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
-      };
-      html2pdf()
-        .set(opt)
-        .from(contentRef.current)
-        .save()
-        .then(() => {
-          setSnackbar({
-            open: true,
-            message: 'Download successful!',
-            severity: 'success',
-          });
+      })
+      .from(contentRef.current)
+      .save()
+      .then(() =>
+        setSnackbar({
+          open: true,
+          message: 'Download successful!',
+          severity: 'success',
         })
-        .catch((err) => {
-          console.error(err);
-          setSnackbar({
-            open: true,
-            message: 'Download failed!',
-            severity: 'error',
-          });
-        });
-    }
+      )
+      .catch(() =>
+        setSnackbar({
+          open: true,
+          message: 'Download failed!',
+          severity: 'error',
+        })
+      );
   };
 
-  const handleCloseSnackbar = (event, reason) => {
+  const handleCloseSnackbar = (_, reason) => {
     if (reason === 'clickaway') return;
-    setSnackbar({ ...snackbar, open: false });
+    setSnackbar((s) => ({ ...s, open: false }));
   };
 
   if (loading) {
@@ -169,7 +152,7 @@ const ReportDetail = () => {
     );
   }
 
-  const renderStatusBadge = (status) => {
+  const renderValidationBadge = (status) => {
     if (status === 'hoax') {
       return (
         <Box className={`${styles.statusBadge} ${styles.hoax}`}>
@@ -177,22 +160,24 @@ const ReportDetail = () => {
           Hoax
         </Box>
       );
-    } else if (status === 'valid') {
+    }
+    if (status === 'valid') {
       return (
         <Box className={`${styles.statusBadge} ${styles.valid}`}>
           <VerifiedUserIcon className={styles.iconStatus} fontSize="large" />
           Valid
         </Box>
       );
-    } else {
-      return (
-        <Box className={`${styles.statusBadge} ${styles.doubtful}`}>
-          <HelpOutlineIcon className={styles.iconStatus} fontSize="large" />
-          Diragukan
-        </Box>
-      );
     }
+    return (
+      <Box className={`${styles.statusBadge} ${styles.doubtful}`}>
+        <HelpOutlineIcon className={styles.iconStatus} fontSize="large" />
+        Diragukan
+      </Box>
+    );
   };
+
+  const isVideo = (url) => /\.(mp4|webm|ogg)$/i.test(url);
 
   return (
     <Container className={styles.container}>
@@ -208,9 +193,22 @@ const ReportDetail = () => {
           </Button>
         </Box>
 
-        {renderStatusBadge(report.validationStatus)}
+        {renderValidationBadge(report.validationStatus)}
 
-        <Box className={styles.pdfContent} ref={contentRef}>
+        <Box mt={2} className={styles.statusSection}>
+          <Typography variant="subtitle2">Status Laporan</Typography>
+          <Typography
+            className={
+              report.reportStatus === 'selesai'
+                ? styles.statusDone
+                : styles.statusInProgress
+            }
+          >
+            {report.reportStatus === 'selesai' ? 'Selesai' : 'Diproses'}
+          </Typography>
+        </Box>
+
+        <Box ref={contentRef} className={styles.pdfContent}>
           <Box className={styles.timestampBox}>
             <AccessTimeIcon className={styles.icon} fontSize="small" />
             <Typography variant="body2" className={styles.timestamp}>
@@ -222,11 +220,6 @@ const ReportDetail = () => {
                 <Typography variant="body2" className={styles.timestamp}>
                   Diubah pada: {formatDateWIB(report.updatedAt)}
                 </Typography>
-                {report.editedBy && (
-                  <Typography variant="body2" className={styles.editedBy}>
-                    Laporan ini diedit oleh {report.editedBy}
-                  </Typography>
-                )}
               </Box>
             )}
           </Box>
@@ -235,82 +228,74 @@ const ReportDetail = () => {
             {report.title}
           </Typography>
 
-          <Box mt={3}>
+          {report.document && (
+            <Box mt={3} className={styles.section}>
+              <Typography variant="h6" className={styles.sectionHeader}>
+                Media
+              </Typography>
+              <Box className={styles.mediaContainer}>
+                {isVideo(report.document) ? (
+                  <video controls className={styles.video}>
+                    <source src={report.document} />
+                    Your browser does not support video.
+                  </video>
+                ) : (
+                  <img
+                    src={report.document}
+                    alt="Uploaded media"
+                    className={styles.image}
+                  />
+                )}
+              </Box>
+            </Box>
+          )}
+
+          <Box mt={3} className={styles.section}>
             <Typography variant="h6" className={styles.sectionHeader}>
-              Isi Laporan:
+              Pengirim
+            </Typography>
+            <Typography variant="body1" className={styles.detailText}>
+              {senderName} (RT {report.user.rt} / RW {report.user.rw})
+            </Typography>
+          </Box>
+
+          <Box mt={3} className={styles.section}>
+            <Typography variant="h6" className={styles.sectionHeader}>
+              Isi Laporan
             </Typography>
             <Paper className={styles.paperContent}>
               <Typography variant="body1" className={styles.contentText}>
-                Detail Laporan dari {report.user.username}: {report.content}
+                {report.content}
               </Typography>
-              {report.document && (
-                <Box mt={2}>
-                  <Typography variant="subtitle2">Dokumen/Lampiran:</Typography>
-                  <a
-                    href={report.document}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {report.document}
-                  </a>
-                </Box>
-              )}
             </Paper>
           </Box>
 
-          <Box mt={3}>
+          <Box mt={3} className={styles.section}>
             <Typography variant="h6" className={styles.sectionHeader}>
-              Detail Laporan:
+              Penjelasan Validasi
             </Typography>
             <Paper className={styles.paperContent}>
-              <Box display="flex" alignItems="center">
+              <Box display="flex" alignItems="flex-start">
                 <InfoIcon className={styles.iconInfo} fontSize="small" />
                 <Typography variant="body1" className={styles.contentText}>
-                  {validationText}
+                  {validationExplanation || 'N/A'}
                 </Typography>
               </Box>
             </Paper>
           </Box>
 
-          <Box mt={3}>
-            <Typography variant="body2" className={styles.userInfo}>
-              Laporan ini dibuat oleh {report.user.username}.
-            </Typography>
-          </Box>
-
-          <Box mt={3}>
-            <Typography variant="h6" className={styles.sectionHeader}>
-              Berita Terkait:
-            </Typography>
-            {report.relatedNews && report.relatedNews.length > 0 ? (
-              report.relatedNews.map((news, index) => (
-                <Box key={index} className={styles.relatedNewsItem}>
-                  <Typography
-                    variant="body2"
-                    className={styles.relatedNewsLink}
-                  >
-                    <a
-                      href={news.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {news.title}
-                    </a>
-                  </Typography>
-                  <Typography variant="body1" className={styles.contentText}>
-                    {news.description}
-                  </Typography>
-                  <Typography variant="caption" className={styles.timestamp}>
-                    Source: {news.source} - Published: {news.publishedAt}
-                  </Typography>
-                </Box>
-              ))
-            ) : (
-              <Typography variant="body2">
-                No related news available.
+          {report.adminExplanation && (
+            <Box mt={3} className={styles.section}>
+              <Typography variant="h6" className={styles.sectionHeader}>
+                Penjelasan Admin
               </Typography>
-            )}
-          </Box>
+              <Paper className={styles.paperContent}>
+                <Typography variant="body1" className={styles.contentText}>
+                  {report.adminExplanation}
+                </Typography>
+              </Paper>
+            </Box>
+          )}
         </Box>
       </Box>
 
@@ -340,6 +325,4 @@ const ReportDetail = () => {
       </Snackbar>
     </Container>
   );
-};
-
-export default ReportDetail;
+}

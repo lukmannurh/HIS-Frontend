@@ -1,6 +1,6 @@
 .container {
-  margin-top: 2rem;
-  margin-bottom: 2rem;
+  margin: 2rem auto;
+  max-width: 900px;
   padding: 2rem;
   background-color: #f5f7fa;
 }
@@ -9,7 +9,7 @@
   position: relative;
   background-color: #ffffff;
   border-radius: 10px;
-  padding: 2rem;
+  padding: 4rem 2.5rem 2.5rem;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
 
@@ -27,72 +27,8 @@
   border-radius: 5px;
   transition: background-color 0.3s ease;
 }
-
 .downloadButton:hover {
   background-color: #388e3c;
-}
-
-.pdfContent {
-  margin-top: 3rem;
-}
-
-.timestampBox {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-bottom: 0.5rem;
-}
-
-.updatedBox {
-  display: flex;
-  align-items: center;
-  margin-left: 1rem;
-}
-
-.icon {
-  margin-right: 0.3rem;
-  color: #6c757d;
-}
-
-.timestamp {
-  font-size: 0.85rem;
-  color: #6c757d;
-  font-style: italic;
-  margin-right: 0.5rem;
-}
-
-.title {
-  text-align: center;
-  font-weight: 700;
-  color: #2c3e50;
-  margin-bottom: 1rem;
-  font-family: 'Roboto', sans-serif;
-}
-
-.sectionHeader {
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  padding-bottom: 0.3rem;
-  border-bottom: 2px solid #e0e0e0;
-  color: #34495e;
-  text-align: left;
-}
-
-.paperContent {
-  padding: 1.5rem;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 1rem;
-}
-
-.contentText {
-  font-family: 'Roboto', sans-serif;
-  color: #424242;
-  line-height: 1.6;
-  text-align: justify;
 }
 
 .statusBadge {
@@ -105,21 +41,122 @@
   font-size: 1.5rem;
   display: inline-flex;
   align-items: center;
+  z-index: 2;
 }
 
-/* Badge untuk status valid */
+.statusSection {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 4rem 0 1.5rem;
+}
+
+.statusDone {
+  color: #388e3c;
+  font-weight: 600;
+}
+
+.statusInProgress {
+  color: #fbc02d;
+  font-weight: 600;
+}
+
+.pdfContent {
+  margin-top: 3rem;
+}
+
+.timestampBox {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.updatedBox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.icon {
+  color: #6c757d;
+}
+
+.timestamp {
+  font-size: 0.85rem;
+  color: #6c757d;
+  font-style: italic;
+}
+
+.title {
+  text-align: center;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 1.5rem;
+  font-family: 'Roboto', sans-serif;
+}
+
+.section {
+  margin-bottom: 2rem;
+}
+
+.sectionHeader {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 2px solid #e0e0e0;
+  color: #34495e;
+}
+
+.mediaContainer {
+  display: flex;
+  justify-content: center;
+}
+
+.image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.video {
+  max-width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.paperContent {
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.contentText {
+  font-family: 'Roboto', sans-serif;
+  color: #424242;
+  line-height: 1.6;
+  text-align: justify;
+}
+
+.iconInfo {
+  margin-right: 0.5rem;
+  color: #1e88e5;
+}
+
 .valid {
   background-color: #c8e6c9;
   color: #388e3c;
 }
 
-/* Badge untuk status hoax */
 .hoax {
   background-color: #ffcdd2;
   color: #d32f2f;
 }
 
-/* Badge untuk status diragukan */
 .doubtful {
   background-color: #fff9c4;
   color: #fbc02d;
@@ -127,44 +164,6 @@
 
 .iconStatus {
   margin-right: 0.3rem;
-  font-size: 1.5rem;
-}
-
-.editedBy {
-  font-size: 0.85rem;
-  color: #616161;
-  margin-left: 1rem;
-  font-style: italic;
-}
-
-.userInfo {
-  font-size: 1rem;
-  color: #616161;
-  margin-top: 1rem;
-}
-
-.relatedNewsItem {
-  padding: 1rem;
-  background-color: #ffffff;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.relatedNewsItem:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.relatedNewsLink a {
-  text-decoration: none;
-  color: #1e88e5;
-  font-weight: 500;
-}
-
-.relatedNewsLink a:hover {
-  text-decoration: underline;
 }
 
 .buttonContainer {
@@ -180,7 +179,6 @@
   border-radius: 4px;
   transition: background-color 0.3s ease;
 }
-
 .backButton:hover {
   background-color: #1565c0;
 }

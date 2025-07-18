@@ -9,8 +9,7 @@ import {
   TableCell,
   TableBody,
   Paper,
-  Button,
-  Box,
+  IconButton,
 } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 
@@ -20,7 +19,6 @@ const ReportsTableUser = ({
   reports,
   currentPage,
   itemsPerPage,
-  formatDateWIB,
   getReportTimestamp,
 }) => (
   <TableContainer component={Paper} className={styles.tableContainer}>
@@ -30,10 +28,13 @@ const ReportsTableUser = ({
           <TableCell className={`${styles.cell} ${styles.centerText}`}>
             No
           </TableCell>
-          <TableCell className={styles.cell}>Title</TableCell>
-          <TableCell className={styles.cell}>Waktu (WIB)</TableCell>
-          <TableCell className={styles.cell}>Validasi</TableCell>
-          <TableCell className={styles.cell}>Status Laporan</TableCell>
+          <TableCell className={styles.cell}>RT</TableCell>
+          <TableCell className={styles.cell}>RW</TableCell>
+          <TableCell className={styles.cell}>Pengirim</TableCell>
+          <TableCell className={styles.cell}>Tanggal</TableCell>
+          <TableCell className={`${styles.cell} ${styles.centerText}`}>
+            Status Laporan
+          </TableCell>
           <TableCell className={`${styles.cell} ${styles.centerText}`}>
             Actions
           </TableCell>
@@ -41,50 +42,33 @@ const ReportsTableUser = ({
       </TableHead>
       <TableBody>
         {reports.map((report, idx) => {
-          const ts = getReportTimestamp(report);
+          const dateOnly = new Date(
+            getReportTimestamp(report)
+          ).toLocaleDateString('id-ID');
+          const sender =
+            report.user.fullName?.trim() !== ''
+              ? report.user.fullName
+              : report.user.username;
+          const status = report.reportStatus || 'diproses';
+
           return (
             <TableRow key={report.id}>
               <TableCell className={`${styles.cell} ${styles.centerText}`}>
                 {currentPage * itemsPerPage + idx + 1}
               </TableCell>
-              <TableCell className={styles.cell}>
-                <RouterLink
-                  to={`/reports/${report.id}`}
-                  className={styles.link}
-                >
-                  {report.title}
-                </RouterLink>
-              </TableCell>
-              <TableCell className={styles.cell}>{formatDateWIB(ts)}</TableCell>
-              <TableCell className={styles.cell}>
-                <span
-                  className={
-                    report.validationStatus === 'hoax'
-                      ? styles.hoaxStatus
-                      : report.validationStatus === 'valid'
-                        ? styles.validStatus
-                        : styles.durigStatus
-                  }
-                >
-                  {report.validationStatus.charAt(0).toUpperCase() +
-                    report.validationStatus.slice(1)}
-                </span>
-              </TableCell>
-              <TableCell className={styles.cell}>
-                {report.status || 'diproses'}
-              </TableCell>
+              <TableCell className={styles.cell}>{report.user.rt}</TableCell>
+              <TableCell className={styles.cell}>{report.user.rw}</TableCell>
+              <TableCell className={styles.cell}>{sender}</TableCell>
+              <TableCell className={styles.cell}>{dateOnly}</TableCell>
+              <TableCell className={styles.cell}>{status}</TableCell>
               <TableCell className={`${styles.cell} ${styles.actionsCell}`}>
-                <Box className={styles.actionsGroup}>
-                  <Button
-                    size="small"
-                    startIcon={<VisibilityIcon />}
-                    component={RouterLink}
-                    to={`/reports/${report.id}`}
-                    className={styles.viewButton}
-                  >
-                    Lihat Laporan
-                  </Button>
-                </Box>
+                <IconButton
+                  component={RouterLink}
+                  to={`/reports/${report.id}`}
+                  size="small"
+                >
+                  <VisibilityIcon fontSize="small" />
+                </IconButton>
               </TableCell>
             </TableRow>
           );
@@ -92,7 +76,7 @@ const ReportsTableUser = ({
         {reports.length === 0 && (
           <TableRow>
             <TableCell
-              colSpan={6}
+              colSpan={7}
               className={`${styles.cell} ${styles.centerText}`}
             >
               No reports found.
@@ -105,5 +89,3 @@ const ReportsTableUser = ({
 );
 
 export default ReportsTableUser;
-
-//test

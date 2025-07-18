@@ -1,6 +1,6 @@
-// src/pages/Reports/Reports.jsx
-
-import React, { useEffect, useState } from 'react';
+/* eslint-disable react-hooks/rules-of-hooks */
+/* eslint-disable no-unused-vars */
+import React, { useEffect, useState, useCallback } from 'react';
 
 import CloseIcon from '@mui/icons-material/Close';
 import {
@@ -22,7 +22,7 @@ import {
   IconButton,
 } from '@mui/material';
 import ReactPaginate from 'react-paginate';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useLocation, Navigate } from 'react-router-dom';
 
 import styles from './Reports.module.css';
 import ReportsTableAdmin from './ReportsTableAdmin';
@@ -30,6 +30,7 @@ import ReportsTableUser from './ReportsTableUser';
 import api from '../../services/api';
 
 const Reports = () => {
+  const location = useLocation();
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -38,45 +39,53 @@ const Reports = () => {
   const [confirmationText, setConfirmationText] = useState('');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [statusDialogOpen, setStatusDialogOpen] = useState(false);
+  const [selectedReport, setSelectedReport] = useState(null);
 
-  const storedUser = JSON.parse(localStorage.getItem('user'));
-  const userRole = storedUser?.role || '';
-  const userId = storedUser?.id || '';
+  const storedUser = JSON.parse(localStorage.getItem('user')) || {};
+  const userRole = storedUser.role?.toLowerCase() || '';
+  const userId = storedUser.id || '';
+
+  // owner tidak boleh mengakses Reports
+  if (userRole === 'owner') {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterSender, setFilterSender] = useState('all');
   const [filterValidation, setFilterValidation] = useState('all');
-
   const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = 5;
 
-  const [statusDialogOpen, setStatusDialogOpen] = useState(false);
-  const [selectedReport, setSelectedReport] = useState(null);
-
-  useEffect(() => {
-    const fetchReports = async () => {
-      try {
-        const response = await api.get('/reports');
-        setReports(response.data);
-      } catch {
-        setError('Failed to fetch reports');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchReports();
+  const fetchReports = useCallback(async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const { data } = await api.get('/reports');
+      setReports(data);
+    } catch {
+      setError('Failed to fetch reports');
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  const filteredReports = reports.filter((report) => {
-    const matchesSearch = report.title
+  // re-fetch whenever URL changes (e.g. after navigation back from edit)
+  useEffect(() => {
+    fetchReports();
+  }, [fetchReports, location]);
+
+  // Filters
+  const filteredReports = reports.filter((r) => {
+    const matchSearch = r.title
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
-    const matchesSender =
-      filterSender === 'all' || report.user.role.toLowerCase() === filterSender;
-    const matchesValidation =
+    const matchSender =
+      filterSender === 'all' || r.user.role.toLowerCase() === filterSender;
+    const matchValidation =
       filterValidation === 'all' ||
-      report.validationStatus.toLowerCase() === filterValidation;
-    return matchesSearch && matchesSender && matchesValidation;
+      r.validationStatus.toLowerCase() === filterValidation;
+    return matchSearch && matchSender && matchValidation;
   });
 
   const displayedReports = filteredReports.slice(
@@ -85,13 +94,11 @@ const Reports = () => {
   );
   const pageCount = Math.ceil(filteredReports.length / itemsPerPage);
 
-  const getReportTimestamp = (report) =>
-    report.updatedAt && report.updatedAt !== report.createdAt
-      ? report.updatedAt
-      : report.createdAt;
+  const getReportTimestamp = (r) =>
+    r.updatedAt && r.updatedAt !== r.createdAt ? r.updatedAt : r.createdAt;
 
-  const formatDateWIB = (dateStr) => {
-    const options = {
+  const formatDateWIB = (dateStr) =>
+    new Date(dateStr).toLocaleString('id-ID', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
@@ -99,10 +106,9 @@ const Reports = () => {
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit',
-    };
-    return new Date(dateStr).toLocaleString('id-ID', options) + ' WIB';
-  };
+    }) + ' WIB';
 
+  // Status dialog
   const openStatusDialog = (report) => {
     setSelectedReport(report);
     setStatusDialogOpen(true);
@@ -114,16 +120,21 @@ const Reports = () => {
   const handleStatusUpdate = async () => {
     try {
       await api.put(`/reports/${selectedReport.id}/status`, {
-        status: 'selesai',
+        reportStatus: 'selesai',
+        validationStatus: selectedReport.validationStatus,
+        adminExplanation: selectedReport.adminExplanation || '',
       });
-      setReports((prev) => prev.filter((r) => r.id !== selectedReport.id));
-      closeStatusDialog();
+      await fetchReports();
+      setSnackbarMessage('Status laporan diperbarui!');
+      setSnackbarOpen(true);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to update status');
+    } finally {
       closeStatusDialog();
     }
   };
 
+  // Delete dialog
   const openDeleteDialog = (report) => {
     setReportToDelete(report);
     setDeleteDialogOpen(true);
@@ -137,31 +148,19 @@ const Reports = () => {
     if (confirmationText === `hapus ${reportToDelete.title}`) {
       try {
         await api.delete(`/reports/${reportToDelete.id}`);
-        setReports((prev) => prev.filter((r) => r.id !== reportToDelete.id));
+        await fetchReports();
         setSnackbarMessage('Laporan berhasil dihapus!');
         setSnackbarOpen(true);
-        closeDeleteDialog();
       } catch {
         setSnackbarMessage('Gagal menghapus laporan!');
         setSnackbarOpen(true);
+      } finally {
+        closeDeleteDialog();
       }
     }
   };
 
-  const handleSearch = (e) => {
-    setSearchQuery(e.target.value);
-    setCurrentPage(0);
-  };
-  const handleFilterSenderChange = (e) => {
-    setFilterSender(e.target.value);
-    setCurrentPage(0);
-  };
-  const handleFilterValidationChange = (e) => {
-    setFilterValidation(e.target.value);
-    setCurrentPage(0);
-  };
-  const handleSnackbarClose = () => setSnackbarOpen(false);
-
+  // Loading & error states
   if (loading) {
     return (
       <Box
@@ -174,7 +173,6 @@ const Reports = () => {
       </Box>
     );
   }
-
   if (error) {
     return (
       <Box className={styles.container} m={3}>
@@ -185,32 +183,41 @@ const Reports = () => {
 
   return (
     <Box className={styles.container}>
+      {/* Header */}
       <Box className={styles.header}>
         <Typography variant="h4">Reports</Typography>
-        <Button variant="contained" component={RouterLink} to="/create-report">
-          Create Report
-        </Button>
+        {userRole === 'user' && (
+          <Button
+            variant="contained"
+            component={RouterLink}
+            to="/create-report"
+          >
+            Create Report
+          </Button>
+        )}
       </Box>
 
+      {/* Search & Filters */}
       <TextField
         fullWidth
         placeholder="Search by Title"
         value={searchQuery}
-        onChange={handleSearch}
+        onChange={(e) => {
+          setSearchQuery(e.target.value);
+          setCurrentPage(0);
+        }}
         margin="normal"
       />
-
       <Box className={styles.filterContainer}>
-        <FormControl
-          variant="outlined"
-          size="small"
-          className={styles.filterControl}
-        >
+        <FormControl size="small" className={styles.filterControl}>
           <InputLabel id="filter-sender-label">Pengirim</InputLabel>
           <Select
             labelId="filter-sender-label"
             value={filterSender}
-            onChange={handleFilterSenderChange}
+            onChange={(e) => {
+              setFilterSender(e.target.value);
+              setCurrentPage(0);
+            }}
             label="Pengirim"
           >
             <MenuItem value="all">Semua</MenuItem>
@@ -219,27 +226,26 @@ const Reports = () => {
             <MenuItem value="user">User</MenuItem>
           </Select>
         </FormControl>
-
-        <FormControl
-          variant="outlined"
-          size="small"
-          className={styles.filterControl}
-        >
+        <FormControl size="small" className={styles.filterControl}>
           <InputLabel id="filter-validation-label">Validasi</InputLabel>
           <Select
             labelId="filter-validation-label"
             value={filterValidation}
-            onChange={handleFilterValidationChange}
+            onChange={(e) => {
+              setFilterValidation(e.target.value);
+              setCurrentPage(0);
+            }}
             label="Validasi"
           >
             <MenuItem value="all">Semua</MenuItem>
             <MenuItem value="valid">Valid</MenuItem>
             <MenuItem value="hoax">Hoax</MenuItem>
-            <MenuItem value="diragukan">Diragukan</MenuItem>
+            <MenuItem value="diragukan">Diragikan</MenuItem>
           </Select>
         </FormControl>
       </Box>
 
+      {/* Table */}
       {userRole === 'user' ? (
         <ReportsTableUser
           reports={displayedReports}
@@ -255,13 +261,12 @@ const Reports = () => {
           itemsPerPage={itemsPerPage}
           formatDateWIB={formatDateWIB}
           getReportTimestamp={getReportTimestamp}
-          userRole={userRole}
-          userId={userId}
           openStatusDialog={openStatusDialog}
           openDeleteDialog={openDeleteDialog}
         />
       )}
 
+      {/* Pagination */}
       <Box
         className={styles.paginationContainer}
         display="flex"
@@ -269,9 +274,8 @@ const Reports = () => {
         mt={3}
       >
         <ReactPaginate
-          previousLabel={'Previous'}
-          nextLabel={'Next'}
-          breakLabel={'...'}
+          previousLabel="Previous"
+          nextLabel="Next"
           pageCount={pageCount}
           onPageChange={({ selected }) => setCurrentPage(selected)}
           containerClassName={styles.pagination}
@@ -285,6 +289,7 @@ const Reports = () => {
         />
       </Box>
 
+      {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onClose={closeDeleteDialog}>
         <DialogTitle>Konfirmasi Hapus Laporan</DialogTitle>
         <DialogContent>
@@ -313,23 +318,7 @@ const Reports = () => {
         </DialogActions>
       </Dialog>
 
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={4000}
-        onClose={handleSnackbarClose}
-        message={snackbarMessage}
-        action={
-          <IconButton
-            size="small"
-            aria-label="close"
-            color="inherit"
-            onClick={handleSnackbarClose}
-          >
-            <CloseIcon fontSize="small" />
-          </IconButton>
-        }
-      />
-
+      {/* Status Confirmation Dialog */}
       <Dialog open={statusDialogOpen} onClose={closeStatusDialog}>
         <DialogTitle>Update Report Status</DialogTitle>
         <DialogContent>
@@ -349,6 +338,23 @@ const Reports = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Snackbar for feedback */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={4000}
+        onClose={() => setSnackbarOpen(false)}
+        message={snackbarMessage}
+        action={
+          <IconButton
+            size="small"
+            color="inherit"
+            onClick={() => setSnackbarOpen(false)}
+          >
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        }
+      />
     </Box>
   );
 };
