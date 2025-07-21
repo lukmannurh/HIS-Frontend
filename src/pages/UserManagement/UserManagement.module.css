@@ -44,8 +44,6 @@
   background-color: #f1f8e9;
 }
 
-/* Table action cell is right-aligned in UsersTable.module.css */
-
 /* Pagination */
 .pagination {
   display: flex;

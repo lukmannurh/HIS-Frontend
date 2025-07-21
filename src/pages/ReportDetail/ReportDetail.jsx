@@ -1,14 +1,17 @@
+/* File: src/pages/Reports/ReportDetail.jsx */
 /* eslint-disable no-empty */
 /* eslint-disable jsx-a11y/media-has-caption */
 import React, { useEffect, useState, useRef } from 'react';
 
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import CancelIcon from '@mui/icons-material/Cancel';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import InfoIcon from '@mui/icons-material/Info';
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
-import UpdateIcon from '@mui/icons-material/Update';
-import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
+import {
+  AccessTime as AccessTimeIcon,
+  Cancel as CancelIcon,
+  HelpOutline as HelpOutlineIcon,
+  Info as InfoIcon,
+  PictureAsPdf as PictureAsPdfIcon,
+  Update as UpdateIcon,
+  VerifiedUser as VerifiedUserIcon,
+} from '@mui/icons-material';
 import {
   Container,
   Typography,
@@ -71,6 +74,7 @@ export default function ReportDetail() {
       second: '2-digit',
     }) + ' WIB';
 
+  // Ambil hanya penjelasan saja
   let validationExplanation = '';
   if (report?.validationDetails) {
     try {
@@ -156,28 +160,30 @@ export default function ReportDetail() {
     if (status === 'hoax') {
       return (
         <Box className={`${styles.statusBadge} ${styles.hoax}`}>
-          <CancelIcon className={styles.iconStatus} fontSize="large" />
-          Hoax
+          <CancelIcon className={styles.iconStatus} fontSize="large" /> Hoax
         </Box>
       );
     }
     if (status === 'valid') {
       return (
         <Box className={`${styles.statusBadge} ${styles.valid}`}>
-          <VerifiedUserIcon className={styles.iconStatus} fontSize="large" />
+          <VerifiedUserIcon className={styles.iconStatus} fontSize="large" />{' '}
           Valid
         </Box>
       );
     }
     return (
       <Box className={`${styles.statusBadge} ${styles.doubtful}`}>
-        <HelpOutlineIcon className={styles.iconStatus} fontSize="large" />
+        <HelpOutlineIcon className={styles.iconStatus} fontSize="large" />{' '}
         Diragukan
       </Box>
     );
   };
 
+  // helper untuk cek video
   const isVideo = (url) => /\.(mp4|webm|ogg)$/i.test(url);
+  // ambil path relatif (CRA proxy akan meneruskannya ke http://localhost:3000)
+  const mediaPath = report.document ? new URL(report.document).pathname : null;
 
   return (
     <Container className={styles.container}>
@@ -188,7 +194,7 @@ export default function ReportDetail() {
             onClick={handleDownloadPDF}
             className={styles.downloadButton}
           >
-            <PictureAsPdfIcon className={styles.pdfIcon} fontSize="small" />
+            <PictureAsPdfIcon className={styles.pdfIcon} fontSize="small" />{' '}
             Download PDF
           </Button>
         </Box>
@@ -209,6 +215,7 @@ export default function ReportDetail() {
         </Box>
 
         <Box ref={contentRef} className={styles.pdfContent}>
+          {/* Tanggal & Update */}
           <Box className={styles.timestampBox}>
             <AccessTimeIcon className={styles.icon} fontSize="small" />
             <Typography variant="body2" className={styles.timestamp}>
@@ -224,24 +231,26 @@ export default function ReportDetail() {
             )}
           </Box>
 
+          {/* Judul */}
           <Typography variant="h3" className={styles.title} mt={2}>
             {report.title}
           </Typography>
 
-          {report.document && (
+          {/* Media section */}
+          {mediaPath && (
             <Box mt={3} className={styles.section}>
               <Typography variant="h6" className={styles.sectionHeader}>
                 Media
               </Typography>
               <Box className={styles.mediaContainer}>
-                {isVideo(report.document) ? (
+                {isVideo(mediaPath) ? (
                   <video controls className={styles.video}>
-                    <source src={report.document} />
+                    <source src={mediaPath} type="video/mp4" />
                     Your browser does not support video.
                   </video>
                 ) : (
                   <img
-                    src={report.document}
+                    src={mediaPath}
                     alt="Uploaded media"
                     className={styles.image}
                   />
@@ -250,6 +259,7 @@ export default function ReportDetail() {
             </Box>
           )}
 
+          {/* Pengirim */}
           <Box mt={3} className={styles.section}>
             <Typography variant="h6" className={styles.sectionHeader}>
               Pengirim
@@ -259,6 +269,7 @@ export default function ReportDetail() {
             </Typography>
           </Box>
 
+          {/* Isi Laporan */}
           <Box mt={3} className={styles.section}>
             <Typography variant="h6" className={styles.sectionHeader}>
               Isi Laporan
@@ -270,6 +281,7 @@ export default function ReportDetail() {
             </Paper>
           </Box>
 
+          {/* Penjelasan Validasi */}
           <Box mt={3} className={styles.section}>
             <Typography variant="h6" className={styles.sectionHeader}>
               Penjelasan Validasi
@@ -284,6 +296,7 @@ export default function ReportDetail() {
             </Paper>
           </Box>
 
+          {/* Penjelasan Admin */}
           {report.adminExplanation && (
             <Box mt={3} className={styles.section}>
               <Typography variant="h6" className={styles.sectionHeader}>
@@ -299,6 +312,7 @@ export default function ReportDetail() {
         </Box>
       </Box>
 
+      {/* Tombol kembali */}
       <Box className={styles.buttonContainer}>
         <Button
           variant="contained"

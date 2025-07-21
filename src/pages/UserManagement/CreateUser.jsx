@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useState, useContext, useEffect } from 'react';
 
 import {
   Visibility as VisibilityIcon,
@@ -17,95 +18,99 @@ import {
 } from '@mui/material';
 
 import styles from './CreateUser.module.css';
+import { AuthContext } from '../../context/AuthContext';
 import api from '../../services/api';
 
 const CreateUser = ({ open, onClose }) => {
-  const [form, setForm] = useState({
+  // ambil auth dari context
+  const { auth } = useContext(AuthContext);
+  const currentRole = auth?.user?.role?.toString().toLowerCase();
+
+  // tentukan role yang boleh dibuat
+  const allowedRoles = currentRole === 'owner' ? ['admin'] : ['user'];
+
+  // inisialisasi form
+  const initialForm = {
     username: '',
     email: '',
+    fullName: '',
+    rt: '',
+    rw: '',
     password: '',
     confirmPassword: '',
-    fullName: '',
-    role: 'user',
-  });
+    role: allowedRoles[0],
+  };
+  const [form, setForm] = useState(initialForm);
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errorDialogOpen, setErrorDialogOpen] = useState(false);
 
-  // Handle input value changes
+  // setiap modal dibuka, reset form termasuk role default
+  useEffect(() => {
+    if (open) {
+      setForm({
+        ...initialForm,
+        role: allowedRoles[0],
+      });
+      setError('');
+      setErrorDialogOpen(false);
+    }
+  }, [open]);
+
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm((f) => ({ ...f, [name]: value }));
   };
 
-  // Toggle visibility for password field
-  const handleTogglePasswordVisibility = () => {
-    setShowPassword((prev) => !prev);
+  const toggle = (setter) => () => setter((v) => !v);
+
+  const setErrorAndOpen = (msg) => {
+    setError(msg);
+    setErrorDialogOpen(true);
   };
 
-  // Toggle visibility for confirm password field
-  const handleToggleConfirmPasswordVisibility = () => {
-    setShowConfirmPassword((prev) => !prev);
-  };
-
-  // Submit form to create new user with validasi input
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
-    // Validasi required fields
-    if (!form.username.trim()) {
-      setError('Username is required');
-      setErrorDialogOpen(true);
-      return;
-    }
-    if (!form.email.trim()) {
-      setError('Email is required');
-      setErrorDialogOpen(true);
-      return;
-    }
-    if (!form.fullName.trim()) {
-      setError('Full Name is required');
-      setErrorDialogOpen(true);
-      return;
-    }
-    if (!form.password || !form.confirmPassword) {
-      setError('Password fields are required');
-      setErrorDialogOpen(true);
-      return;
-    }
-    if (form.password.length < 6) {
-      setError('Password must be at least 6 characters');
-      setErrorDialogOpen(true);
-      return;
-    }
-    if (form.password !== form.confirmPassword) {
-      setError('Passwords do not match');
-      setErrorDialogOpen(true);
-      return;
-    }
+    // validasi
+    if (!form.username.trim()) return setErrorAndOpen('Username wajib diisi');
+    if (!form.email.trim()) return setErrorAndOpen('Email wajib diisi');
+    if (!form.fullName.trim())
+      return setErrorAndOpen('Nama lengkap wajib diisi');
+    if (!form.rt || isNaN(form.rt) || Number(form.rt) <= 0)
+      return setErrorAndOpen('RT wajib angka > 0');
+    if (!form.rw || isNaN(form.rw) || Number(form.rw) <= 0)
+      return setErrorAndOpen('RW wajib angka > 0');
+    if (!form.password || !form.confirmPassword)
+      return setErrorAndOpen('Kedua kata sandi wajib diisi');
+    if (form.password.length < 6)
+      return setErrorAndOpen('Kata sandi minimal 6 karakter');
+    if (form.password !== form.confirmPassword)
+      return setErrorAndOpen('Kata sandi dan konfirmasi tidak sama');
 
     setSubmitting(true);
     try {
       await api.post('/auth/register', {
         username: form.username.trim(),
         email: form.email.trim(),
+        fullName: form.fullName.trim(),
+        rt: Number(form.rt),
+        rw: Number(form.rw),
         password: form.password,
         role: form.role,
-        fullName: form.fullName.trim(),
       });
       onClose();
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create user');
-      setErrorDialogOpen(true);
+      setErrorAndOpen(err.response?.data?.message || 'Gagal membuat akun');
     } finally {
       setSubmitting(false);
     }
   };
 
-  // Close error dialog
-  const handleCloseErrorDialog = () => {
+  const handleCloseError = () => {
     setErrorDialogOpen(false);
     setError('');
   };
@@ -120,16 +125,15 @@ const CreateUser = ({ open, onClose }) => {
         classes={{ paper: styles.dialogPaper }}
       >
         <DialogTitle className={styles.dialogTitle}>
-          Create New User
+          Buat Pengguna Baru
         </DialogTitle>
         <DialogContent dividers>
           <form onSubmit={handleSubmit} className={styles.form}>
             <TextField
-              label="Username *"
+              label="Nama Pengguna *"
               name="username"
               value={form.username}
               onChange={handleChange}
-              required
               fullWidth
               margin="normal"
             />
@@ -139,28 +143,49 @@ const CreateUser = ({ open, onClose }) => {
               type="email"
               value={form.email}
               onChange={handleChange}
-              required
               fullWidth
               margin="normal"
             />
-            {/* Password Field */}
             <TextField
-              label="Password *"
+              label="Nama Lengkap *"
+              name="fullName"
+              value={form.fullName}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+            />
+            <div className={styles.row}>
+              <TextField
+                label="RT *"
+                name="rt"
+                type="number"
+                value={form.rt}
+                onChange={handleChange}
+                className={styles.halfField}
+                margin="normal"
+              />
+              <TextField
+                label="RW *"
+                name="rw"
+                type="number"
+                value={form.rw}
+                onChange={handleChange}
+                className={styles.halfField}
+                margin="normal"
+              />
+            </div>
+            <TextField
+              label="Kata Sandi *"
               name="password"
               type={showPassword ? 'text' : 'password'}
               value={form.password}
               onChange={handleChange}
-              required
               fullWidth
               margin="normal"
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton
-                      onClick={handleTogglePasswordVisibility}
-                      edge="end"
-                      aria-label="toggle password visibility"
-                    >
+                    <IconButton onClick={toggle(setShowPassword)} edge="end">
                       {showPassword ? (
                         <VisibilityOffIcon />
                       ) : (
@@ -171,23 +196,20 @@ const CreateUser = ({ open, onClose }) => {
                 ),
               }}
             />
-            {/* Confirm Password Field */}
             <TextField
-              label="Confirm Password *"
+              label="Konfirmasi Kata Sandi *"
               name="confirmPassword"
               type={showConfirmPassword ? 'text' : 'password'}
               value={form.confirmPassword}
               onChange={handleChange}
-              required
               fullWidth
               margin="normal"
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
                     <IconButton
-                      onClick={handleToggleConfirmPasswordVisibility}
+                      onClick={toggle(setShowConfirmPassword)}
                       edge="end"
-                      aria-label="toggle confirm password visibility"
                     >
                       {showConfirmPassword ? (
                         <VisibilityOffIcon />
@@ -200,27 +222,20 @@ const CreateUser = ({ open, onClose }) => {
               }}
             />
             <TextField
-              label="Full Name *"
-              name="fullName"
-              value={form.fullName}
-              onChange={handleChange}
-              required
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              label="Role"
+              label="Role *"
               name="role"
               value={form.role}
               onChange={handleChange}
-              required
-              fullWidth
-              margin="normal"
               select
               SelectProps={{ native: true }}
+              fullWidth
+              margin="normal"
             >
-              <option value="user">User</option>
-              <option value="admin">Admin</option>
+              {allowedRoles.map((r) => (
+                <option key={r} value={r}>
+                  {r.charAt(0).toUpperCase() + r.slice(1)}
+                </option>
+              ))}
             </TextField>
           </form>
         </DialogContent>
@@ -228,49 +243,42 @@ const CreateUser = ({ open, onClose }) => {
           <Button
             onClick={onClose}
             variant="text"
-            color="secondary"
             className={styles.cancelButton}
           >
-            Cancel
+            Batal
           </Button>
           <Button
             onClick={handleSubmit}
             variant="contained"
-            color="primary"
             disabled={submitting}
             className={styles.submitButton}
           >
-            {submitting ? 'Creating...' : 'Create User'}
+            {submitting ? 'Membuat...' : 'Buat'}
           </Button>
         </DialogActions>
       </Dialog>
 
-      {errorDialogOpen && (
-        <Dialog
-          open={errorDialogOpen}
-          onClose={handleCloseErrorDialog}
-          maxWidth="sm"
-          fullWidth
-          classes={{ paper: styles.errorDialogPaper }}
-        >
-          <DialogTitle className={styles.errorDialogTitle}>Error</DialogTitle>
-          <DialogContent dividers>
-            <Typography className={styles.errorDialogContent}>
-              {error}
-            </Typography>
-          </DialogContent>
-          <DialogActions>
-            <Button
-              onClick={handleCloseErrorDialog}
-              color="primary"
-              variant="contained"
-              className={styles.errorDialogButton}
-            >
-              OK
-            </Button>
-          </DialogActions>
-        </Dialog>
-      )}
+      <Dialog
+        open={errorDialogOpen}
+        onClose={handleCloseError}
+        maxWidth="sm"
+        fullWidth
+        classes={{ paper: styles.errorDialogPaper }}
+      >
+        <DialogTitle className={styles.errorDialogTitle}>Kesalahan</DialogTitle>
+        <DialogContent dividers>
+          <Typography className={styles.errorDialogContent}>{error}</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={handleCloseError}
+            variant="contained"
+            className={styles.errorDialogButton}
+          >
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

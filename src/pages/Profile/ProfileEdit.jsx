@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 
 import {
   Container,
@@ -11,51 +11,63 @@ import {
   Slider,
   Card,
   CardContent,
+  Snackbar,
+  Alert,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 import styles from './Profile.module.css';
-import NotificationDialog from '../../components/LogoutDialog/NotificationDialog';
-import { AuthContext } from '../../context/AuthContext';
 import api from '../../services/api';
 
-const ProfileEdit = () => {
-  const { auth, setAuth } = useContext(AuthContext);
-  const [editForm, setEditForm] = useState({
+export default function ProfileEdit() {
+  const [form, setForm] = useState({
     email: '',
     fullName: '',
     address: '',
     gender: 'Pria',
     age: 25,
+    rt: '',
+    rw: '',
   });
   const [photoPreview, setPhotoPreview] = useState('');
   const [photoFile, setPhotoFile] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [updating, setUpdating] = useState(false);
-  const [notification, setNotification] = useState({
+  const [saving, setSaving] = useState(false);
+  const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
-    severity: '', // 'success' atau 'error'
+    severity: 'success',
   });
   const navigate = useNavigate();
+
+  const normalizePhotoPath = (raw) => {
+    if (!raw) return '';
+    try {
+      const url = new URL(raw);
+      return url.pathname;
+    } catch {
+      return raw.startsWith('/uploads') ? raw : `/uploads/${raw}`;
+    }
+  };
 
   const fetchProfile = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await api.get('/users/me');
-      const { email, fullName, address, gender, age, photo } = response.data;
-      setEditForm({
-        email,
-        fullName: fullName || '',
-        address: address || '',
-        gender: gender || 'Pria',
-        age: age || 25,
+      const { data } = await api.get('/users/me');
+      setForm({
+        email: data.email || '',
+        fullName: data.fullName || '',
+        address: data.address || '',
+        gender: data.gender || 'Pria',
+        age: data.age ?? 25,
+        rt: data.rt ?? '',
+        rw: data.rw ?? '',
       });
-      setPhotoPreview(photo || '');
+      setPhotoPreview(normalizePhotoPath(data.photo));
     } catch (err) {
-      setNotification({
+      setSnackbar({
         open: true,
-        message: err.response?.data?.message || 'Gagal mengambil data profil',
+        message: err.response?.data?.message || 'Gagal mengambil profil',
         severity: 'error',
       });
     } finally {
@@ -68,15 +80,14 @@ const ProfileEdit = () => {
   }, [fetchProfile]);
 
   const handleChange = (e) => {
-    setEditForm({ ...editForm, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm((f) => ({ ...f, [name]: value }));
   };
-
-  const handleAgeChange = (e, newValue) => {
-    setEditForm({ ...editForm, age: newValue });
+  const handleAgeChange = (_, v) => {
+    setForm((f) => ({ ...f, age: v }));
   };
-
   const handlePhotoChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
+    if (e.target.files?.[0]) {
       setPhotoFile(e.target.files[0]);
       setPhotoPreview(URL.createObjectURL(e.target.files[0]));
     }
@@ -84,40 +95,29 @@ const ProfileEdit = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setNotification({ open: false, message: '', severity: '' });
-    setUpdating(true);
+    setSaving(true);
     try {
-      const formData = new FormData();
-      formData.append('email', editForm.email);
-      formData.append('fullName', editForm.fullName);
-      formData.append('address', editForm.address);
-      formData.append('gender', editForm.gender);
-      formData.append('age', editForm.age);
-      if (photoFile) {
-        formData.append('photo', photoFile);
-      }
-      const response = await api.put('/users/profile', formData, {
+      const fd = new FormData();
+      Object.entries(form).forEach(([k, v]) => fd.append(k, v));
+      if (photoFile) fd.append('photo', photoFile);
+
+      await api.put('/users/profile', fd, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      const updatedProfile = response.data.data;
-      setAuth({ ...auth, user: updatedProfile });
-      localStorage.setItem('user', JSON.stringify(updatedProfile));
-      setNotification({
+      setSnackbar({
         open: true,
-        message: 'Profil berhasil diperbarui.',
+        message: 'Profil berhasil diperbarui!',
         severity: 'success',
       });
-      setTimeout(() => {
-        navigate('/profile');
-      }, 1500);
+      setTimeout(() => navigate('/profile'), 1000);
     } catch (err) {
-      setNotification({
+      setSnackbar({
         open: true,
-        message: err.response?.data?.message || 'Gagal memperbarui profil',
+        message: err.response?.data?.message || 'Gagal menyimpan',
         severity: 'error',
       });
     } finally {
-      setUpdating(false);
+      setSaving(false);
     }
   };
 
@@ -133,74 +133,91 @@ const ProfileEdit = () => {
     <Container maxWidth="sm" className={styles.profileContainer}>
       <Card className={styles.profileCard}>
         <CardContent>
-          <Typography
-            variant="h4"
-            align="center"
-            className={styles.profileTitle}
-          >
+          {/* <Typography variant="h4" className={styles.profileTitle}>
             Edit Profil Saya
-          </Typography>
+          </Typography> */}
           <Box
             component="form"
             onSubmit={handleSubmit}
             className={styles.editForm}
           >
+            {/* ROW 1: Email & Nama Lengkap */}
+            <Box className={styles.row}>
+              <TextField
+                label="Email"
+                name="email"
+                type="email"
+                value={form.email}
+                onChange={handleChange}
+                fullWidth
+                required
+              />
+              <TextField
+                label="Nama Lengkap"
+                name="fullName"
+                value={form.fullName}
+                onChange={handleChange}
+                fullWidth
+                required
+              />
+            </Box>
+
+            {/* ROW 2: Alamat */}
             <TextField
-              label="Email"
-              name="email"
-              type="email"
-              value={editForm.email}
-              onChange={handleChange}
-              margin="normal"
-              fullWidth
-              required
-            />
-            <TextField
-              label="Nama Lengkap"
-              name="fullName"
-              value={editForm.fullName}
-              onChange={handleChange}
-              margin="normal"
-              fullWidth
-            />
-            <TextField
-              label="Address"
+              label="Alamat"
               name="address"
-              value={editForm.address}
+              value={form.address}
               onChange={handleChange}
-              margin="normal"
               fullWidth
+              multiline
+              rows={3}
             />
-            <TextField
-              select
-              label="Gender"
-              name="gender"
-              value={editForm.gender}
-              onChange={handleChange}
-              margin="normal"
-              fullWidth
-              required
-            >
-              <MenuItem value="Pria">Pria</MenuItem>
-              <MenuItem value="Wanita">Wanita</MenuItem>
-            </TextField>
-            <Typography variant="subtitle1" className={styles.fieldLabel}>
-              Age: {editForm.age}
-            </Typography>
-            <Slider
-              value={editForm.age}
-              onChange={handleAgeChange}
-              valueLabelDisplay="auto"
-              min={15}
-              max={80}
-              marks={[
-                { value: 15, label: '15' },
-                { value: 80, label: '80' },
-              ]}
-              sx={{ marginY: 2 }}
-            />
-            <Box mt={2}>
-              <Typography variant="body1">Ganti Foto Profil:</Typography>
+
+            {/* ROW 3: Gender & Usia */}
+            <Box className={styles.row}>
+              <TextField
+                select
+                label="Gender"
+                name="gender"
+                value={form.gender}
+                onChange={handleChange}
+                className={styles.halfField}
+              >
+                <MenuItem value="Pria">Pria</MenuItem>
+                <MenuItem value="Wanita">Wanita</MenuItem>
+              </TextField>
+              <Box className={styles.halfField}>
+                <Typography gutterBottom>Usia: {form.age} tahun</Typography>
+                <Slider
+                  value={form.age}
+                  onChange={handleAgeChange}
+                  min={10}
+                  max={100}
+                />
+              </Box>
+            </Box>
+
+            {/* ROW 4: RT & RW */}
+            <Box className={styles.row}>
+              <TextField
+                label="RT"
+                name="rt"
+                value={form.rt}
+                onChange={handleChange}
+                className={styles.halfField}
+              />
+              <TextField
+                label="RW"
+                name="rw"
+                value={form.rw}
+                onChange={handleChange}
+                className={styles.halfField}
+              />
+            </Box>
+
+            {/* ROW 5: Foto Profil */}
+            <Box>
+              <Typography>Ganti Foto Profil:</Typography>
               <Box className={styles.photoPreviewBox}>
                 <img
                   src={photoPreview || '/default-profile.png'}
@@ -210,11 +227,12 @@ const ProfileEdit = () => {
               </Box>
               <input
                 type="file"
-                name="photo"
-                accept="image/jpeg,image/png,image/svg+xml"
+                accept="image/*"
                 onChange={handlePhotoChange}
               />
             </Box>
+
+            {/* TOMBOL */}
             <Box className={styles.formButtonContainer}>
               <Button onClick={() => navigate('/profile')} color="secondary">
                 Batal
@@ -223,23 +241,22 @@ const ProfileEdit = () => {
                 type="submit"
                 variant="contained"
                 color="primary"
-                disabled={updating}
+                disabled={saving}
               >
-                {updating ? 'Memperbarui...' : 'Simpan'}
+                {saving ? 'Menyimpan...' : 'Simpan'}
               </Button>
             </Box>
           </Box>
         </CardContent>
       </Card>
-      {/* Menampilkan notifikasi sebagai dialog di tengah layar */}
-      <NotificationDialog
-        open={notification.open}
-        message={notification.message}
-        severity={notification.severity}
-        onClose={() => setNotification({ ...notification, open: false })}
-      />
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
+      >
+        <Alert severity={snackbar.severity}>{snackbar.message}</Alert>
+      </Snackbar>
     </Container>
   );
-};
-
-export default ProfileEdit;
+}

@@ -1,3 +1,5 @@
+/* src/pages/Reports/ReportDetail.module.css */
+
 .container {
   margin: 2rem auto;
   max-width: 900px;
@@ -65,18 +67,12 @@
   margin-top: 3rem;
 }
 
-.timestampBox {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  justify-content: center;
-}
-
+.timestampBox,
 .updatedBox {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  justify-content: center;
 }
 
 .icon {
@@ -110,24 +106,6 @@
   color: #34495e;
 }
 
-.mediaContainer {
-  display: flex;
-  justify-content: center;
-}
-
-.image {
-  max-width: 100%;
-  height: auto;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.video {
-  max-width: 100%;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
 .paperContent {
   padding: 1.5rem;
   background-color: #f8f9fa;
@@ -147,16 +125,27 @@
   color: #1e88e5;
 }
 
+/* MEDIA */
+.mediaContainer {
+  display: flex;
+  justify-content: center;
+}
+.image,
+.video {
+  max-width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* BADGE COLORS */
 .valid {
   background-color: #c8e6c9;
   color: #388e3c;
 }
-
 .hoax {
   background-color: #ffcdd2;
   color: #d32f2f;
 }
-
 .doubtful {
   background-color: #fff9c4;
   color: #fbc02d;

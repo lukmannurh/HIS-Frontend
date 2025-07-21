@@ -1,11 +1,87 @@
-.profileContainer {
+/* .profileContainer {
   margin-top: 2rem;
   margin-bottom: 2rem;
   display: flex;
   justify-content: center;
+} */
+
+.profileContainer {
+  background-color: #f5f7fa;
+  min-height: 100vh;
+  padding: 3rem 0;
 }
 
 .profileCard {
+  max-width: 600px;
+  margin: 0 auto;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: 4rem;
+}
+
+.headerSection {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.avatar {
+  width: 96px !important;
+  height: 96px !important;
+  font-size: 2.5rem !important;
+  background-color: #88c273 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.titleBox {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.fullName {
+  font-weight: 700;
+  color: #333333;
+  line-height: 1.2;
+}
+
+.divider {
+  margin: 1rem 0 2rem;
+  background-color: #e0e0e0;
+}
+
+.infoGrid {
+  margin-bottom: 2rem;
+}
+
+.infoLabel {
+  display: block;
+  font-size: 0.75rem;
+  color: #555555;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.25rem;
+}
+
+.infoValue {
+  font-size: 1rem;
+  color: #333333;
+}
+
+.buttonContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+/* .profileCard {
   padding: 1.5rem 2rem;
   background-color: #ffffff;
   border-radius: 12px;
@@ -21,9 +97,9 @@
   margin-top: 3rem;
   display: flex;
   justify-content: center;
-}
+} */
 
-/* Header: Avatar dan Nama */
+/* Header: Avatar dan Nama
 .headerSection {
   display: flex;
   align-items: center;
@@ -51,7 +127,7 @@
 }
 
 /* Info Grid */
-.infoGrid {
+/* .infoGrid {
   margin-top: 1rem;
 }
 
@@ -63,14 +139,14 @@
 .infoValue {
   color: #444;
   margin-left: 0.5rem;
-}
+} */
 
 /* Tombol pada tampilan view */
-.buttonContainer {
+/* .buttonContainer {
   display: flex;
   justify-content: center;
   margin-top: 2rem;
-}
+} */ 
 
 /* Edit Form */
 .editForm {
@@ -79,10 +155,20 @@
   gap: 1rem;
 }
 
+.row {
+  display: flex;
+  gap: 1rem;
+}
+
+.halfField {
+  flex: 1;
+}
+
 /* Label untuk field tambahan */
-.fieldLabel {
-  margin-top: 1rem;
-  font-weight: 600;
+.profileTitle {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-weight: bold;
 }
 
 /* Container preview foto */
@@ -106,20 +192,4 @@
   display: flex;
   gap: 1rem;
   justify-content: center;
-}
-
-.profileTitle {
-  text-align: center;
-  margin-bottom: 1.5rem;
-  font-weight: bold;
-}
-
-/* Tambahan styling untuk NotificationDialog jika diperlukan */
-.notificationDialogPaper {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  margin: 0;
-  padding: 8px 16px;
-  min-width: 300px;
 }

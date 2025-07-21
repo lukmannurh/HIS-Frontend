@@ -15,7 +15,6 @@ import {
 
 import CreateUser from './CreateUser';
 import DeleteUserDialog from './DeleteUserDialog';
-import EditUserRole from './EditUserRole';
 import styles from './UserManagement.module.css';
 import UsersTable from './UsersTable';
 import { AuthContext } from '../../context/AuthContext';
@@ -28,7 +27,6 @@ const UserManagement = () => {
   const [error, setError] = useState('');
 
   const [showCreate, setShowCreate] = useState(false);
-  const [editingUser, setEditingUser] = useState(null);
   const [deletingUser, setDeletingUser] = useState(null);
 
   // Search & Sort
@@ -49,16 +47,20 @@ const UserManagement = () => {
     handleSortClose();
   };
 
-  // Fetch users
-  useEffect(() => {
+  // Fetch users (exclude current user)
+  const fetchUsers = () => {
+    setLoading(true);
     api
       .get('/users')
       .then((res) => {
         setUsers(res.data.filter((u) => u.id !== auth.user.id));
+        setError('');
       })
-      .catch(() => setError('Failed to fetch users'))
+      .catch(() => setError('Gagal memuat data pengguna'))
       .finally(() => setLoading(false));
-  }, [auth.user.id]);
+  };
+
+  useEffect(fetchUsers, [auth.user.id]);
 
   // Filter by search
   const filtered = useMemo(
@@ -150,7 +152,6 @@ const UserManagement = () => {
         users={displayedUsers}
         currentPage={currentPage}
         itemsPerPage={itemsPerPage}
-        onEditRole={setEditingUser}
         onDelete={setDeletingUser}
       />
 
@@ -168,25 +169,7 @@ const UserManagement = () => {
           open
           onClose={() => {
             setShowCreate(false);
-            api
-              .get('/users')
-              .then((res) =>
-                setUsers(res.data.filter((u) => u.id !== auth.user.id))
-              );
-          }}
-        />
-      )}
-      {editingUser && (
-        <EditUserRole
-          open
-          user={editingUser}
-          onClose={() => {
-            setEditingUser(null);
-            api
-              .get('/users')
-              .then((res) =>
-                setUsers(res.data.filter((u) => u.id !== auth.user.id))
-              );
+            fetchUsers();
           }}
         />
       )}

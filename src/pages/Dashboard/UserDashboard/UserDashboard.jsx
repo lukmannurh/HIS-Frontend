@@ -1,107 +1,121 @@
 import React, { useEffect, useState } from 'react';
 
-import 'chart.js/auto';
 import {
+  Container,
   Box,
   Typography,
-  Paper,
-  Grid,
   CircularProgress,
   Alert,
+  TableContainer,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Paper,
+  Button,
 } from '@mui/material';
-import { Bar } from 'react-chartjs-2';
+import { useNavigate } from 'react-router-dom';
 
 import styles from './UserDashboard.module.css';
 import api from '../../../services/api';
 
-const UserDashboard = () => {
+export default function UserDashboard() {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     api
-      .get('/reports')
+      .get('/reports') // backend hanya mengembalikan laporan milik user
       .then((res) => setReports(res.data))
-      .catch(() => setError('Gagal memuat data dashboard'))
+      .catch(() => setError('Gagal memuat laporan Anda'))
       .finally(() => setLoading(false));
   }, []);
 
   if (loading) {
     return (
-      <Box
-        className={styles.dashboardContainer}
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-      >
+      <Box className={styles.loadingContainer}>
         <CircularProgress />
       </Box>
     );
   }
   if (error) {
     return (
-      <Box className={styles.dashboardContainer}>
+      <Container maxWidth="md" className={styles.container}>
         <Alert severity="error">{error}</Alert>
-      </Box>
+      </Container>
     );
   }
 
-  // Hitung status laporan
-  const statusCounts = reports.reduce((acc, r) => {
-    acc[r.validationStatus] = (acc[r.validationStatus] || 0) + 1;
-    return acc;
-  }, {});
-
-  const total = reports.length;
-  const valid = statusCounts.valid || 0;
-  const hoax = statusCounts.hoax || 0;
-  const diragukan = statusCounts.diragukan || 0;
-
-  const chartData = {
-    labels: ['Total', 'Valid', 'Hoax', 'Diragukan'],
-    datasets: [
-      {
-        label: 'Jumlah Laporan',
-        data: [total, valid, hoax, diragukan],
-        backgroundColor: ['#42a5f5', '#66bb6a', '#ef5350', '#ffa726'],
-      },
-    ],
-  };
+  const formatDate = (iso) =>
+    new Date(iso).toLocaleString('id-ID', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
 
   return (
-    <Box className={styles.dashboardContainer}>
-      <Typography variant="h4" className={styles.dashboardTitle}>
-        User Dashboard
+    <Container maxWidth="md" className={styles.container}>
+      <Typography variant="h4" className={styles.title}>
+        Laporan Saya
       </Typography>
 
-      <Grid container spacing={2} className={styles.cardsGrid}>
-        {[
-          { label: 'Total Laporan', value: total, color: '#42a5f5' },
-          { label: 'Valid', value: valid, color: '#66bb6a' },
-          { label: 'Hoax', value: hoax, color: '#ef5350' },
-          { label: 'Diragukan', value: diragukan, color: '#ffa726' },
-        ].map((card) => (
-          <Grid item xs={6} sm={3} key={card.label}>
-            <Paper
-              className={styles.statCard}
-              style={{ borderTopColor: card.color }}
-            >
-              <Typography className={styles.statLabel}>{card.label}</Typography>
-              <Typography className={styles.statValue}>{card.value}</Typography>
-            </Paper>
-          </Grid>
-        ))}
-      </Grid>
-
-      <Paper className={styles.chartPaper}>
-        <Typography variant="h6" className={styles.chartTitle}>
-          Ringkasan Status Laporan
+      {reports.length === 0 ? (
+        <Typography variant="body1">
+          Anda belum membuat laporan apa pun.
         </Typography>
-        <Bar data={chartData} />
-      </Paper>
-    </Box>
+      ) : (
+        <TableContainer component={Paper} className={styles.tableContainer}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Judul</TableCell>
+                <TableCell>Tanggal Dibuat</TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell>Validasi</TableCell>
+                <TableCell align="right">Aksi</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {reports.map((r) => (
+                <TableRow key={r.id} hover>
+                  <TableCell>{r.title}</TableCell>
+                  <TableCell>{formatDate(r.createdAt)}</TableCell>
+                  <TableCell className={styles.statusCell}>
+                    {r.reportStatus === 'selesai' ? (
+                      <Box className={styles.badgeDone}>Selesai</Box>
+                    ) : (
+                      <Box className={styles.badgeProcess}>Diproses</Box>
+                    )}
+                  </TableCell>
+                  <TableCell className={styles.validationCell}>
+                    {r.validationStatus === 'valid' ? (
+                      <Box className={styles.badgeValid}>Valid</Box>
+                    ) : r.validationStatus === 'hoax' ? (
+                      <Box className={styles.badgeHoax}>Hoax</Box>
+                    ) : (
+                      <Box className={styles.badgeDoubtful}>Diragukan</Box>
+                    )}
+                  </TableCell>
+                  <TableCell align="right">
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      onClick={() => navigate(`/reports/${r.id}`)}
+                    >
+                      View
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
+    </Container>
   );
-};
-
-export default UserDashboard;
+}

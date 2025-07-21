@@ -31,31 +31,18 @@ export default function SidebarNavbar({ collapsed, setCollapsed }) {
   const navigate = useNavigate();
   const userRole = auth?.user?.role?.toLowerCase() || 'user';
 
+  // build menu based on role
   let menuItems = [];
-
   if (userRole === 'user') {
-    // user: boleh Create + lihat data
     menuItems = [
       { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
-      {
-        text: 'Reports',
-        icon: <ArticleIcon />,
-        children: [
-          { text: 'Create Report', path: '/create-report' },
-          { text: 'Report Data', path: '/reports' },
-        ],
-      },
+      { text: 'Create Report', icon: <ArticleIcon />, path: '/create-report' },
       { text: 'Profile', icon: <PersonIcon />, path: '/profile' },
     ];
   } else if (userRole === 'admin') {
-    // admin: hanya lihat data Reports + fitur admin lain
     menuItems = [
       { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
-      {
-        text: 'Reports',
-        icon: <ArticleIcon />,
-        children: [{ text: 'Report Data', path: '/reports' }],
-      },
+      { text: 'Report Data', icon: <ArticleIcon />, path: '/reports' },
       { text: 'Archives', icon: <ArchiveIcon />, path: '/archives' },
       { text: 'Profile', icon: <PersonIcon />, path: '/profile' },
       {
@@ -65,7 +52,6 @@ export default function SidebarNavbar({ collapsed, setCollapsed }) {
       },
     ];
   } else if (userRole === 'owner') {
-    // owner: hilangkan menu Reports sepenuhnya
     menuItems = [
       { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
       { text: 'Archives', icon: <ArchiveIcon />, path: '/archives' },
@@ -86,12 +72,16 @@ export default function SidebarNavbar({ collapsed, setCollapsed }) {
 
   return (
     <Box className={`${styles.sidebar} ${collapsed ? styles.collapsed : ''}`}>
-      {/* Brand Section */}
+      {/* Brand */}
       <Box className={styles.brandSection}>
         {!collapsed && (
           <Box className={styles.logoContainer}>
             <img src={logoNavbar} alt="Logo" className={styles.logoImage} />
-            <Button variant="outlined" className={styles.roleButton}>
+            <Button
+              variant="outlined"
+              size="small"
+              className={styles.roleButton}
+            >
               Role: {userRole.charAt(0).toUpperCase() + userRole.slice(1)}
             </Button>
           </Box>
@@ -104,73 +94,31 @@ export default function SidebarNavbar({ collapsed, setCollapsed }) {
         </IconButton>
       </Box>
 
-      <Divider className={styles.divider} />
+      <Divider />
 
-      {/* Menu */}
+      {/* Menu items */}
       <List className={styles.menuList}>
-        {menuItems.map((item, idx) => {
-          if (item.children) {
-            return (
-              <Box key={idx}>
-                <Tooltip title={collapsed ? item.text : ''} placement="right">
-                  <ListItem
-                    button
-                    onClick={() => handleNav(item.children[0].path)}
-                    className={styles.listItem}
-                  >
-                    <ListItemIcon className={styles.icon}>
-                      {item.icon}
-                    </ListItemIcon>
-                    {!collapsed && (
-                      <ListItemText
-                        primary={item.text}
-                        className={styles.text}
-                      />
-                    )}
-                  </ListItem>
-                </Tooltip>
-                {!collapsed && (
-                  <Box className={styles.subMenu}>
-                    {item.children.map((sub, subIdx) => (
-                      <ListItem
-                        key={subIdx}
-                        button
-                        onClick={() => handleNav(sub.path)}
-                        className={styles.subMenuItem}
-                      >
-                        <ListItemText
-                          primary={sub.text}
-                          className={styles.subMenuText}
-                        />
-                      </ListItem>
-                    ))}
-                  </Box>
-                )}
-              </Box>
-            );
-          }
-          return (
-            <Tooltip
-              title={collapsed ? item.text : ''}
-              placement="right"
-              key={idx}
+        {menuItems.map((item) => (
+          <Tooltip
+            key={item.text}
+            title={collapsed ? item.text : ''}
+            placement="right"
+          >
+            <ListItem
+              button
+              onClick={() => handleNav(item.path)}
+              className={styles.listItem}
             >
-              <ListItem
-                button
-                onClick={() => handleNav(item.path)}
-                className={styles.listItem}
-              >
-                <ListItemIcon className={styles.icon}>{item.icon}</ListItemIcon>
-                {!collapsed && (
-                  <ListItemText primary={item.text} className={styles.text} />
-                )}
-              </ListItem>
-            </Tooltip>
-          );
-        })}
+              <ListItemIcon className={styles.icon}>{item.icon}</ListItemIcon>
+              {!collapsed && (
+                <ListItemText primary={item.text} className={styles.text} />
+              )}
+            </ListItem>
+          </Tooltip>
+        ))}
       </List>
 
-      {/* Footer: Logout */}
+      {/* Logout */}
       <Box className={styles.footer}>
         <Tooltip title={collapsed ? 'Logout' : ''} placement="right">
           <ListItem

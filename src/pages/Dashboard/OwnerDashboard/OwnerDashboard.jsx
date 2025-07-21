@@ -1,59 +1,126 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 
 import 'chart.js/auto';
-import { Box, Typography, Paper, Grid, Card, CardContent } from '@mui/material';
-import { Bar, Pie, Line } from 'react-chartjs-2';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import {
+  Box,
+  Typography,
+  Grid,
+  Card,
+  CardContent,
+  Button,
+  CircularProgress,
+  Alert,
+} from '@mui/material';
+import { Bar, Line, Pie, Doughnut, Scatter } from 'react-chartjs-2';
 
 import styles from './OwnerDashboard.module.css';
 import api from '../../../services/api';
 
-const OwnerDashboard = () => {
+export default function OwnerDashboard() {
   const [reports, setReports] = useState([]);
   const [users, setUsers] = useState([]);
   const [archives, setArchives] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [lastUpdated, setLastUpdated] = useState(null);
+  const [activeChart, setActiveChart] = useState('');
+
+  const fetchData = async () => {
+    setLoading(true);
+    setError('');
+
+    // Fetch reports with error handling
+    try {
+      const rRes = await api.get('/reports');
+      setReports(rRes.data);
+    } catch (err) {
+      setError(
+        err.response?.status === 403
+          ? 'Anda tidak memiliki akses untuk melihat data laporan.'
+          : err.response?.data?.message || 'Gagal memuat laporan.'
+      );
+      setLoading(false);
+      return;
+    }
+
+    // Fetch users
+    try {
+      const uRes = await api.get('/users');
+      setUsers(uRes.data);
+    } catch (err) {
+      setError(
+        err.response?.status === 403
+          ? 'Anda tidak memiliki akses untuk melihat data pengguna.'
+          : err.response?.data?.message || 'Gagal memuat pengguna.'
+      );
+      setLoading(false);
+      return;
+    }
+
+    // Fetch archives
+    try {
+      const aRes = await api.get('/archives');
+      setArchives(aRes.data);
+    } catch (err) {
+      setError(
+        err.response?.status === 403
+          ? 'Anda tidak memiliki akses untuk melihat data arsip.'
+          : err.response?.data?.message || 'Gagal memuat arsip.'
+      );
+      setLoading(false);
+      return;
+    }
+
+    setLastUpdated(new Date());
+    setLoading(false);
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const reportsResponse = await api.get('/reports');
-        setReports(reportsResponse.data);
-
-        const usersResponse = await api.get('/users');
-        setUsers(usersResponse.data);
-
-        const archivesResponse = await api.get('/archives');
-        setArchives(archivesResponse.data);
-      } catch (error) {
-        console.error('Error fetching owner dashboard data:', error);
-      }
-    };
     fetchData();
   }, []);
 
-  // 1) Distribusi Laporan per Bulan (Bar)
-  const distributionLabels = [
+  // Summary metrics for Admin role only
+  const totalReports = reports.length;
+  const totalArchives = archives.length;
+  const totalAdmins = users.filter((u) => u.role === 'admin').length;
+  const totalHoax = reports.filter((r) => r.validationStatus === 'hoax').length;
+  const totalValid = reports.filter(
+    (r) => r.validationStatus === 'valid'
+  ).length;
+  const totalDoubtful = reports.filter(
+    (r) => r.validationStatus === 'diragukan'
+  ).length;
+
+  // Helper: unique months
+  const getMonths = (items, key) => [
     ...new Set(
-      reports.map((r) =>
-        new Date(r.createdAt).toLocaleString('id-ID', {
+      items.map((i) =>
+        new Date(i[key]).toLocaleString('id-ID', {
           month: 'short',
           year: 'numeric',
         })
       )
     ),
   ];
-  const distributionData = {
-    labels: distributionLabels,
+
+  // Chart datasets
+  const months = getMonths(reports, 'createdAt');
+
+  const barReports = {
+    labels: months,
     datasets: [
       {
-        label: 'Laporan per Bulan',
-        data: distributionLabels.map(
-          (label) =>
+        label: 'Jumlah Laporan',
+        data: months.map(
+          (m) =>
             reports.filter(
               (r) =>
                 new Date(r.createdAt).toLocaleString('id-ID', {
                   month: 'short',
                   year: 'numeric',
-                }) === label
+                }) === m
             ).length
         ),
         backgroundColor: '#42a5f5',
@@ -61,364 +128,252 @@ const OwnerDashboard = () => {
     ],
   };
 
-  // 2) Status Validasi (Pie)
-  const statusCounts = reports.reduce((acc, r) => {
-    acc[r.validationStatus] = (acc[r.validationStatus] || 0) + 1;
-    return acc;
-  }, {});
-  const statusData = {
-    labels: Object.keys(statusCounts),
+  const lineReports = {
+    labels: months,
     datasets: [
       {
-        label: 'Status Validasi',
-        data: Object.values(statusCounts),
+        label: 'Tren Laporan',
+        data: months.map(
+          (m) =>
+            reports.filter(
+              (r) =>
+                new Date(r.createdAt).toLocaleString('id-ID', {
+                  month: 'short',
+                  year: 'numeric',
+                }) === m
+            ).length
+        ),
+        fill: false,
+        tension: 0.3,
+        borderColor: '#1976d2',
+      },
+    ],
+  };
+
+  const pieValidation = {
+    labels: ['Valid', 'Diragukan', 'Hoax', 'Unknown'],
+    datasets: [
+      {
+        data: [
+          totalValid,
+          totalDoubtful,
+          totalHoax,
+          totalReports - (totalValid + totalDoubtful + totalHoax),
+        ],
         backgroundColor: ['#66bb6a', '#ffa726', '#ef5350', '#9e9e9e'],
       },
     ],
   };
 
-  // (contoh opsi) Agar Pie dan Bar sama-sama mengisi kontainer:
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false, // nonaktifkan aspect ratio
-    plugins: {
-      legend: {
-        position: 'bottom', // bisa 'top'|'bottom'|'left'|'right'
-      },
-      tooltip: {
-        mode: 'index',
-        intersect: false,
-      },
-    },
-  };
-
-  // 3) Tren Laporan Harian (Line)
-  const sortedReports = [...reports].sort(
-    (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
-  );
-  const dailyLabels = sortedReports.map((r) =>
-    new Date(r.createdAt).toLocaleDateString('id-ID')
-  );
-  const dailyData = {
-    labels: dailyLabels,
-    datasets: [
-      {
-        label: 'Laporan Harian',
-        data: dailyLabels.map(
-          (label) =>
-            sortedReports.filter(
-              (r) => new Date(r.createdAt).toLocaleDateString('id-ID') === label
-            ).length
-        ),
-        fill: false,
-        borderColor: '#42a5f5',
-      },
-    ],
-  };
-
-  // 4) Distribusi Pengguna (Bar) – berdasarkan role
-  const userRoleCounts = users.reduce((acc, user) => {
-    acc[user.role] = (acc[user.role] || 0) + 1;
-    return acc;
-  }, {});
-  const userRoleData = {
-    labels: Object.keys(userRoleCounts),
-    datasets: [
-      {
-        label: 'Jumlah Pengguna',
-        data: Object.values(userRoleCounts),
-        backgroundColor: ['#8e24aa', '#3949ab', '#d81b60', '#ffa726'],
-      },
-    ],
-  };
-
-  // 5) Arsip Laporan per Bulan (Bar)
-  const archiveLabels = [
-    ...new Set(
-      archives.map((a) =>
-        new Date(a.archivedAt).toLocaleString('id-ID', {
-          month: 'short',
-          year: 'numeric',
-        })
-      )
-    ),
-  ];
-  const archiveData = {
-    labels: archiveLabels,
+  const doughnutArchives = {
+    labels: getMonths(archives, 'archivedAt'),
     datasets: [
       {
         label: 'Arsip per Bulan',
-        data: archiveLabels.map(
-          (label) =>
+        data: getMonths(archives, 'archivedAt').map(
+          (m) =>
             archives.filter(
               (a) =>
                 new Date(a.archivedAt).toLocaleString('id-ID', {
                   month: 'short',
                   year: 'numeric',
-                }) === label
+                }) === m
             ).length
         ),
-        backgroundColor: '#ff7043',
+        backgroundColor: [
+          '#42a5f5',
+          '#7e57c2',
+          '#26a69a',
+          '#ffa726',
+          '#ef5350',
+        ],
       },
     ],
   };
 
-  // 6) Laporan oleh Admin
-  const adminReports = reports.filter((r) => r.user.role === 'admin');
-  const adminReportData = {
-    labels: ['Laporan oleh Admin'],
+  const barAdmins = {
+    labels: ['Admin'],
     datasets: [
       {
-        label: 'Jumlah Laporan',
-        data: [adminReports.length],
-        backgroundColor: '#ab47bc',
+        label: 'Jumlah Admin',
+        data: [totalAdmins],
+        backgroundColor: '#1976d2',
       },
     ],
   };
 
-  // 7) Top 5 Pelapor
-  const userReportCounts = users
-    .map((user) => ({
-      username: user.username,
-      count: reports.filter((r) => r.user.id === user.id).length,
-    }))
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 5);
-  const topUserData = {
-    labels: userReportCounts.map((u) => u.username),
+  const scatterAdmins = {
     datasets: [
       {
-        label: 'Top 5 Pelapor',
-        data: userReportCounts.map((u) => u.count),
-        backgroundColor: '#26a69a',
-      },
-    ],
-  };
-
-  // 8) Trend Validasi Harian (Stacked Bar)
-  const trendDates = [
-    ...new Set(
-      sortedReports.map((r) =>
-        new Date(r.createdAt).toLocaleDateString('id-ID')
-      )
-    ),
-  ];
-  const trendData = {
-    labels: trendDates,
-    datasets: [
-      {
-        label: 'Valid',
-        data: trendDates.map(
-          (date) =>
-            sortedReports.filter(
-              (r) =>
-                new Date(r.createdAt).toLocaleDateString('id-ID') === date &&
-                r.validationStatus === 'valid'
-            ).length
-        ),
-        backgroundColor: '#66bb6a',
-      },
-      {
-        label: 'Hoax',
-        data: trendDates.map(
-          (date) =>
-            sortedReports.filter(
-              (r) =>
-                new Date(r.createdAt).toLocaleDateString('id-ID') === date &&
-                r.validationStatus === 'hoax'
-            ).length
-        ),
+        label: 'Sebaran Admin (RT vs RW)',
+        data: users
+          .filter((u) => u.role === 'admin' && !isNaN(u.rt) && !isNaN(u.rw))
+          .map((u) => ({ x: Number(u.rt), y: Number(u.rw) })),
         backgroundColor: '#ef5350',
       },
-      {
-        label: 'Diragukan',
-        data: trendDates.map(
-          (date) =>
-            sortedReports.filter(
-              (r) =>
-                new Date(r.createdAt).toLocaleDateString('id-ID') === date &&
-                r.validationStatus === 'diragukan'
-            ).length
-        ),
-        backgroundColor: '#ffa726',
-      },
-      {
-        label: 'Unknown',
-        data: trendDates.map(
-          (date) =>
-            sortedReports.filter(
-              (r) =>
-                new Date(r.createdAt).toLocaleDateString('id-ID') === date &&
-                (r.validationStatus === 'unknown' ||
-                  r.validationStatus === undefined)
-            ).length
-        ),
-        backgroundColor: '#9e9e9e',
-      },
     ],
   };
 
-  // -- Summary Cards --
-  const totalReports = reports.length;
-  const totalArchives = archives.length;
-  const totalUsers = users.length;
-  const totalHoax = statusCounts['hoax'] || 0;
+  // Common chart options
+  const baseOpts = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'bottom' },
+      title: { display: true, text: '' },
+    },
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: activeChart === 'scatter' ? 'RT' : 'Bulan',
+        },
+        ticks: { precision: 0 },
+      },
+      y: {
+        title: {
+          display: true,
+          text: activeChart === 'scatter' ? 'RW' : 'Jumlah',
+        },
+        ticks: { precision: 0 },
+      },
+    },
+  };
+
+  if (loading)
+    return (
+      <Box className={styles.loading}>
+        <CircularProgress />
+      </Box>
+    );
+  if (error) return <Alert severity="error">{error}</Alert>;
 
   return (
-    <Box className={styles.dashboardContainer}>
-      <Typography variant="h4" className={styles.dashboardTitle}>
-        Owner Dashboard
-      </Typography>
+    <Box className={styles.container}>
+      <Box className={styles.topBar}>
+        <Typography variant="h4" className={styles.title}>
+          Owner Dashboard
+        </Typography>
+        <Button
+          className={styles.refreshButton}
+          startIcon={<RefreshIcon />}
+          onClick={fetchData}
+        >
+          Refresh
+        </Button>
+      </Box>
+      {lastUpdated && (
+        <Typography variant="caption" className={styles.lastUpdated}>
+          Terakhir diperbarui:{' '}
+          {new Intl.DateTimeFormat('id-ID', {
+            dateStyle: 'short',
+            timeStyle: 'medium',
+          }).format(lastUpdated)}
+        </Typography>
+      )}
 
-      {/* Summary Cards */}
-      <Grid container spacing={2} className={styles.summaryRow}>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card className={styles.summaryCard}>
-            <CardContent>
-              <Typography variant="subtitle2" className={styles.cardSubtitle}>
-                Total Laporan
-              </Typography>
-              <Typography variant="h5" className={styles.cardValue}>
-                {totalReports}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card className={styles.summaryCard}>
-            <CardContent>
-              <Typography variant="subtitle2" className={styles.cardSubtitle}>
-                Arsip Laporan
-              </Typography>
-              <Typography variant="h5" className={styles.cardValue}>
-                {totalArchives}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card className={styles.summaryCard}>
-            <CardContent>
-              <Typography variant="subtitle2" className={styles.cardSubtitle}>
-                Total Pengguna
-              </Typography>
-              <Typography variant="h5" className={styles.cardValue}>
-                {totalUsers}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card className={styles.summaryCard}>
-            <CardContent>
-              <Typography variant="subtitle2" className={styles.cardSubtitle}>
-                Laporan Hoax
-              </Typography>
-              <Typography variant="h5" className={styles.cardValue}>
-                {totalHoax}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
+      <Grid container spacing={2} className={styles.summary}>
+        {[
+          { key: 'bar', label: 'Laporan/Bulan', value: totalReports },
+          { key: 'line', label: 'Tren Laporan', value: totalReports },
+          { key: 'pie', label: 'Validasi', value: totalReports },
+          { key: 'doughnut', label: 'Arsip Laporan', value: totalArchives },
+          { key: 'admins', label: 'Admin', value: totalAdmins },
+          { key: 'scatter', label: 'Sebaran Admin', value: totalAdmins },
+        ].map((card) => (
+          <Grid item xs={6} sm={4} md={3} lg={2} key={card.key}>
+            <Card
+              className={`${styles.card} ${activeChart === card.key ? styles.cardActive : ''}`}
+              onClick={() =>
+                setActiveChart(activeChart === card.key ? '' : card.key)
+              }
+            >
+              <CardContent>
+                <Typography variant="subtitle2">{card.label}</Typography>
+                <Typography variant="h5">{card.value}</Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
       </Grid>
 
-      <Grid container spacing={3} alignItems="stretch">
-        {/* Bar vs Pie (distribusi vs status) */}
-        <Grid item xs={12} md={6}>
-          <Paper className={`${styles.chartPaper} ${styles.equalBox}`}>
-            <Typography variant="h6" className={styles.chartTitle}>
-              Distribusi Laporan per Bulan
-            </Typography>
-            <div className={styles.chartWrapper}>
-              <Bar data={distributionData} options={chartOptions} />
-            </div>
-          </Paper>
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <Paper className={`${styles.chartPaper} ${styles.equalBox}`}>
-            <Typography variant="h6" className={styles.chartTitle}>
-              Status Validasi Laporan
-            </Typography>
-            <div className={styles.chartWrapper}>
-              <Pie data={statusData} options={chartOptions} />
-            </div>
-          </Paper>
-        </Grid>
-
-        {/* daily line vs user role bar */}
-        <Grid item xs={12} md={6}>
-          <Paper className={`${styles.chartPaper} ${styles.equalBox}`}>
-            <Typography variant="h6" className={styles.chartTitle}>
-              Tren Laporan Harian
-            </Typography>
-            <div className={styles.chartWrapper}>
-              <Line data={dailyData} options={chartOptions} />
-            </div>
-          </Paper>
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <Paper className={`${styles.chartPaper} ${styles.equalBox}`}>
-            <Typography variant="h6" className={styles.chartTitle}>
-              Distribusi Pengguna
-            </Typography>
-            <div className={styles.chartWrapper}>
-              <Bar data={userRoleData} options={chartOptions} />
-            </div>
-          </Paper>
-        </Grid>
-
-        {/* archive vs adminReports */}
-        <Grid item xs={12} md={6}>
-          <Paper className={`${styles.chartPaper} ${styles.equalBox}`}>
-            <Typography variant="h6" className={styles.chartTitle}>
-              Arsip Laporan per Bulan
-            </Typography>
-            <div className={styles.chartWrapper}>
-              <Bar data={archiveData} options={chartOptions} />
-            </div>
-          </Paper>
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <Paper className={`${styles.chartPaper} ${styles.equalBox}`}>
-            <Typography variant="h6" className={styles.chartTitle}>
-              Laporan oleh Admin
-            </Typography>
-            <div className={styles.chartWrapper}>
-              <Bar data={adminReportData} options={chartOptions} />
-            </div>
-          </Paper>
-        </Grid>
-
-        {/* topUser vs trendValidasi */}
-        <Grid item xs={12} md={6}>
-          <Paper className={`${styles.chartPaper} ${styles.equalBox}`}>
-            <Typography variant="h6" className={styles.chartTitle}>
-              Top 5 Pelapor
-            </Typography>
-            <div className={styles.chartWrapper}>
-              <Bar data={topUserData} options={chartOptions} />
-            </div>
-          </Paper>
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <Paper className={`${styles.chartPaper} ${styles.equalBox}`}>
-            <Typography variant="h6" className={styles.chartTitle}>
-              Trend Validasi Harian
-            </Typography>
-            <div className={styles.chartWrapper}>
-              <Bar
-                data={trendData}
-                options={{
-                  ...chartOptions,
-                  scales: { x: { stacked: true }, y: { stacked: true } },
-                }}
-              />
-            </div>
-          </Paper>
-        </Grid>
-      </Grid>
+      <Box className={styles.detailBox}>
+        {activeChart === 'bar' && (
+          <Bar
+            data={barReports}
+            options={{
+              ...baseOpts,
+              plugins: {
+                ...baseOpts.plugins,
+                title: { display: true, text: 'Distribusi Laporan per Bulan' },
+              },
+            }}
+          />
+        )}
+        {activeChart === 'line' && (
+          <Line
+            data={lineReports}
+            options={{
+              ...baseOpts,
+              plugins: {
+                ...baseOpts.plugins,
+                title: { display: true, text: 'Tren Laporan' },
+              },
+            }}
+          />
+        )}
+        {activeChart === 'pie' && (
+          <Pie
+            data={pieValidation}
+            options={{
+              ...baseOpts,
+              plugins: {
+                ...baseOpts.plugins,
+                title: { display: true, text: 'Status Validasi Laporan' },
+              },
+            }}
+          />
+        )}
+        {activeChart === 'doughnut' && (
+          <Doughnut
+            data={doughnutArchives}
+            options={{
+              ...baseOpts,
+              plugins: {
+                ...baseOpts.plugins,
+                title: { display: true, text: 'Arsip Laporan per Bulan' },
+              },
+            }}
+          />
+        )}
+        {activeChart === 'admins' && (
+          <Bar
+            data={barAdmins}
+            options={{
+              ...baseOpts,
+              plugins: {
+                ...baseOpts.plugins,
+                title: { display: true, text: 'Jumlah Admin' },
+              },
+            }}
+          />
+        )}
+        {activeChart === 'scatter' && (
+          <Scatter
+            data={scatterAdmins}
+            options={{
+              ...baseOpts,
+              plugins: {
+                ...baseOpts.plugins,
+                title: {
+                  display: true,
+                  text: 'Sebaran Admin berdasarkan RT dan RW',
+                },
+              },
+            }}
+          />
+        )}
+      </Box>
     </Box>
   );
-};
-
-export default OwnerDashboard;
+}

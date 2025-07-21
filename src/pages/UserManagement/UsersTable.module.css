@@ -1,5 +1,3 @@
-/* src/pages/usermanagement/UsersTable.module.css */
-
 /* Table container */
 .tableContainer {
   margin-top: 1rem;
@@ -33,18 +31,8 @@
 
 .actionsGroup {
   display: inline-flex;
-  gap: 0.5rem;
   justify-content: center;
   width: 100%;
-}
-
-.editButton {
-  color: #33691e;
-  text-transform: none;
-}
-
-.editButton:hover {
-  background-color: rgba(200,230,201,0.4);
 }
 
 .deleteButton {

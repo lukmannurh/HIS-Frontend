@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 
 import AdminDashboard from './AdminDashboard/AdminDashboard';
+import styles from './Dashboard.module.css';
 import OwnerDashboard from './OwnerDashboard/OwnerDashboard';
 import UserDashboard from './UserDashboard/UserDashboard';
 import { AuthContext } from '../../context/AuthContext';
@@ -8,18 +9,30 @@ import { AuthContext } from '../../context/AuthContext';
 const Dashboard = () => {
   const { auth } = useContext(AuthContext);
 
-  if (!auth.isAuthenticated) {
-    return null; // atau redirect ke /login
+  // Jika belum login, bisa redirect atau tampilkan null
+  if (!auth?.isAuthenticated) {
+    return null;
+    // Atau: return <Navigate to="/login" />;
   }
 
+  // Pilih komponen dashboard berdasarkan role
+  let Component;
   switch (auth.user.role) {
     case 'owner':
-      return <OwnerDashboard />;
+      Component = OwnerDashboard;
+      break;
     case 'admin':
-      return <AdminDashboard />;
+      Component = AdminDashboard;
+      break;
     default:
-      return <UserDashboard />;
+      Component = UserDashboard;
   }
+
+  return (
+    <div className={styles.dashboardWrapper}>
+      <Component />
+    </div>
+  );
 };
 
 export default Dashboard;
