@@ -11,6 +11,7 @@ import {
   Grid,
   Snackbar,
   Alert,
+  Link,
 } from '@mui/material';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 
@@ -34,78 +35,108 @@ const LandingPage = () => {
 
   return (
     <Box className={styles.landingContainer}>
-      {/* HERO SECTION */}
-      <Box className={styles.heroSection}>
-        <Box className={styles.heroOverlay}>
-          <Container maxWidth="md" className={styles.heroContent}>
-            <Typography variant="h3" className={styles.heroTitle} gutterBottom>
-              Hamlet Information System
-            </Typography>
-            <Typography
-              variant="h6"
-              className={styles.heroSubtitle}
-              gutterBottom
-            >
-              Aplikasi web untuk memfasilitasi komunikasi dan manajemen
-              informasi di tingkat desa,
-              <br />
-              dengan fitur hoaks checker.
-            </Typography>
+      {/* HERO */}
+      <Box className={styles.heroSection} role="banner">
+        <Box className={styles.heroOverlay} />
+        <Container maxWidth="lg" className={styles.heroContent}>
+          <Typography variant="h2" className={styles.heroTitle}>
+            Hamlet Information System
+          </Typography>
+          <Typography variant="h6" className={styles.heroSubtitle}>
+            HIS memudahkan warga dan pengelola Desa Kalisuren untuk memeriksa
+            kebenaran laporan secara cepat, otomatis, dan akurat, sehingga
+            informasi yang beredar tetap tepercaya.
+          </Typography>
+          <Box className={styles.heroButtons}>
             <Button
               variant="contained"
               size="large"
               component={RouterLink}
               to="/login"
-              className={styles.heroButton}
+              className={styles.heroButtonPrimary}
             >
-              Mulai Sekarang
+              Mulai Verifikasi
             </Button>
-          </Container>
-        </Box>
+            <Button
+              variant="outlined"
+              size="large"
+              href="#features"
+              className={styles.heroButtonSecondary}
+            >
+              Lihat Cara Kerja
+            </Button>
+          </Box>
+        </Container>
       </Box>
 
-      {/* FEATURES SECTION */}
-      <Box className={styles.featuresSection}>
+      {/* FEATURES */}
+      <Box
+        id="features"
+        className={styles.featuresSection}
+        component="section"
+        aria-labelledby="fitur-title"
+      >
         <Container maxWidth="lg">
           <Typography
-            variant="h4"
+            id="fitur-title"
+            variant="h3"
             className={styles.sectionTitle}
             align="center"
             gutterBottom
           >
             Fitur Unggulan
           </Typography>
-          <Grid container spacing={4} justifyContent="center">
+          <Typography className={styles.sectionSubtitle} align="center">
+            Dibangun dengan praktik keamanan dan skalabilitas yang baik agar
+            nyaman dipakai oleh warga dan pengelola.
+          </Typography>
+
+          <Grid
+            container
+            spacing={4}
+            justifyContent="center"
+            className={styles.featuresGrid}
+          >
             <Grid item xs={12} sm={6} md={4}>
               <Box className={styles.featureCard}>
-                <SecurityIcon className={styles.featureIcon} />
+                <Box className={styles.iconWrap} aria-hidden>
+                  <SecurityIcon className={styles.featureIcon} />
+                </Box>
                 <Typography variant="h6" className={styles.featureTitle}>
                   Hoaks Checker
                 </Typography>
                 <Typography variant="body2" className={styles.featureDesc}>
-                  Periksa validitas informasi dengan cepat dan akurat.
+                  Verifikasi cepat untuk memfilter kabar bohong sebelum menyebar
+                  di warga.
                 </Typography>
               </Box>
             </Grid>
+
             <Grid item xs={12} sm={6} md={4}>
               <Box className={styles.featureCard}>
-                <VerifiedUserIcon className={styles.featureIcon} />
+                <Box className={styles.iconWrap} aria-hidden>
+                  <VerifiedUserIcon className={styles.featureIcon} />
+                </Box>
                 <Typography variant="h6" className={styles.featureTitle}>
                   Verifikasi Data
                 </Typography>
                 <Typography variant="body2" className={styles.featureDesc}>
-                  Proses verifikasi yang transparan dan terpercaya.
+                  Alur verifikasi transparan—data lebih tepercaya untuk
+                  keputusan sehari-hari.
                 </Typography>
               </Box>
             </Grid>
+
             <Grid item xs={12} sm={6} md={4}>
               <Box className={styles.featureCard}>
-                <GroupIcon className={styles.featureIcon} />
+                <Box className={styles.iconWrap} aria-hidden>
+                  <GroupIcon className={styles.featureIcon} />
+                </Box>
                 <Typography variant="h6" className={styles.featureTitle}>
                   Kolaborasi Multi-Peran
                 </Typography>
                 <Typography variant="body2" className={styles.featureDesc}>
-                  Dukungan peran Owner, Admin, dan User untuk pengelolaan yang
+                  Akses terarah (Owner, Admin, User) untuk proses yang rapi dan
                   terintegrasi.
                 </Typography>
               </Box>
@@ -114,19 +145,28 @@ const LandingPage = () => {
         </Container>
       </Box>
 
-      {/* CTA SECTION */}
-      <Box className={styles.ctaSection}>
-        <Container maxWidth="sm" className={styles.ctaContainer}>
-          <Typography variant="h5" className={styles.ctaTitle} gutterBottom>
-            Bangun Desa Cerdas Anda
+      {/* CTA */}
+      <Box
+        className={styles.ctaSection}
+        component="section"
+        aria-labelledby="cta-title"
+      >
+        <Container maxWidth="md" className={styles.ctaContainer}>
+          <Typography
+            id="cta-title"
+            variant="h4"
+            className={styles.ctaTitle}
+            gutterBottom
+          >
+            Bangun Desa Cerdas, Mulai Hari Ini
           </Typography>
           <Typography
             variant="body1"
             className={styles.ctaSubtitle}
             gutterBottom
           >
-            Bergabunglah sekarang untuk mewujudkan sistem informasi desa yang
-            efektif dan bebas hoaks.
+            Wujudkan komunikasi yang tertata dan data yang tepercaya. Coba HIS
+            sekarang juga.
           </Typography>
           <Button
             variant="contained"
@@ -135,22 +175,51 @@ const LandingPage = () => {
             to="/login"
             className={styles.ctaButton}
           >
-            Masuk
+            Masuk & Mulai Kelola
           </Button>
         </Container>
       </Box>
 
       {/* FOOTER */}
-      <Box component="footer" className={styles.footer}>
+      <Box component="footer" className={styles.footer} id="contact">
         <Container maxWidth="lg" className={styles.footerContent}>
-          <Typography variant="body2" align="center">
+          <Box className={styles.footerCols}>
+            <Box className={styles.footerBrand}>
+              <Box className={styles.brandDot} aria-hidden />
+              <Typography className={styles.footerBrandText}>
+                Hamlet Information System
+              </Typography>
+            </Box>
+            <Box className={styles.footerLinks}>
+              <Link
+                href="#features"
+                underline="none"
+                className={styles.footerLink}
+              >
+                Fitur
+              </Link>
+              <Link
+                component={RouterLink}
+                to="/login"
+                underline="none"
+                className={styles.footerLink}
+              >
+                Masuk
+              </Link>
+            </Box>
+          </Box>
+          <Typography
+            variant="body2"
+            align="center"
+            className={styles.footerCopy}
+          >
             © {new Date().getFullYear()} Hamlet Information System. All rights
             reserved.
           </Typography>
         </Container>
       </Box>
 
-      {/* Notifikasi berhasil logout */}
+      {/* Snackbar */}
       <Snackbar
         open={logoutSuccess}
         autoHideDuration={6000}
